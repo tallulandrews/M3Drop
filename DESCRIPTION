@@ -1,0 +1,9 @@
+Package: W3D
+Version: 1.0
+Date: 2015-09-29
+Title: Working With Weighted Dropouts
+Author: Tallulah Andrews <tallulandrews@gmail.com>
+Maintainer: Tallulah Andrews <tallulandrews@gmail.com>
+Depends: R (>= 3.0.4), RColorBrewer, gplots, bbmle, statmod
+Description: A package for working with single-cell RNASeq gene expression data that contains a large number of zero values (dropouts).
+License: BSD

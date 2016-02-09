@@ -1,0 +1,13 @@
+\name{}
+\alias{}
+\title{}
+\description{}
+\usage{}
+\arguments{
+  \item{}{}
+}
+\details{}
+\value{}
+\seealso{}
+\examples{}
+\keyword{}
