@@ -1,9 +1,9 @@
 # Modularize this stuff more sensibly
 #  Plotting Functions
-bg__dropout_plot_base <- function (expr_mat, weights = 1, xlim = NA, suppress.plot=FALSE) {
+bg__dropout_plot_base <- function (expr_mat, xlim = NA, suppress.plot=FALSE) {
 	require("RColorBrewer")
 	
-	gene_info = bg__calc_variables(expr_mat,weights);
+	gene_info = bg__calc_variables(expr_mat);
 
         xes = log(gene_info$s)/log(10);
         put_in_order = order(xes);
@@ -22,7 +22,7 @@ bg__dropout_plot_base <- function (expr_mat, weights = 1, xlim = NA, suppress.pl
 	        	plot(xes,gene_info$p, main="", ylab="Dropout Proportion", xlab="log(expression)", col = dens.col,pch=16)
 		}
 	}
-	invisible(list(P=gene_info$p, S=gene_info$s, xes=xes, data=expr_mat, weights=weights, order=put_in_order));
+	invisible(list(P=gene_info$p, S=gene_info$s, xes=xes, data=expr_mat, order=put_in_order));
 }
 
 bg__add_model_to_plot <- function(fitted_model, base_plot, lty=1, lwd=1, col="black",legend_loc = "topright") {
@@ -47,7 +47,7 @@ bg__highlight_genes <- function (base_plot, genes, colour="purple", pch=16) {
 	points(base_plot$xes[genes],base_plot$P[genes],col=colour, pch=pch)
 }
 
-bg__expression_heatmap <- function (genes, data, cell_labels=NA, gene_labels=NA, key_genes=NA, key_cells=NA) { # Should weighting be taken into account for heatmap clustering? - too much of a pain
+bg__expression_heatmap <- function (genes, data, cell_labels=NA, gene_labels=NA, key_genes=NA, key_cells=NA) { 
 	require("RColorBrewer")
 	require("gplots")
 	if(!is.numeric(genes)) {
@@ -128,24 +128,14 @@ bg__expression_heatmap <- function (genes, data, cell_labels=NA, gene_labels=NA,
 }
 
 # Model-fitting/manipulation Functions
-bg__calc_variables <- function(expr_mat, weights = 1) {
+bg__calc_variables <- function(expr_mat) {
         # Calc variables
-	if (length(dim(weights)) == 2 & prod(dim(weights) == dim(expr_mat))) {
-		p = rowZero_wgt(expr_mat,weights)/rowSums(weights);
-        	s = rowMeans_wgt(expr_mat,weights);
-		s_stderr = sqrt(rowVar_wgt(expr_mat,weights))/sqrt(rowSums(weights));
-		tmp = weights; tmp[expr_mat == 0] = 0;
-		s_stderr_nozero = sqrt(rowVar_wgt(expr_mat,tmp))/sqrt(rowSums(tmp));
-		p_stderr = sqrt(p*(1-p)/rowSums(weights));
-	} else {
-		print("Weights not provided or not same dimension as expression matrix. Using unweighted version.")
-	        p = apply(expr_mat,1,function(x){y = x[!is.na(x)]; sum(y==0)/length(y)});
-	        s = rowMeans(expr_mat, na.rm=T);
-		s_stderr = unlist(apply(expr_mat,1,sd))/sqrt(length(expr_mat[1,]));
-		tmp = expr_mat; tmp[tmp == 0] = NA
-		s_stderr_nozero = unlist(apply(tmp,1,sd, na.rm=T))/sqrt(rowSums(expr_mat>0));
-		p_stderr = sqrt(p*(1-p)/length(expr_mat[1,]));
-	}
+	p = apply(expr_mat,1,function(x){y = x[!is.na(x)]; sum(y==0)/length(y)});
+	s = rowMeans(expr_mat, na.rm=T);
+	s_stderr = unlist(apply(expr_mat,1,sd))/sqrt(length(expr_mat[1,]));
+	tmp = expr_mat; tmp[tmp == 0] = NA
+	s_stderr_nozero = unlist(apply(tmp,1,sd, na.rm=T))/sqrt(rowSums(expr_mat>0));
+	p_stderr = sqrt(p*(1-p)/length(expr_mat[1,]));
 	names(s) = rownames(expr_mat);
 	names(p) = rownames(expr_mat);
 	return(list(s = s, p = p, s_stderr = s_stderr, s_stderr_nozero = s_stderr_nozero, p_stderr = p_stderr))
@@ -284,8 +274,8 @@ bg__filter_cells <- function(expr_mat,labels=NA, suppress.plot=FALSE, threshold=
 
 # DE Genes functions
 
-bg__test_DE_K_equiv <- function (expr_mat, weights=1, fit=NA) {
-	gene_info = bg__calc_variables(expr_mat, weights);
+bg__test_DE_K_equiv <- function (expr_mat, fit=NA) {
+	gene_info = bg__calc_variables(expr_mat);
 	if (is.na(fit)) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
 	}
@@ -304,8 +294,8 @@ bg__test_DE_K_equiv <- function (expr_mat, weights=1, fit=NA) {
 	return(list(pval = pval, fold_change = effect_size))
 }
 # Use the fact that errors of proportions are well define by converting S to proportion detected equivalents?
-bg__test_DE_P_equiv <- function (expr_mat, weights=1, fit=NA) {
-	gene_info = bg__calc_variables(expr_mat, weights);
+bg__test_DE_P_equiv <- function (expr_mat,  fit=NA) {
+	gene_info = bg__calc_variables(expr_mat);
 	if (is.na(fit)) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
 	}
@@ -326,8 +316,8 @@ bg__test_DE_P_equiv <- function (expr_mat, weights=1, fit=NA) {
 }
 
 # Use the fact that S as a function of P is more stable to noise for the main part of the curve
-bg__test_DE_S_equiv <- function (expr_mat, weights=1, fit=NA, method="propagate") {
-	gene_info = bg__calc_variables(expr_mat, weights);
+bg__test_DE_S_equiv <- function (expr_mat, fit=NA, method="propagate") {
+	gene_info = bg__calc_variables(expr_mat);
 	if (is.na(fit[1])) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
 	}
@@ -360,8 +350,8 @@ bg__test_DE_S_equiv <- function (expr_mat, weights=1, fit=NA, method="propagate"
 	return(list(pval = pval, effect = effect_size))
 }
 
-bg__get_extreme_residuals <- function (expr_mat,weights=1, fit=NA, v_threshold=c(0.05,0.95), perc_most_extreme = NA, fdr_threshold = 0.1, direction="right", suppress.plot = FALSE) {
-	gene_info = bg__calc_variables(expr_mat, weights);
+bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95), perc_most_extreme = NA, fdr_threshold = 0.1, direction="right", suppress.plot = FALSE) {
+	gene_info = bg__calc_variables(expr_mat);
 	if (is.na(fit)) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
 	}
@@ -431,8 +421,8 @@ M3D_Clean_Data <- function(expr_mat, labels = NA, is.counts=TRUE, suppress.plot=
         return(list(data=expr_mat, labels=labels));
 }
 
-M3D_Dropout_Models <- function(expr_mat, weights = 1, xlim=NA) {
-	BasePlot = bg__dropout_plot_base(expr_mat, weights = weights, xlim = xlim);
+M3D_Dropout_Models <- function(expr_mat, xlim=NA) {
+	BasePlot = bg__dropout_plot_base(expr_mat, xlim = xlim);
 	MM = bg__fit_MM(BasePlot$P, BasePlot$S);
 	SCDE = bg__fit_logistic(BasePlot$P, BasePlot$S);
 	ZIFA = bg__fit_ZIFA(BasePlot$P, BasePlot$S);
@@ -442,11 +432,11 @@ M3D_Dropout_Models <- function(expr_mat, weights = 1, xlim=NA) {
 	invisible(list(MMfit = MM, LogiFit = SCDE, ExpoFit = ZIFA));
 }
 
-M3D_Differential_Expression <- function(expr_mat, weights=1, mt_method="bon", mt_threshold=0.05) {
-	BasePlot = bg__dropout_plot_base(expr_mat, weights = weights, xlim = NA);
+M3D_Differential_Expression <- function(expr_mat, mt_method="bon", mt_threshold=0.05) {
+	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA);
 	MM = bg__fit_MM(BasePlot$P, BasePlot$S);
 	sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
-	DEoutput = bg__test_DE_K_equiv(expr_mat, weights=weights, fit=MM);
+	DEoutput = bg__test_DE_K_equiv(expr_mat, fit=MM);
 
 	sig = which(p.adjust(DEoutput$pval, method=mt_method) < mt_threshold);
 	DEgenes = rownames(expr_mat)[sig];
@@ -480,16 +470,16 @@ M3D_Expression_Heatmap <- function(Genes, expr_mat, cell_labels=NA, interesting_
 	invisible(heatmap_output);
 }
 
-M3D_Get_Extremes <- function(expr_mat, weights=1, fdr_threshold = 0.1, percent = NA, v_threshold=c(0.05,0.95)) {
-	BasePlot = bg__dropout_plot_base(expr_mat, weights = weights, xlim = NA);
+M3D_Get_Extremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_threshold=c(0.05,0.95)) {
+	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA);
 	MM = bg__fit_MM(BasePlot$P, BasePlot$S);
 	sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
 	if (is.na(percent)) {
-		shifted_right = bg__get_extreme_residuals(expr_mat,weights, fit=MM, v_threshold=v_threshold, fdr_threshold = fdr_threshold, direction="right", suppress.plot=TRUE)
-		shifted_left  = bg__get_extreme_residuals(expr_mat,weights, fit=MM, v_threshold=v_threshold, fdr_threshold = fdr_threshold, direction="left",  suppress.plot=TRUE)
+		shifted_right = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, fdr_threshold = fdr_threshold, direction="right", suppress.plot=TRUE)
+		shifted_left  = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, fdr_threshold = fdr_threshold, direction="left",  suppress.plot=TRUE)
 	} else {
-		shifted_right = bg__get_extreme_residuals(expr_mat,weights, fit=MM, v_threshold=v_threshold, perc_most_extreme = percent, direction="right", suppress.plot=TRUE)
-		shifted_left  = bg__get_extreme_residuals(expr_mat,weights, fit=MM, v_threshold=v_threshold, perc_most_extreme = percent, direction="left",  suppress.plot=TRUE)
+		shifted_right = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, perc_most_extreme = percent, direction="right", suppress.plot=TRUE)
+		shifted_left  = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, perc_most_extreme = percent, direction="left",  suppress.plot=TRUE)
 
 	}
 	bg__highlight_genes(BasePlot, shifted_right, colour="orange");
