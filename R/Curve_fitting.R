@@ -82,14 +82,16 @@ bg__fit_ZIFA <- function(p,s) {
 	return(list(lambda=lambda,Lerr=Lerr,fitted_err = res_err,predictions=predicted, model=c("p ~ e^(-lambda*S^2)",paste("lambda =",round(lambda,digits=2))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))
 }
 
-M3D_Dropout_Models <- function(expr_mat, xlim=NA) {
-	BasePlot = bg__dropout_plot_base(expr_mat, xlim = xlim);
+M3D_Dropout_Models <- function(expr_mat, xlim=NA, suppress.plot=FALSE) {
+	BasePlot = bg__dropout_plot_base(expr_mat, xlim = xlim, suppress.plot=suppress.plot);
 	MM = bg__fit_MM(BasePlot$p, BasePlot$s);
 	SCDE = bg__fit_logistic(BasePlot$p, BasePlot$s);
 	ZIFA = bg__fit_ZIFA(BasePlot$p, BasePlot$s);
-	sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
-	sizeloc = bg__add_model_to_plot(SCDE, BasePlot, lty=2, lwd=2.5, col="magenta3",legend_loc = c(sizeloc$rect$left+sizeloc$rect$w,sizeloc$rect$top-sizeloc$rect$h-0.05));
-	sizeloc = bg__add_model_to_plot(ZIFA, BasePlot, lty=3, lwd=2.5, col="red",legend_loc = c(sizeloc$rect$left+sizeloc$rect$w,sizeloc$rect$top-sizeloc$rect$h-0.05));
+	if (!suppress.plot) {
+	  	sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
+		sizeloc = bg__add_model_to_plot(SCDE, BasePlot, lty=2, lwd=2.5, col="magenta3",legend_loc = c(sizeloc$rect$left+sizeloc$rect$w,sizeloc$rect$top-sizeloc$rect$h-0.05));
+		sizeloc = bg__add_model_to_plot(ZIFA, BasePlot, lty=3, lwd=2.5, col="red",legend_loc = c(sizeloc$rect$left+sizeloc$rect$w,sizeloc$rect$top-sizeloc$rect$h-0.05));
+	}
 	invisible(list(MMfit = MM, LogiFit = SCDE, ExpoFit = ZIFA));
 }
 
