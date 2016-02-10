@@ -150,3 +150,5 @@ M3D_Expression_Heatmap <- function(Genes, expr_mat, cell_labels=NA, interesting_
 	heatmap_output = bg__expression_heatmap(Genes, expr_mat, cell_labels=cell_labels, gene_labels=as.numeric(gene_labels), key_genes=as.character(marker_genes), key_cells=outlier_cells);
 	invisible(heatmap_output);
 }
+
+M3D_Get_Heatmap_Cell_Clusters <- function (heatmap_output, k) {cutree(as.hclust(heatmap_output$colDendrogram), k=k)}
