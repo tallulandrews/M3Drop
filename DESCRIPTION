@@ -4,6 +4,10 @@ Date: 2016-02-10
 Title: Michaelis-Menten Modelling of Dropouts
 Author: Tallulah Andrews <tallulandrews@gmail.com>
 Maintainer: Tallulah Andrews <tallulandrews@gmail.com>
-Depends: R (>= 3.0.4), RColorBrewer, gplots, bbmle, statmod, ROCR
-Description: A package for modelling single-cell RNASeq gene expression data which contains a large number of zero values (dropouts).
+Depends: R (>= 3.0.4)
+Imports: RColorBrewer, gplots, bbmle, statmod
+Suggests: ROCR, knitr
+VignetteBuilder: knitr
+Collate: basics.R, Plotting_fxns.R, Curve_fitting.R, Extremes.R, Normalization.R, Brennecke_implementation.R
+Description: A package for modelling zero-values (dropouts) in single-cell RNASeq data using the Michaelis-Menten equation.
 License: GPL-2
