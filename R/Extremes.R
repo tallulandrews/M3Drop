@@ -124,7 +124,7 @@ bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95
 ##### Assembled Analysis Chunks ####
 M3D_Differential_Expression <- function(expr_mat, mt_method="bon", mt_threshold=0.05) {
 	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA);
-	MM = bg__fit_MM(BasePlot$P, BasePlot$S);
+	MM = bg__fit_MM(BasePlot$p, BasePlot$s);
 	sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
 	DEoutput = bg__test_DE_K_equiv(expr_mat, fit=MM);
 
@@ -139,7 +139,7 @@ M3D_Differential_Expression <- function(expr_mat, mt_method="bon", mt_threshold=
 
 M3D_Get_Extremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_threshold=c(0.05,0.95)) {
 	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA);
-	MM = bg__fit_MM(BasePlot$P, BasePlot$S);
+	MM = bg__fit_MM(BasePlot$p, BasePlot$s);
 	sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
 	if (is.na(percent)) {
 		shifted_right = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, fdr_threshold = fdr_threshold, direction="right", suppress.plot=TRUE)
@@ -156,12 +156,12 @@ M3D_Get_Extremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_thre
 
 M3D_Test_Shift <- function(expr_mat, genes_to_test, name="") {
 	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA);
-	MM = bg__fit_MM(BasePlot$P, BasePlot$S);
+	MM = bg__fit_MM(BasePlot$p, BasePlot$s);
 	sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
 	bg_highlight_genes(BasePlot, genes_to_test, colour="purple");
 	title(main=name);
 
-	res = bg__horizontal_residuals_MM_log10(MM$K, BasePlot$P, BasePlot$S)
+	res = bg__horizontal_residuals_MM_log10(MM$K, BasePlot$p, BasePlot$s)
 	mu = mean(res); sigma = sd(res);
 	s_mu = mean(res[rownames(expr_mat) %in% as.character(genes_to_test)]);
 	Z = abs(s_mu-mu)/(sigma/sqrt(length(res)));

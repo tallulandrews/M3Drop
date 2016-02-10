@@ -22,7 +22,7 @@ bg__dropout_plot_base <- function (expr_mat, xlim = NA, suppress.plot=FALSE) {
 	        	plot(xes,gene_info$p, main="", ylab="Dropout Proportion", xlab="log(expression)", col = dens.col,pch=16)
 		}
 	}
-	invisible(list(P=gene_info$p, S=gene_info$s, xes=xes, data=expr_mat, order=put_in_order));
+	invisible(list(p=gene_info$p, s=gene_info$s, xes=xes, data=expr_mat, order=put_in_order));
 }
 
 bg__add_model_to_plot <- function(fitted_model, base_plot, lty=1, lwd=1, col="black",legend_loc = "topright") {
@@ -44,7 +44,7 @@ bg__highlight_genes <- function (base_plot, genes, colour="purple", pch=16) {
 		if (nomatch > 0) {warning(paste(nomatch, " genes could not be matched to data, they will not be highlighted."));}
 		genes = genes[!is.na(genes)];
 	}
-	points(base_plot$xes[genes],base_plot$P[genes],col=colour, pch=pch)
+	points(base_plot$xes[genes],base_plot$p[genes],col=colour, pch=pch)
 }
 
 bg__expression_heatmap <- function (genes, data, cell_labels=NA, gene_labels=NA, key_genes=NA, key_cells=NA) { 
