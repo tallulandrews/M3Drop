@@ -36,7 +36,7 @@ hidden__normalize <- function(data) {
 	# Combine UQ and detection rate adjusted normalization 
 	# Stephanie Hick, Mingziang Teng, Rafael A Irizarry "On the widespread and critical impact of systematic single-cell RNA-Seq data" http://dx.doi.org/10.1101/025528 
 	cell_zero = colSums(data == 0)/length(data[,1]);
-	uq = unlist(apply(data,2,bg__UQ));
+	uq = unlist(apply(data,2,hidden__UQ));
 	normfactor = (uq/median(uq)) * (median(cell_zero)/cell_zero); 
 	data = t(t(data)/normfactor);
 	return(data);

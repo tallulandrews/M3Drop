@@ -6,4 +6,4 @@ Author: Tallulah Andrews <tallulandrews@gmail.com>
 Maintainer: Tallulah Andrews <tallulandrews@gmail.com>
 Depends: R (>= 3.0.4), RColorBrewer, gplots, bbmle, statmod, ROCR
 Description: A package for modelling single-cell RNASeq gene expression data which contains a large number of zero values (dropouts).
-License: BSD
+License: GPL-2

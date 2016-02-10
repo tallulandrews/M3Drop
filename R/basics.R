@@ -34,7 +34,7 @@ hidden_getAUC <- function(gene, labels) {
 }
 
 bg__getmarkers <- function(expr_mat, labels) {
-        aucs = apply(expr_mat,1,getAUC,labels=labels)
+        aucs = apply(expr_mat,1,hidden_getAUC,labels=labels)
         auc_df <- data.frame(matrix(unlist(aucs), ncol=3, byrow=T))
         rownames(auc_df) = rownames(expr_mat)
         colnames(auc_df) = c("AUC","Group", "pval")
