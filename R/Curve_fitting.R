@@ -10,7 +10,7 @@ bg__fit_MM <- function (p,s) {
 	if (length(p) != length(s)) {
 		stop(print("Error: p and s not same length. Cannot fit Michaelis-Menten."))
 	}
-	require("bbmle")
+	#require("bbmle")
 	LL <- function(krt,sigma) {
 		R = log(p)/log(10)-log((1-(s/((krt+s)))))/log(10) #log normal error
 		R = suppressWarnings(dnorm(R,0,sigma,log=TRUE))
@@ -59,7 +59,7 @@ bg__fit_ZIFA <- function(p,s) {
 #	preddoubleX = fitted(doubleXfit);
 #	lambda=summary(doubleXfit)$parameters[1,1];
 #	return(list(predictions=preddoubleX, lambda=lambda, model=c("p ~ e^(-lambda*S^2)",paste("lambda =",signif(lambda,digits=2))),SSr = round(sum((residuals(doubleXfit))^2)),SAr = round(sum(abs(residuals(doubleXfit))))));
-	require("bbmle")
+	#require("bbmle")
 	LL <- function(lambda,sigma) {
 		R = p-exp(-lambda*s*s)
 		R = suppressWarnings(dnorm(R,0,sigma,log=TRUE))

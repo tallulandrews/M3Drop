@@ -168,7 +168,7 @@ M3D_Test_Shift <- function(expr_mat, genes_to_test, name="", suppress.plot=FALSE
 	MM = bg__fit_MM(BasePlot$p, BasePlot$s);
 	if (!suppress.plot) {
 		sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
-		bg_highlight_genes(BasePlot, genes_to_test, colour="purple");
+		bg__highlight_genes(BasePlot, genes_to_test, colour="purple");
 		title(main=name);
 	}
 

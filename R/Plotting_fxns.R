@@ -1,7 +1,7 @@
 # Modularize this stuff more sensibly
 #  Plotting Functions
 bg__dropout_plot_base <- function (expr_mat, xlim = NA, suppress.plot=FALSE) {
-	require("RColorBrewer")
+	#require("RColorBrewer")
 	
 	gene_info = bg__calc_variables(expr_mat);
 
@@ -49,8 +49,8 @@ bg__highlight_genes <- function (base_plot, genes, colour="purple", pch=16) {
 }
 
 bg__expression_heatmap <- function (genes, data, cell_labels=NA, gene_labels=NA, key_genes=NA, key_cells=NA) { 
-	require("RColorBrewer")
-	require("gplots")
+	#require("RColorBrewer")
+	#require("gplots")
 	if(!is.numeric(genes)) {
 		genes = match(genes, rownames(data));
 		nomatch = sum(is.na(genes));

@@ -15,7 +15,7 @@ bg__invert_MM <- function (K, p) {K*(1-p)/(p)}
 bg__horizontal_residuals_MM_log10 <- function (K, p, s) {log(s)/log(10) - log(bg__invert_MM(K,p))/log(10)}
 
 hidden_getAUC <- function(gene, labels) {
-        require("ROCR")
+        #require("ROCR")
         ranked=rank(gene);
         ms = aggregate(ranked~unlist(labels),FUN=mean); #Get average score for each cluster
         posgroup = as.character(unlist(ms[which(ms[,2]==max(ms[,2])),1])); #Get cluster with highest average score
