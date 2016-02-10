@@ -48,14 +48,19 @@ M3D_Clean_Data <- function(expr_mat, labels = NA, is.counts=TRUE, suppress.plot=
 	        expr_mat = expr_mat[!is_pseudo,];
 	}
 
-	expr_mat = bg__filter_cells(expr_mat, labels, suppress.plot = suppress.plot, threshold=min_detected_genes);
-
-        detected = rowSums(expr_mat > 0) > 3;
-        expr_mat = expr_mat[detected,];
+	data_list = bg__filter_cells(expr_mat, labels, suppress.plot = suppress.plot, threshold=min_detected_genes);
+	
+        detected = rowSums(data_list$expr_mat > 0) > 3;
+        expr_mat = data_list$expr_mat[detected,];
+	labels   = data_list$labels
 
 	spikes = grep("ercc",rownames(expr_mat), ignore.case=TRUE)
 	if (is.counts) {
-                totreads = colSums(expr_mat[-c(spikes),])
+		if (length(spikes) > 1) {
+	                totreads = colSums(expr_mat[-c(spikes),])
+		} else {
+			totreads = colSums(expr_mat);
+		}
                 cpm = t(t(expr_mat)/totreads)*1000000;
                 lowExpr = rowMeans(cpm) < 10^-5;
                 cpm=cpm[!lowExpr,];
