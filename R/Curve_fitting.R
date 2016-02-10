@@ -12,7 +12,14 @@ bg__fit_MM <- function (p,s) {
 	}
 	#require("bbmle")
 	LL <- function(krt,sigma) {
-		R = log(p)/log(10)-log((1-(s/((krt+s)))))/log(10) #log normal error
+		R = p-(1-(s/((krt+s))))
+		R = suppressWarnings(dnorm(R,0,sigma,log=TRUE))
+		-sum(R)
+	}
+	LL_s <- function(krt,sigma) {
+		p_nozero = p[p<1 & s > 0 & p>0];
+		s_nozero = s[p<1 & s > 0 & p>0];
+		R = log(s_nozero)/log(10)-log(krt*p_nozero/(1-p_nozero))/log(10); #horizontal residuals are log-normally distributed
 		R = suppressWarnings(dnorm(R,0,sigma,log=TRUE))
 		-sum(R)
 	}
