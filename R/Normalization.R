@@ -1,10 +1,10 @@
 # Normalization Functions
 hidden__UQ <- function(x){quantile(x[x>0],0.75)};
 
-bg__filter_cells <- function(expr_mat,labels=NA, suppress.plot=FALSE, threshold=NA) {
+bg__filter_cells <- function(expr_mat,labels=NA, suppress.plot=FALSE, min_detected_genes=NA) {
 	num_detected =  colSums(expr_mat > 0);
-	if (!is.na(threshold)) {
-		low_quality = num_detected < threshold;
+	if (!is.na(min_detected_genes)) {
+		low_quality = num_detected < min_detected_genes;
 	} else {
 		num_zero = colSums(expr_mat == 0);
 		cell_zero = num_zero/length(expr_mat[,1]);
@@ -48,7 +48,7 @@ M3D_Clean_Data <- function(expr_mat, labels = NA, is.counts=TRUE, suppress.plot=
 	        expr_mat = expr_mat[!is_pseudo,];
 	}
 
-	data_list = bg__filter_cells(expr_mat, labels, suppress.plot = suppress.plot, threshold=min_detected_genes);
+	data_list = bg__filter_cells(expr_mat, labels, suppress.plot = suppress.plot, min_detected_genes=min_detected_genes);
 	
         detected = rowSums(data_list$expr_mat > 0) > 3;
         expr_mat = data_list$expr_mat[detected,];
