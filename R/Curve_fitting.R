@@ -81,8 +81,8 @@ M3D_Dropout_Models <- function(expr_mat, xlim=NA) {
 	SCDE = bg__fit_logistic(BasePlot$p, BasePlot$s);
 	ZIFA = bg__fit_ZIFA(BasePlot$p, BasePlot$s);
 	sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
-	sizeloc = bg__add_model_to_plot(SCDE, BasePlot, lty=2, lwd=2.5, col="grey35",legend_loc = c(sizeloc$rect$left+sizeloc$rect$w,sizeloc$rect$top-sizeloc$rect$h-0.05));
-	sizeloc = bg__add_model_to_plot(ZIFA, BasePlot, lty=3, lwd=2.5, col="grey65",legend_loc = c(sizeloc$rect$left+sizeloc$rect$w,sizeloc$rect$top-sizeloc$rect$h-0.05));
+	sizeloc = bg__add_model_to_plot(SCDE, BasePlot, lty=2, lwd=2.5, col="magenta3",legend_loc = c(sizeloc$rect$left+sizeloc$rect$w,sizeloc$rect$top-sizeloc$rect$h-0.05));
+	sizeloc = bg__add_model_to_plot(ZIFA, BasePlot, lty=3, lwd=2.5, col="red",legend_loc = c(sizeloc$rect$left+sizeloc$rect$w,sizeloc$rect$top-sizeloc$rect$h-0.05));
 	invisible(list(MMfit = MM, LogiFit = SCDE, ExpoFit = ZIFA));
 }
 

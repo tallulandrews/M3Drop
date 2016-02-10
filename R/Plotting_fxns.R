@@ -45,6 +45,7 @@ bg__highlight_genes <- function (base_plot, genes, colour="purple", pch=16) {
 		genes = genes[!is.na(genes)];
 	}
 	points(base_plot$xes[genes],base_plot$p[genes],col=colour, pch=pch)
+	invisible(cbind(base_plot$s[genes],base_plot$p[genes]));
 }
 
 bg__expression_heatmap <- function (genes, data, cell_labels=NA, gene_labels=NA, key_genes=NA, key_cells=NA) { 

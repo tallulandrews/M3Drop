@@ -5,7 +5,7 @@ Brennecke_getVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE,
         rowVars <- function(x) { unlist(apply(x,1,var))}
 
         colGenes = "black"
-        colSp = "grey35"
+        colSp = "blue"
 
 
         fullCountTable <- expr_mat;
@@ -64,6 +64,10 @@ Brennecke_getVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE,
                 # Plot the genes, use a different color if they are highly variable
                 points( meansGenes, cv2Genes, pch=20, cex=.2,
                         col = ifelse( padj < .1, "#C0007090", colGenes ) )
+		# Plot/highlight the spike-ins if they are different from the genes
+		if (length(meansSp) < length(meansGenes)) {
+			points(meansSp, cv2Sp, pch=20, cex=.5, col=colSp)
+		}
                 # Add the technical noise fit
                 xg <- 10^seq( -2, 6, length.out=1000 )
                 lines( xg, (a1)/xg + a0, col="#FF000080", lwd=3 )

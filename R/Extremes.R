@@ -20,7 +20,7 @@ bg__test_DE_K_equiv <- function (expr_mat, fit=NA) {
 	return(list(pval = pval, fold_change = effect_size))
 }
 # Use the fact that errors of proportions are well define by converting S to proportion detected equivalents?
-bg__test_DE_P_equiv <- function (expr_mat,  fit=NA) {
+hidden__test_DE_P_equiv <- function (expr_mat,  fit=NA) {
 	gene_info = bg__calc_variables(expr_mat);
 	if (is.na(fit)) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
@@ -42,7 +42,7 @@ bg__test_DE_P_equiv <- function (expr_mat,  fit=NA) {
 }
 
 # Use the fact that S as a function of P is more stable to noise for the main part of the curve
-bg__test_DE_S_equiv <- function (expr_mat, fit=NA, method="propagate") {
+hidden__test_DE_S_equiv <- function (expr_mat, fit=NA, method="propagate") {
 	gene_info = bg__calc_variables(expr_mat);
 	if (is.na(fit[1])) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
@@ -122,25 +122,32 @@ bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95
 	}
 }
 ##### Assembled Analysis Chunks ####
-M3D_Differential_Expression <- function(expr_mat, mt_method="bon", mt_threshold=0.05) {
-	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA);
+M3D_Differential_Expression <- function(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE) {
+	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
 	MM = bg__fit_MM(BasePlot$p, BasePlot$s);
-	sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
+	if (!suppress.plot) {
+		sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
+	}
 	DEoutput = bg__test_DE_K_equiv(expr_mat, fit=MM);
 
 	sig = which(p.adjust(DEoutput$pval, method=mt_method) < mt_threshold);
 	DEgenes = rownames(expr_mat)[sig];
 	DEgenes = DEgenes[!is.na(DEgenes)];
-	bg__highlight_genes(BasePlot, DEgenes);
+	if (!suppress.plot) {
+		bg__highlight_genes(BasePlot, DEgenes);
+	}
 	
 	TABLE = data.frame(Gene = DEgenes, p.value = DEoutput$pval[sig], q.value= p.adjust(DEoutput$pval, method=mt_method)[sig])
 	return(TABLE)
 }
 
-M3D_Get_Extremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_threshold=c(0.05,0.95)) {
-	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA);
+M3D_Get_Extremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_threshold=c(0.05,0.95), suppress.plot=FALSE) {
+	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
 	MM = bg__fit_MM(BasePlot$p, BasePlot$s);
-	sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
+	if (!suppress.plot) {
+		sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
+	}
+
 	if (is.na(percent)) {
 		shifted_right = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, fdr_threshold = fdr_threshold, direction="right", suppress.plot=TRUE)
 		shifted_left  = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, fdr_threshold = fdr_threshold, direction="left",  suppress.plot=TRUE)
@@ -149,17 +156,21 @@ M3D_Get_Extremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_thre
 		shifted_left  = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, perc_most_extreme = percent, direction="left",  suppress.plot=TRUE)
 
 	}
-	bg__highlight_genes(BasePlot, shifted_right, colour="orange");
-	bg__highlight_genes(BasePlot, shifted_left, colour="purple");
+	if (!suppress.plot) {
+		bg__highlight_genes(BasePlot, shifted_right, colour="orange");
+		bg__highlight_genes(BasePlot, shifted_left, colour="purple");
+	}
 	return(list(left=shifted_left,right=shifted_right));
 }
 
-M3D_Test_Shift <- function(expr_mat, genes_to_test, name="") {
-	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA);
+M3D_Test_Shift <- function(expr_mat, genes_to_test, name="", suppress.plot=FALSE) {
+	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
 	MM = bg__fit_MM(BasePlot$p, BasePlot$s);
-	sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
-	bg_highlight_genes(BasePlot, genes_to_test, colour="purple");
-	title(main=name);
+	if (!suppress.plot) {
+		sizeloc = bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
+		bg_highlight_genes(BasePlot, genes_to_test, colour="purple");
+		title(main=name);
+	}
 
 	res = bg__horizontal_residuals_MM_log10(MM$K, BasePlot$p, BasePlot$s)
 	mu = mean(res); sigma = sd(res);
@@ -167,9 +178,4 @@ M3D_Test_Shift <- function(expr_mat, genes_to_test, name="") {
 	Z = abs(s_mu-mu)/(sigma/sqrt(length(res)));
 	pval = pnorm(Z, lower.tail=TRUE)
 	return(list(sample=s_mu, pop=mu, p.value=pval));
-}
-
-	
-
-
 }
