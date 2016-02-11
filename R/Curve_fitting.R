@@ -72,19 +72,19 @@ bg__fit_ZIFA <- function(p,s) {
 #	lambda=summary(doubleXfit)$parameters[1,1];
 #	return(list(predictions=preddoubleX, lambda=lambda, model=c("p ~ e^(-lambda*S^2)",paste("lambda =",signif(lambda,digits=2))),SSr = round(sum((residuals(doubleXfit))^2)),SAr = round(sum(abs(residuals(doubleXfit))))));
 	#require("bbmle")
-	LL <- function(lambda,sigma) {
-		R = p-exp(-lambda*s*s)
-		R = suppressWarnings(dnorm(R,0,sigma,log=TRUE))
-		-sum(R)
-	}
-	fit = mle2(LL,start=list(lambda=0.01, sigma=0.25))
-	thing = summary(fit)
-	lambda = attributes(summary(fit))$coef[1,1]
+#	LL <- function(lambda) {
+#		R = p-exp(-lambda*s*s)
+#		R = suppressWarnings(dnorm(R,0,0.1,log=TRUE))
+#		-sum(R)
+#	}
+#	fit = mle2(LL,start=list(lambda=180/(mean(s)^2)))
+	fit = lm(log(p[p>0])~-1+s[p>0]^2)
+	lambda = fit$coeff[1]
 	res_err = attributes(summary(fit))$coef[2,1]
-	Lerr = attributes(summary(fit))$coef[1,2]
+	Lerr = summary(fit)$coeff[1,2]
 	predicted = exp(-lambda*s*s)
 	residuals = p-predicted
-	return(list(lambda=lambda,Lerr=Lerr,fitted_err = res_err,predictions=predicted, model=c("p ~ e^(-lambda*S^2)",paste("lambda =",round(lambda,digits=2))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))
+	return(list(lambda=lambda,Lerr=Lerr,fitted_err = res_err,predictions=predicted, model=c("p ~ e^(-lambda*S^2)",paste("lambda =",signif(lambda,digits=2))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))
 }
 
 M3D_Dropout_Models <- function(expr_mat, xlim=NA, suppress.plot=FALSE) {

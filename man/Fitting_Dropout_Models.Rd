@@ -16,9 +16,9 @@
   \item{s}{a vector of mean expression values for each gene. Must be the same order & length as p.}
 }
 \details{Fits one of different models to the relationship between dropout rate and mean expression. The three models are: 
-		\code{bg__fit_MM} : the Michaelis-Menten function \deqn{P=1-\frac{S}{S+K}}{P = 1 - S/(K+S)} (see: [1]). Fit using mle2 using normally distributed error.
-		\code{bg__fit_logistic} : a logistic regression between P and log base 10 of S (used by [2]). Fit using glm.
-		\code{bg__fit_ZIFA} : a double exponential \deqn{P = e^{\lambda S^2}}{P = e^(-lambda*S^2)} (used by [3]). Fit using mle2 using normally distributed error.
+		\code{bg__fit_MM} : the Michaelis-Menten function \deqn{P=1-\frac{S}{S+K}}{P = 1 - S/(K+S)} (see: [1]). Fit using \code{mle2} using normally distributed error.
+		\code{bg__fit_logistic} : a logistic regression between P and log base 10 of S (used by [2]). Fit using \code{glm}.
+		\code{bg__fit_ZIFA} : a double exponential \deqn{P = e^{\lambda S^2}}{P = e^(-lambda*S^2)} (used by [3]). Fit using \code{lm} after log-transformation.
 }
 \value{Named list including:
 	K,fitted_err/B0,B1/lambda,fitted_err : the fitted parameters
