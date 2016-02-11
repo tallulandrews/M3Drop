@@ -43,7 +43,8 @@ bg__fit_logistic <- function(p,s) {
         predlog = fitted(logistic)
 	fullpredictions = rep(0, times=length(s));
 	fullpredictions[s>0] = predlog
-	return(list(predictions=fullpredictions, B0 = logistic$coeff[1], B1=logistic$coeff[2] ,model=c( "Logistic", paste("Intercept =",round(logistic$coeff[1],digits=3)),paste("Coeff =",round(logistic$coeff[2],digits=3))),SSr=round(sum((fitted(logistic)-p)^2)),SAr=round(sum(abs(fitted(logistic)-p)))));
+	res = fullpredictions-p;
+	return(list(predictions=fullpredictions, B0 = logistic$coeff[1], B1=logistic$coeff[2] ,model=c( "Logistic", paste("Intercept =",round(logistic$coeff[1],digits=3)),paste("Coeff =",round(logistic$coeff[2],digits=3))),SSr=round(sum(res^2)),SAr=round(sum(abs(res)))));
 #	require("bbmle")
 #	LL <- function(B0,B1,sigma) {
 #		R = p-(1/(1+exp(-B0+B1*log(s)/log(10))))
