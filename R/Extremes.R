@@ -53,7 +53,7 @@ hidden__test_DE_S_equiv <- function (expr_mat, fit=NA, method="propagate") {
 	S_mean = gene_info$s
 	S_err = gene_info$s_stderr
 	K_err = fit$Kerr;
-	S_equiv = bg__invert_MM(fit$K,p_obs);
+	S_equiv = hidden__invert_MM(fit$K,p_obs);
 
 	## Monte Carlo method to estimate error around S_equiv ##
 	MC_err <- function (p_base) {
@@ -61,7 +61,7 @@ hidden__test_DE_S_equiv <- function (expr_mat, fit=NA, method="propagate") {
 		p_rand = p_rand[p_rand > 0 & p_rand < 1]
 		K_rand = rnorm(length(p_rand),fit$K,sd = K_err);
 		K_rand[K_rand < 1] = 1;
-		S_equiv_rand = bg__invert_MM(K_rand, p_rand)
+		S_equiv_rand = hidden__invert_MM(K_rand, p_rand)
 		sd(S_equiv_rand)
 	}
 	if (method == "MC") {
@@ -76,7 +76,7 @@ hidden__test_DE_S_equiv <- function (expr_mat, fit=NA, method="propagate") {
 	return(list(pval = pval, effect = effect_size))
 }
 
-bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95), perc_most_extreme = NA, fdr_threshold = 0.1, direction="right", suppress.plot = FALSE) {
+bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95), percent = NA, fdr_threshold = 0.1, direction="right", suppress.plot = FALSE) {
 	gene_info = bg__calc_variables(expr_mat);
 	if (is.na(fit)) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
@@ -84,7 +84,7 @@ bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95
 	res = bg__horizontal_residuals_MM_log10(fit$K, gene_info$p, gene_info$s)
 	res = res[gene_info$p < max(v_threshold) & gene_info$p > min(v_threshold)]
 
-	if (is.na(perc_most_extreme)) {
+	if (is.na(percent)) {
 		mu = mean(res); sigma = sd(res);
 		# deal with potential bi-modality
 		if (sum(res > mu-sigma & res < mu+sigma) < 0.5) { # should be 0.68 theoretically
@@ -113,10 +113,10 @@ bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95
 		return(names(pval)[sig]);
 	} else {
 		if (direction=="right") {
-			cut_off = quantile(res,prob=1-perc_most_extreme);
+			cut_off = quantile(res,prob=1-percent);
 			return(names(res)[res > cut_off]);
 		} else {
-			cut_off = quantile(res,prob=perc_most_extreme);
+			cut_off = quantile(res,prob=percent);
 			return(names(res)[res < cut_off]);
 		}
 	}
@@ -152,8 +152,8 @@ M3D_Get_Extremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_thre
 		shifted_right = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, fdr_threshold = fdr_threshold, direction="right", suppress.plot=TRUE)
 		shifted_left  = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, fdr_threshold = fdr_threshold, direction="left",  suppress.plot=TRUE)
 	} else {
-		shifted_right = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, perc_most_extreme = percent, direction="right", suppress.plot=TRUE)
-		shifted_left  = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, perc_most_extreme = percent, direction="left",  suppress.plot=TRUE)
+		shifted_right = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, percent = percent, direction="right", suppress.plot=TRUE)
+		shifted_left  = bg__get_extreme_residuals(expr_mat, fit=MM, v_threshold=v_threshold, percent = percent, direction="left",  suppress.plot=TRUE)
 
 	}
 	if (!suppress.plot) {

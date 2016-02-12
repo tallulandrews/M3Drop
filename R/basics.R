@@ -11,8 +11,8 @@ bg__calc_variables <- function(expr_mat) {
 	return(list(s = s, p = p, s_stderr = s_stderr, s_stderr_nozero = s_stderr_nozero, p_stderr = p_stderr))
 }
 
-bg__invert_MM <- function (K, p) {K*(1-p)/(p)}
-bg__horizontal_residuals_MM_log10 <- function (K, p, s) {log(s)/log(10) - log(bg__invert_MM(K,p))/log(10)}
+hidden__invert_MM <- function (K, p) {K*(1-p)/(p)}
+bg__horizontal_residuals_MM_log10 <- function (K, p, s) {log(s)/log(10) - log(hidden__invert_MM(K,p))/log(10)}
 
 hidden_getAUC <- function(gene, labels) {
         require("ROCR")
