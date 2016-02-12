@@ -173,9 +173,11 @@ M3D_Test_Shift <- function(expr_mat, genes_to_test, name="", suppress.plot=FALSE
 	}
 
 	res = bg__horizontal_residuals_MM_log10(MM$K, BasePlot$p, BasePlot$s)
-	mu = mean(res); sigma = sd(res);
-	s_mu = mean(res[rownames(expr_mat) %in% as.character(genes_to_test)]);
-	Z = abs(s_mu-mu)/(sigma/sqrt(length(res)));
-	pval = pnorm(Z, lower.tail=TRUE)
-	return(list(sample=s_mu, pop=mu, p.value=pval));
+	res[is.infinite(res)] = NA;
+	mu = median(res, na.rm=TRUE); #sigma = sd(res, na.rm=TRUE);
+	s_mu = median(res[rownames(expr_mat) %in% as.character(genes_to_test)], na.rm=TRUE);
+	#Z = abs(s_mu-mu)/(sigma/sqrt(length(res)));
+	#pval = pnorm(Z, lower.tail=TRUE)
+	pval=suppressWarnings(wilcox.test(res[rownames(expr_mat) %in% as.character(genes_to_test)], na.rm=TRUE)$p.value)
+	return(data.frame(sample=s_mu, pop=mu, p.value=pval));
 }
