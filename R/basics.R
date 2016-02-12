@@ -33,7 +33,10 @@ hidden_getAUC <- function(gene, labels) {
         return(c(val,posgroup,pval))
 }
 
-bg__getmarkers <- function(expr_mat, labels) {
+M3D_getmarkers <- function(expr_mat, labels) {
+	if (length(labels) != length(expr_mat[1,])) {
+		stop("Length of labels does not match number of cells.")
+	}
         aucs = apply(expr_mat,1,hidden_getAUC,labels=labels)
         auc_df <- data.frame(matrix(unlist(aucs), ncol=3, byrow=T))
         rownames(auc_df) = rownames(expr_mat)
