@@ -48,31 +48,34 @@ bg__highlight_genes <- function (base_plot, genes, colour="purple", pch=16) {
 	invisible(cbind(base_plot$s[genes],base_plot$p[genes]));
 }
 
-bg__expression_heatmap <- function (genes, data, cell_labels=NA, gene_labels=NA, key_genes=NA, key_cells=NA) { 
+bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels=NA, key_genes=genes, key_cells=NA) { 
 	#require("RColorBrewer")
 	#require("gplots")
 	if(!is.numeric(genes)) {
-		genes = match(genes, rownames(data));
-		nomatch = sum(is.na(genes));
+		new_genes = match(genes, rownames(expr_mat));
+		nomatch = sum(is.na(new_genes));
 		if (nomatch > 0) {warning(paste(nomatch, " genes could not be matched to data, they will not be included in the heatmap."));}
-		genes = genes[!is.na(genes)];
+		if (mean(key_genes==genes)==1) {
+			key_genes = new_genes[!is.na(new_genes)];
+		}
+		genes = new_genes[!is.na(new_genes)];
 	}
 	if (length(genes) < 1) {warning("No genes for heatmap.");return();}
 	# Plot heatmap of expression
 	heatcolours <- rev(brewer.pal(11,"RdBu"))
 	col_breaks = c(-100,seq(-2,2,length=10),100)
-	heat_data = as.matrix(data[genes,])
+	heat_data = as.matrix(expr_mat[genes,])
 	heat_data = log(heat_data+1)/log(2);
 	ColColors = rep("white", times=length(heat_data[1,]))
 	RowColors = rep("white", times=length(heat_data[,1]))
 	# remove row & column labels
 	rownames(heat_data) = rep("", length(heat_data[,1]));
 	if (!is.na(key_genes)) {
-		rownames(heat_data)[rownames(data[genes,]) %in% key_genes] = rownames(data[genes,])[rownames(data[genes,]) %in% key_genes]; 
+		rownames(heat_data)[rownames(expr_mat[genes,]) %in% key_genes] = rownames(expr_mat[genes,])[rownames(expr_mat[genes,]) %in% key_genes]; 
 	}
 	colnames(heat_data) = rep("", length(heat_data[1,]));
 	if (!is.na(key_cells)) {
-		colnames(heat_data)[colnames(data[genes,]) %in% key_cells] = colnames(data[genes,])[colnames(data[genes,]) %in% key_cells]; 
+		colnames(heat_data)[colnames(expr_mat[genes,]) %in% key_cells] = colnames(expr_mat[genes,])[colnames(expr_mat[genes,]) %in% key_cells]; 
 	}
 	if (!is.na(cell_labels[1])) {
 		colours = as.factor(cell_labels)
@@ -128,26 +131,26 @@ bg__expression_heatmap <- function (genes, data, cell_labels=NA, gene_labels=NA,
 	invisible(heatmap_output);
 }
 
-M3D_Expression_Heatmap <- function(Genes, expr_mat, cell_labels=NA, interesting_genes=NA, marker_genes=NA, outlier_cells=NA) {
+M3D_Expression_Heatmap <- function(genes, expr_mat, cell_labels=NA, interesting_genes=NA, key_genes=genes, key_cells=NA) {
 	# Converted known DE genes into heatmap labels 
-	gene_labels = rep(1, times = length(Genes));
+	gene_labels = rep(1, times = length(genes));
 	if (is.na(interesting_genes)) {
 		gene_labels=NA
 	}
  	if (is.list(interesting_genes)) {
                 for (i in 1:length(interesting_genes)) {
-                        gene_labels[Genes %in% interesting_genes[[i]]] = i+1;
+                        gene_labels[genes %in% interesting_genes[[i]]] = i+1;
                 }
         } else {
-                gene_labels[Genes %in% interesting_genes] = 2;
+                gene_labels[genes %in% interesting_genes] = 2;
         }
-	if (is.numeric(marker_genes) | is.logical(marker_genes)) {
-		marker_genes = rownames(expr_mat)[marker_genes];
+	if (is.numeric(key_genes) | is.logical(key_genes)) {
+		key_genes = rownames(expr_mat)[key_genes];
 	}
-	if (is.numeric(outlier_cells) | is.logical(outlier_cells)) {
-		outlier_cells = rownames(expr_mat)[outlier_cells];
+	if (is.numeric(key_cells) | is.logical(key_cells)) {
+		key_cells = rownames(expr_mat)[key_cells];
 	}
-	heatmap_output = bg__expression_heatmap(Genes, expr_mat, cell_labels=cell_labels, gene_labels=as.numeric(gene_labels), key_genes=as.character(marker_genes), key_cells=outlier_cells);
+	heatmap_output = bg__expression_heatmap(genes, expr_mat, cell_labels=cell_labels, gene_labels=as.numeric(gene_labels), key_genes=as.character(key_genes), key_cells=key_cells);
 	invisible(heatmap_output);
 }
 
