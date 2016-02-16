@@ -25,8 +25,8 @@ bg__filter_cells <- function(expr_mat,labels=NA, suppress.plot=FALSE, min_detect
 		}
 	}
 	if (sum(low_quality) > 0) {
+		if (length(labels)==length(expr_mat[1,])) {labels = labels[!low_quality]}
 		expr_mat = expr_mat[,!low_quality];
-		if (!is.na(labels)) {labels = labels[!low_quality]}
 	}
 	return(list(expr_mat = expr_mat, labels = labels));
 }
