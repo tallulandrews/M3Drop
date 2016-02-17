@@ -12,7 +12,6 @@
   \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
   \item{cell_labels}{factor of labels for each cell in the expression matrix that will to coloured in a top bar of the heatmap.}
   \item{interesting_genes}{list of vectors of gene names that will be used to colour the bar at the top of the heatmap.}
-  \item{gene_labels}{factor of labels for each gene in the expression matrix t will be used to colour the bar at the side of the heatmap.}
   \item{key_genes}{a character vector of gene names to be labelled on the heatmap.}
   \item{key_cells}{a character vector of cells to be labelled on the heatmap.}
 }
