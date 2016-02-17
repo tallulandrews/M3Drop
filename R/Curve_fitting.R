@@ -78,13 +78,14 @@ bg__fit_ZIFA <- function(p,s) {
 #		-sum(R)
 #	}
 #	fit = mle2(LL,start=list(lambda=180/(mean(s)^2)))
-	fit = lm(log(p[p>0])~-1+s[p>0]^2)
+	p_nozero = p; p_nozero[p == 0] = min(p[p>0])/10
+	fit = lm(log(p_nozero)~-1+s^2)
 	lambda = fit$coeff[1]
 	res_err = attributes(summary(fit))$coef[2,1]
 	Lerr = summary(fit)$coeff[1,2]
-	predicted = exp(-lambda*s*s)
+	predicted = exp(lambda*s*s)
 	residuals = p-predicted
-	return(list(lambda=lambda,Lerr=Lerr,fitted_err = res_err,predictions=predicted, model=c("p ~ e^(-lambda*S^2)",paste("lambda =",signif(lambda,digits=2))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))
+	return(list(lambda=-lambda,Lerr=Lerr,fitted_err = res_err,predictions=predicted, model=c("p ~ e^(-lambda*S^2)",paste("lambda =",signif(lambda,digits=2))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))
 }
 
 M3D_Dropout_Models <- function(expr_mat, xlim=NA, suppress.plot=FALSE) {
