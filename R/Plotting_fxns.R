@@ -42,7 +42,7 @@ bg__highlight_genes <- function (base_plot, genes, colour="purple", pch=16) {
 		genes = match(as.character(genes), rownames(base_plot$data));
 		nomatch = sum(is.na(genes));
 		if (nomatch > 0) {warning(paste(nomatch, " genes could not be matched to data, they will not be highlighted."));}
-		if (nomatch == length(genes)) {invisible(cbind(c(NA,NA)c(NA,NA)))}
+		if (nomatch == length(genes)) {invisible(cbind(c(NA,NA),c(NA,NA)))}
 		genes = genes[!is.na(genes)];
 	}
 	points(base_plot$xes[genes],base_plot$p[genes],col=colour, pch=pch)
