@@ -42,6 +42,7 @@ bg__highlight_genes <- function (base_plot, genes, colour="purple", pch=16) {
 		genes = match(as.character(genes), rownames(base_plot$data));
 		nomatch = sum(is.na(genes));
 		if (nomatch > 0) {warning(paste(nomatch, " genes could not be matched to data, they will not be highlighted."));}
+		if (nomatch == length(genes)) {invisible(cbind(c(NA,NA)c(NA,NA)))}
 		genes = genes[!is.na(genes)];
 	}
 	points(base_plot$xes[genes],base_plot$p[genes],col=colour, pch=pch)
@@ -55,8 +56,10 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 		new_genes = match(genes, rownames(expr_mat));
 		nomatch = sum(is.na(new_genes));
 		if (nomatch > 0) {warning(paste(nomatch, " genes could not be matched to data, they will not be included in the heatmap."));}
+		if (length(key_genes) == length(genes)) {
 		if (mean(key_genes==genes)==1) {
 			key_genes = new_genes[!is.na(new_genes)];
+		}
 		}
 		genes = new_genes[!is.na(new_genes)];
 	}
@@ -70,11 +73,11 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 	RowColors = rep("white", times=length(heat_data[,1]))
 	# remove row & column labels
 	rownames(heat_data) = rep("", length(heat_data[,1]));
-	if (!is.na(key_genes)) {
+	if (!is.na(key_genes[1])) {
 		rownames(heat_data)[rownames(expr_mat[genes,]) %in% key_genes] = rownames(expr_mat[genes,])[rownames(expr_mat[genes,]) %in% key_genes]; 
 	}
 	colnames(heat_data) = rep("", length(heat_data[1,]));
-	if (!is.na(key_cells)) {
+	if (!is.na(key_cells[1])) {
 		colnames(heat_data)[colnames(expr_mat[genes,]) %in% key_cells] = colnames(expr_mat[genes,])[colnames(expr_mat[genes,]) %in% key_cells]; 
 	}
 	if (!is.na(cell_labels[1])) {
@@ -134,7 +137,7 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 M3D_Expression_Heatmap <- function(genes, expr_mat, cell_labels=NA, interesting_genes=NA, key_genes=genes, key_cells=NA) {
 	# Converted known DE genes into heatmap labels 
 	gene_labels = rep(1, times = length(genes));
-	if (is.na(interesting_genes)) {
+	if (is.na(interesting_genes[1])) {
 		gene_labels=NA
 	}
  	if (is.list(interesting_genes)) {

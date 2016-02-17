@@ -277,8 +277,8 @@ ConvertSetstoTable <- function(set1, set2, set3, names)
 M3D_ThreeSet_Venn <- function(set1,set2,set3,names){
   table = ConvertSetstoTable(as.character(set1), as.character(set2), as.character(set3), names=names)
   nicer_table = table
-  if (max(table$table) > 10*median(table$table)) {
-    bigones = table$table > 10*median(table$table);
+  if (max(table$table) > 5*mean(table$table)) {
+    bigones = table$table > 5*mean(table$table);
     nicer_table$table[bigones] = table$table[bigones]/5
   }
   if (sum(table$table == 0) > 1) {
