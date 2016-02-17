@@ -1,4 +1,3 @@
-exportPattern("bg__*")
 exportPattern("M3D_*")
 export(Brennecke_getVariableGenes)
 import(RColorBrewer)
