@@ -1,13 +1,11 @@
 \name{M3D_Differential_Expression}
 \alias{M3D_Differential_Expression}
-\alias{bg__test_DE_K_equiv}
 \title{Differentially Expressed Genes.}
 \description{
 	Use Michaelis-Menten curve to find differentially expressed (DE) genes.
 }
 \usage{
   M3D_Differential_Expression(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE)
-  bg__test_DE_K_equiv(expr_mat, fit=NA)
 }
 \arguments{
   \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
@@ -25,9 +23,5 @@
   library(M3DExampleData)
   DE_genes = M3D_Differential_Expression(Mmus_example_list$data, suppress.plot=TRUE)
   DE_genes = M3D_Differential_Expression(Mmus_example_list$data)
-  DE_test_results = bg__test_DE_K_equiv(Mmus_example_list$data);
-}
-\seealso{
-  \code{\link{bg__fit_MM}}
 }
 \keyword{differential expression}

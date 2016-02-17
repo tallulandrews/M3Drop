@@ -1,13 +1,11 @@
 \name{M3D_Expression_Heatmap}
 \alias{M3D_Expression_Heatmap}
-\alias{bg__expression_heatmap}
 \title{Plot Heatmap of Gene Expression}
 \description{
 	Plots a customized heatmap of scaled log expression values.
 }
 \usage{
   M3D_Expression_Heatmap(genes, expr_mat, cell_labels=NA, interesting_genes=NA, key_genes=genes, key_cells=NA)
-   bg__expression_heatmap(genes, expr_mat, cell_labels=NA, gene_labels=NA, key_genes=genes, key_cells=NA)
 }
 \arguments{
   \item{genes}{a character vector of gene names to be plot.}

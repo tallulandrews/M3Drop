@@ -1,13 +1,11 @@
 \name{M3D_Clean_Data}
 \alias{M3D_Clean_Data}
-\alias{bg__filter_cells}
 \title{Filter Expression Data}
 \description{
 	Filters and normalizes a given expression matrix. Removes low quality cells and undetected genes, and normalizes counts to counts per million. 
 }
 \usage{
   M3D_Clean_Data(expr_mat, labels = NA, is.counts = TRUE, suppress.plot = FALSE, pseudo_genes = NA, min_detected_genes = NA)
-  bg__filter_cells(expr_mat, labels = NA, suppress.plot = FALSE, min_detected_genes = NA)
 }
 \arguments{
   \item{expr_mat}{a numeric matrix of expression values, columns = samples/cells, rows = genes.}
