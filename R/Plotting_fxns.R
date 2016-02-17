@@ -102,7 +102,7 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 	lmat=rbind(c(6,0,5),c(0,0,2),c(4,1,3))
 
 
-	heatmap_output = heatmap.2(heat_data, ColSideColors = ColColors, RowSideColors = RowColors, col=heatcolours, breaks=col_breaks, scale="row",symbreaks=T, trace="none", dendrogram="column", key=FALSE, Rowv=TRUE, Colv=TRUE,lwid=lwid, lhei=lhei,lmat=lmat, hclustfun=function(x){hclust(x,method="ward.D2")})
+	heatmap_output = suppressWarnings(heatmap.2(heat_data, ColSideColors = ColColors, RowSideColors = RowColors, col=heatcolours, breaks=col_breaks, scale="row",symbreaks=T, trace="none", dendrogram="column", key=FALSE, Rowv=TRUE, Colv=TRUE,lwid=lwid, lhei=lhei,lmat=lmat, hclustfun=function(x){hclust(x,method="ward.D2")}))
 	# Custom key
 	par(fig = c(0, 1/(5.2),4/(5.2), 1), mar=c(4,1,1,1), new=TRUE)
 	scale01 <- function(x, low = min(x), high = max(x)) {

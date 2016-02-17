@@ -2,7 +2,7 @@
 
 bg__test_DE_K_equiv <- function (expr_mat, fit=NA) {
 	gene_info = bg__calc_variables(expr_mat);
-	if (is.na(fit)) {
+	if (is.na(fit)[1]) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
 	}
 	p_obs = gene_info$p;
