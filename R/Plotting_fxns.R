@@ -56,11 +56,6 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 		new_genes = match(genes, rownames(expr_mat));
 		nomatch = sum(is.na(new_genes));
 		if (nomatch > 0) {warning(paste(nomatch, " genes could not be matched to data, they will not be included in the heatmap."));}
-		if (length(key_genes) == length(genes)) {
-		if (mean(key_genes==genes)==1) {
-			key_genes = new_genes[!is.na(new_genes)];
-		}
-		}
 		genes = new_genes[!is.na(new_genes)];
 	}
 	if (length(genes) < 1) {warning("No genes for heatmap.");return();}
@@ -81,6 +76,7 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 		colnames(heat_data)[colnames(expr_mat[genes,]) %in% key_cells] = colnames(expr_mat[genes,])[colnames(expr_mat[genes,]) %in% key_cells]; 
 	}
 	if (!is.na(cell_labels[1])) {
+		cell_labels = as.character(cell_labels);
 		colours = as.factor(cell_labels)
 		palette = brewer.pal(max(3,length(unique(cell_labels))), "Set3");
 		ColColors = palette[colours];	
