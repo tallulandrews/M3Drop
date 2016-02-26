@@ -14,8 +14,8 @@ bg__dropout_plot_base <- function (expr_mat, xlim = NA, suppress.plot=FALSE) {
         colours <-  colorRampPalette(c("#000099", "#00FEFF", "#FCFF00"))(256) #blue->yellow
         dens.col = colours[dens]
 
-        par(fg="black")
 	if (!suppress.plot) {
+        	par(fg="black")
 		if (!(sum(is.na(xlim)))) {
 	        	plot(xes,gene_info$p, main="", ylab="Dropout Proportion", xlab="log(expression)", col = dens.col,pch=16, xlim=xlim, ylim=c(0,1))
 		} else {
