@@ -179,5 +179,5 @@ M3D_Test_Shift <- function(expr_mat, genes_to_test, name="", background=rownames
 	#Z = abs(s_mu-mu)/(sigma/sqrt(length(res)));
 	#pval = pnorm(Z, lower.tail=TRUE)
 	pval=suppressWarnings(wilcox.test(res[rownames(expr_mat) %in% as.character(genes_to_test)], res[rownames(expr_mat) %in% as.character(background)], na.rm=TRUE)$p.value)
-	return(data.frame(sample=s_mu, pop=mu, p.value=pval));
+	return(data.frame(sample=s_mu, background=mu, p.value=pval));
 }
