@@ -1,11 +1,11 @@
-\name{M3D_getmarkers}
-\alias{M3D_getmarkers}
+\name{M3Drop_getmarkers}
+\alias{M3Drop_getmarkers}
 \title{Identify marker genes}
 \description{
 	Calculates area under the ROC curve for each gene to predict the best group of cells from all other cells.
 }
 \usage{
-  M3D_getmarkers(expr_mat, labels)
+  M3Drop_getmarkers(expr_mat, labels)
 }
 \arguments{
   \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
@@ -18,6 +18,6 @@
 }
 \examples{
   library(M3DExampleData)
-  marker_gene_table = M3D_getmarkers(Mmus_example_list$data, Mmus_example_list$labels)
+  marker_gene_table = M3Drop_getmarkers(Mmus_example_list$data, Mmus_example_list$labels)
 }
 \keyword{markers}
