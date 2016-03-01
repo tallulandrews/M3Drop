@@ -7,7 +7,7 @@ bg__filter_cells <- function(expr_mat,labels=NA, suppress.plot=FALSE, min_detect
 		low_quality = num_detected < min_detected_genes;
 	} else {
 		num_zero = colSums(expr_mat == 0);
-		cell_zero = num_zero/length(expr_mat[,1]);
+		cell_zero = num_zero;
 		mu = mean(cell_zero);
 		sigma = sd(cell_zero);
 		# Deal with bi-modal

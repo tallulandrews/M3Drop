@@ -163,7 +163,7 @@ M3D_Get_Extremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_thre
 	return(list(left=shifted_left,right=shifted_right));
 }
 
-M3D_Test_Shift <- function(expr_mat, genes_to_test, name="", suppress.plot=FALSE) {
+M3D_Test_Shift <- function(expr_mat, genes_to_test, name="", background=rownames(expr_mat), suppress.plot=FALSE) {
 	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
 	MM = bg__fit_MM(BasePlot$p, BasePlot$s);
 	if (!suppress.plot) {
@@ -174,10 +174,10 @@ M3D_Test_Shift <- function(expr_mat, genes_to_test, name="", suppress.plot=FALSE
 
 	res = bg__horizontal_residuals_MM_log10(MM$K, BasePlot$p, BasePlot$s)
 	res[is.infinite(res)] = NA;
-	mu = median(res, na.rm=TRUE); #sigma = sd(res, na.rm=TRUE);
+	mu = median(res[rownames(expr_mat) %in% as.character(background)], na.rm=TRUE); #sigma = sd(res, na.rm=TRUE);
 	s_mu = median(res[rownames(expr_mat) %in% as.character(genes_to_test)], na.rm=TRUE);
 	#Z = abs(s_mu-mu)/(sigma/sqrt(length(res)));
 	#pval = pnorm(Z, lower.tail=TRUE)
-	pval=suppressWarnings(wilcox.test(res[rownames(expr_mat) %in% as.character(genes_to_test)], na.rm=TRUE)$p.value)
-	return(data.frame(sample=s_mu, pop=mu, p.value=pval));
+	pval=suppressWarnings(wilcox.test(res[rownames(expr_mat) %in% as.character(genes_to_test)], res[rownames(expr_mat) %in% as.character(background)], na.rm=TRUE)$p.value)
+	return(data.frame(sample=s_mu, background=mu, p.value=pval));
 }
