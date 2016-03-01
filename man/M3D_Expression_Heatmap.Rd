@@ -1,11 +1,11 @@
-\name{M3D_Expression_Heatmap}
-\alias{M3D_Expression_Heatmap}
+\name{M3Drop_Expression_Heatmap}
+\alias{M3Drop_Expression_Heatmap}
 \title{Plot Heatmap of Gene Expression}
 \description{
 	Plots a customized heatmap of scaled log expression values.
 }
 \usage{
-  M3D_Expression_Heatmap(genes, expr_mat, cell_labels=NA, interesting_genes=NA, key_genes=genes, key_cells=NA)
+  M3Drop_Expression_Heatmap(genes, expr_mat, cell_labels=NA, interesting_genes=NA, key_genes=genes, key_cells=NA)
 }
 \arguments{
   \item{genes}{a character vector of gene names to be plot.}
@@ -19,6 +19,6 @@
 \value{Invisibly, output from heatmap.2 call.}
 \examples{
   library(M3DExampleData)
-  M3D_Expression_Heatmap(head(rownames(Mmus_example_list$data),20),Mmus_example_list$data, cell_labels = Mmus_example_list$labels)
+  M3Drop_Expression_Heatmap(head(rownames(Mmus_example_list$data),20),Mmus_example_list$data, cell_labels = Mmus_example_list$labels)
 }
 \keyword{heatmap}

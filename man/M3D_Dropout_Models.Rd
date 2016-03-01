@@ -1,10 +1,10 @@
-\name{M3D_Dropout_Models}
-\alias{M3D_Dropout_Models}
+\name{M3Drop_Dropout_Models}
+\alias{M3Drop_Dropout_Models}
 \title{Fit functions to the dropouts vs expression distribution.}
 \description{
 	Fits the modified Michaelis-Menten equation (MM), a logistic regession (logistic), or a double exponential (ZIFA) function to the relationship between mean expression and dropout-rate (proportion of zero values).
 }
-\usage{M3D_Dropout_Models(expr_mat, xlim=NA, suppress.plot=FALSE)}
+\usage{M3Drop_Dropout_Models(expr_mat, xlim=NA, suppress.plot=FALSE)}
 \arguments{
   \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
   \item{xlim}{limits for x-axis of plot.}
@@ -18,7 +18,7 @@
 \value{Invisibly, a list of output from each fit (MMfit, LogiFit, ExpoFit).}
 \examples{
   library(M3DExampleData)
-  M3D_Dropout_Models(Mmus_example_list$data)
+  M3Drop_Dropout_Models(Mmus_example_list$data)
 } 
 
 \references{
