@@ -2,7 +2,7 @@
 Brennecke_getVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, fdr=0.1, minBiolDisp=0.5) {
         #require(statmod)
 
-        rowVars <- function(x) { unlist(apply(x,1,var))}
+        rowVars <- function(x) { unlist(apply(x,1,var, na.rm=T))}
 
         colGenes = "black"
         colSp = "blue"
@@ -22,23 +22,23 @@ Brennecke_getVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE,
                 countsGenes = fullCountTable;
         }
 
-        meansSp = rowMeans(countsSp)
+        meansSp = rowMeans(countsSp, na.rm=T)
         varsSp = rowVars(countsSp)
         cv2Sp = varsSp/meansSp^2
-        meansGenes = rowMeans(countsGenes)
+        meansGenes = rowMeans(countsGenes, na.rm=T)
         varsGenes = rowVars(countsGenes)
         cv2Genes = varsGenes/meansGenes^2
         # Fit Model
         minMeanForFit <- unname( quantile( meansSp[ which( cv2Sp > 0.3 ) ], 0.80))
         useForFit <- meansSp >= minMeanForFit
-        if (sum(useForFit) < 50) {
+        if (sum(useForFit, na.rm=T) < 20) {
                 warning("Too few spike-ins exceed minMeanForFit, recomputing using all genes.")
                 meansAll = c(meansGenes, meansSp)
                 cv2All = c(cv2Genes,cv2Sp)
                 minMeanForFit <- unname( quantile( meansAll[ which( cv2All > 0.3 ) ], 0.80))
                 useForFit <- meansSp >= minMeanForFit
         }
-        if (sum(useForFit) < 50) {warning(paste("Only", sum(useForFit), "spike-ins to be used in fitting, may result in poor fit."))}
+        if (sum(useForFit, na.rm=T) < 30) {warning(paste("Only", sum(useForFit), "spike-ins to be used in fitting, may result in poor fit."))}
         fit <- glmgam.fit( cbind( a0 = 1, a1tilde = 1/meansSp[useForFit] ), cv2Sp[useForFit] )
         a0 <- unname( fit$coefficients["a0"] )
         a1 <- unname( fit$coefficients["a1tilde"])

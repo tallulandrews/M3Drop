@@ -22,7 +22,7 @@ bg__test_DE_K_equiv <- function (expr_mat, fit=NA) {
 # Use the fact that errors of proportions are well define by converting S to proportion detected equivalents?
 hidden__test_DE_P_equiv <- function (expr_mat,  fit=NA) {
 	gene_info = bg__calc_variables(expr_mat);
-	if (is.na(fit)) {
+	if (is.na(fit)[1]) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
 	}
 	p_obs = gene_info$p;
@@ -78,7 +78,7 @@ hidden__test_DE_S_equiv <- function (expr_mat, fit=NA, method="propagate") {
 
 bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95), percent = NA, fdr_threshold = 0.1, direction="right", suppress.plot = FALSE) {
 	gene_info = bg__calc_variables(expr_mat);
-	if (is.na(fit)) {
+	if (is.na(fit)[1]) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
 	}
 	res = bg__horizontal_residuals_MM_log10(fit$K, gene_info$p, gene_info$s)
@@ -122,7 +122,7 @@ bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95
 	}
 }
 ##### Assembled Analysis Chunks ####
-M3D_Differential_Expression <- function(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE) {
+M3Drop_Differential_Expression <- function(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE) {
 	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
 	MM = bg__fit_MM(BasePlot$p, BasePlot$s);
 	if (!suppress.plot) {
@@ -141,7 +141,7 @@ M3D_Differential_Expression <- function(expr_mat, mt_method="bon", mt_threshold=
 	return(TABLE)
 }
 
-M3D_Get_Extremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_threshold=c(0.05,0.95), suppress.plot=FALSE) {
+M3Drop_Get_Extremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_threshold=c(0.05,0.95), suppress.plot=FALSE) {
 	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
 	MM = bg__fit_MM(BasePlot$p, BasePlot$s);
 	if (!suppress.plot) {
@@ -163,7 +163,7 @@ M3D_Get_Extremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_thre
 	return(list(left=shifted_left,right=shifted_right));
 }
 
-M3D_Test_Shift <- function(expr_mat, genes_to_test, name="", background=rownames(expr_mat), suppress.plot=FALSE) {
+M3Drop_Test_Shift <- function(expr_mat, genes_to_test, name="", background=rownames(expr_mat), suppress.plot=FALSE) {
 	BasePlot = bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
 	MM = bg__fit_MM(BasePlot$p, BasePlot$s);
 	if (!suppress.plot) {

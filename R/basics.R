@@ -33,7 +33,7 @@ hidden_getAUC <- function(gene, labels) {
         return(c(val,posgroup,pval))
 }
 
-M3D_getmarkers <- function(expr_mat, labels) {
+M3Drop_getmarkers <- function(expr_mat, labels) {
 	if (length(labels) != length(expr_mat[1,])) {
 		stop("Length of labels does not match number of cells.")
 	}

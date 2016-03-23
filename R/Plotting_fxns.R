@@ -17,7 +17,7 @@ bg__dropout_plot_base <- function (expr_mat, xlim = NA, suppress.plot=FALSE) {
 	if (!suppress.plot) {
         	par(fg="black")
 		if (!(sum(is.na(xlim)))) {
-	        	plot(xes,gene_info$p, main="", ylab="Dropout Proportion", xlab="log(expression)", col = dens.col,pch=16, xlim=xlim, ylim=c(0,1))
+	        	plot(xes,gene_info$p, main="", ylab="Dropout Proportion", xlab="log10(expression)", col = dens.col,pch=16, xlim=xlim, ylim=c(0,1))
 		} else {
 	        	plot(xes,gene_info$p, main="", ylab="Dropout Proportion", xlab="log(expression)", col = dens.col,pch=16)
 		}
@@ -55,10 +55,10 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 	if(!is.numeric(genes)) {
 		new_genes = match(genes, rownames(expr_mat));
 		nomatch = sum(is.na(new_genes));
-		if (nomatch > 0) {warning(paste(nomatch, " genes could not be matched to data, they will not be included in the heatmap."));}
+		if (nomatch > 0) {warning(paste("Warning: ",nomatch, " genes could not be matched to data, they will not be included in the heatmap."));}
 		genes = new_genes[!is.na(new_genes)];
 	}
-	if (length(genes) < 1) {warning("No genes for heatmap.");return();}
+	if (length(genes) < 1) {stop("Error: No genes for heatmap.");return();}
 	# Plot heatmap of expression
 	heatcolours <- rev(brewer.pal(11,"RdBu"))
 	col_breaks = c(-100,seq(-2,2,length=10),100)
@@ -152,6 +152,9 @@ M3Drop_Expression_Heatmap <- function(genes, expr_mat, cell_labels=NA, interesti
 	}
 	if (is.numeric(key_cells) | is.logical(key_cells)) {
 		key_cells = rownames(expr_mat)[key_cells];
+	}
+	if (!is.vector(genes)) {
+		stop("Error: genes must be a vector.")
 	}
 	heatmap_output = bg__expression_heatmap(genes, expr_mat, cell_labels=cell_labels, gene_labels=as.numeric(gene_labels), key_genes=as.character(key_genes), key_cells=key_cells);
 	invisible(heatmap_output);
