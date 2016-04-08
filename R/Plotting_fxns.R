@@ -160,4 +160,45 @@ M3Drop_Expression_Heatmap <- function(genes, expr_mat, cell_labels=NA, interesti
 	invisible(heatmap_output);
 }
 
-M3Drop_Get_Heatmap_Cell_Clusters <- function (heatmap_output, k) {cutree(as.hclust(heatmap_output$colDendrogram), k=k)}
+M3Drop_Get_Heatmap_Cell_Clusters <- function (heatmap_output, k) {
+	tryCatch(
+		returned_val <- cutree(as.hclust(heatmap_output$colDendrogram), k=k),
+		warning=function(w) {print(w)},
+		error=function(e){
+			print(e);
+			print("Dendrogram may have flat branches, trying again");
+			returned_val <-hidden_get_clusters(heatmap_output,k)
+			}
+	)
+	return(returned_val);
+}
+
+hidden_get_clusters<- function(heatout, k){
+        dendro=heatout$colDendrogram
+        curr_k = 1;
+        dendro_list = list(dendro)
+        dendro_heights = attr(dendro, "height")
+        while( curr_k < k ){
+                to_split = which(dendro_heights == max(dendro_heights))
+                to_split_dendro = dendro_list[[to_split]]
+                to_split_height =  dendro_heights[to_split]
+
+                children = as.list(to_split_dendro)
+                for (i in 1:length(children)) {
+                        dendro_heights = c(dendro_heights,attr(children[[i]],"height"))
+                        dendro_list[[length(dendro_list)+1]] <- children[[i]]
+                }
+                # Remove to split
+                dendro_list[to_split] = NULL
+                dendro_heights = dendro_heights[-to_split]
+                curr_k = curr_k-1+length(children)
+        }
+        # Make group vector
+        names_orig_order = labels(dendro)[order(heatout$colInd)]
+        groups = rep(0, times=length(names_orig_order))
+        for (i in 1:length(dendro_list)) {
+                groups[names_orig_order %in% labels(dendro_list[[i]])] = i
+        }
+        return(groups);
+}
+
