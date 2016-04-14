@@ -16,7 +16,6 @@ hidden__invert_MM <- function (K, p) {K*(1-p)/(p)}
 bg__horizontal_residuals_MM_log10 <- function (K, p, s) {log(s)/log(10) - log(hidden__invert_MM(K,p))/log(10)}
 
 hidden_getAUC <- function(gene, labels) {
-        require("ROCR")
         ranked=rank(gene);
         ms = aggregate(ranked~unlist(labels),FUN=mean); #Get average score for each cluster
         posgroup = as.character(unlist(ms[which(ms[,2]==max(ms[,2])),1])); #Get cluster with highest average score
@@ -26,8 +25,8 @@ hidden_getAUC <- function(gene, labels) {
         truth = labels == posgroup
 
         #Make predictions & get auc using RCOR package.
-        pred=prediction(ranked,as.numeric(truth))
-        val = unlist(performance(pred,"auc")@y.values)
+        pred=ROCR::prediction(ranked,as.numeric(truth))
+        val = unlist(ROCR::performance(pred,"auc")@y.values)
         pval = wilcox.test(gene[truth],gene[!truth])$p.value
         if (!exists("pval")) {pval=NA}
 
@@ -47,6 +46,5 @@ M3Drop_getmarkers <- function(expr_mat, labels) {
         auc_df = auc_df[auc_df[,1] > 0,]
 	auc_df = auc_df[order(-auc_df$AUC),]
         return(auc_df);
-
 }
 
