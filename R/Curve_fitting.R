@@ -30,7 +30,7 @@ bg__fit_MM <- function (p,s) {
 	Kerr = fit@coef[2]
 	predicted = 1-(s/(krt+s))
 	residuals = p-predicted
-	return(list(K=krt,Kerr=Kerr,fitted_err = res_err,predictions=predicted, model=c("MMenten",paste("Krt =",round(krt,digits=3))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))
+	return(list(K=krt,Kerr=Kerr,fitted_err = res_err,predictions=predicted, model=c("MMenten",paste("K =",round(krt,digits=3))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))
 
 }
 bg__fit_logistic <- function(p,s) {
