@@ -45,6 +45,7 @@ M3Drop_getmarkers <- function(expr_mat, labels) {
         auc_df[,1] = as.numeric(as.character(auc_df[,1]))
         auc_df[,3] = as.numeric(as.character(auc_df[,3]))
         auc_df = auc_df[auc_df[,1] > 0,]
+	auc_df = auc_df[order(-auc_df$AUC),]
         return(auc_df);
 
 }
