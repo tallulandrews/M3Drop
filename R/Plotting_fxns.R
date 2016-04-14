@@ -153,6 +153,9 @@ M3Drop_Expression_Heatmap <- function(genes, expr_mat, cell_labels=NA, interesti
 	if (is.numeric(key_cells) | is.logical(key_cells)) {
 		key_cells = rownames(expr_mat)[key_cells];
 	}
+	if (is.factor(genes)) {
+		genes = as.character(genes);
+	}
 	if (!is.vector(genes)) {
 		stop("Error: genes must be a vector.")
 	}
