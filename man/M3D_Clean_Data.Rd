@@ -1,12 +1,12 @@
-\name{M3D_Clean_Data}
-\alias{M3D_Clean_Data}
+\name{M3Drop_Clean_Data}
+\alias{M3Drop_Clean_Data}
 \alias{bg__filter_cells}
 \title{Filter Expression Data}
 \description{
 	Filters and normalizes a given expression matrix. Removes low quality cells and undetected genes, and normalizes counts to counts per million. 
 }
 \usage{
-  M3D_Clean_Data(expr_mat, labels = NA, is.counts = TRUE, suppress.plot = FALSE, pseudo_genes = NA, min_detected_genes = NA)
+  M3Drop_Clean_Data(expr_mat, labels = NA, is.counts = TRUE, suppress.plot = FALSE, pseudo_genes = NA, min_detected_genes = NA)
   bg__filter_cells(expr_mat, labels = NA, suppress.plot = FALSE, min_detected_genes = NA)
 }
 \arguments{
@@ -21,7 +21,7 @@
 \value{list with elements: data, the normalized filtered expression matrix; and labels, labels of the remaining cells.}
 \examples{
   library(M3DExampleData)
-  cpm = M3D_Clean_Data(Mmus_example_list$data, Mmus_example_list$labels, is.counts=TRUE, min_detected_genes=2000) # Remove all cells with < 2000 detected genes and convert to cpm 
-  filtered_only = M3D_Clean_Data(Mmus_example_list$data, Mmus_example_list$labels, is.counts=FALSE) # Removes cells with significantly few detected genes (FDR=5%)
+  cpm = M3Drop_Clean_Data(Mmus_example_list$data, Mmus_example_list$labels, is.counts=TRUE, min_detected_genes=2000) # Remove all cells with < 2000 detected genes and convert to cpm 
+  filtered_only = M3Drop_Clean_Data(Mmus_example_list$data, Mmus_example_list$labels, is.counts=FALSE) # Removes cells with significantly few detected genes (FDR=5%)
 }
 \keyword{normalization, quality control}

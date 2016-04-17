@@ -1,5 +1,5 @@
 exportPattern("bg__*")
-exportPattern("M3D_*")
+exportPattern("M3Drop_*")
 export(Brennecke_getVariableGenes)
 import(RColorBrewer)
 import(gplots)
