@@ -2,11 +2,11 @@
 hidden__UQ <- function(x){quantile(x[x>0],0.75)};
 
 bg__filter_cells <- function(expr_mat,labels=NA, suppress.plot=FALSE, min_detected_genes=NA) {
-	num_detected =  colSums(expr_mat > 0);
+	num_detected =  colSums(expr_mat > 0, na.rm=T);
 	if (!is.na(min_detected_genes)) {
 		low_quality = num_detected < min_detected_genes;
 	} else {
-		num_zero = colSums(expr_mat == 0);
+		num_zero = colSums(expr_mat == 0, na.rm=T);
 		cell_zero = num_zero;
 		mu = mean(cell_zero);
 		sigma = sd(cell_zero);

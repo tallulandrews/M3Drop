@@ -23,7 +23,7 @@
   residuals = bg__horizontal_residuals_MM_log10(K=9, p=gene_info$p, s=gene_info$s)
 }
 \seealso{
-  \code{\link{M3D_Test_Shift}}
-  \code{\link{M3D_Get_Extremes}}
+  \code{\link{M3Drop_Test_Shift}}
+  \code{\link{M3Drop_Get_Extremes}}
 }
 \keyword{residuals}

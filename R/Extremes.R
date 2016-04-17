@@ -22,7 +22,7 @@ bg__test_DE_K_equiv <- function (expr_mat, fit=NA) {
 # Use the fact that errors of proportions are well define by converting S to proportion detected equivalents?
 hidden__test_DE_P_equiv <- function (expr_mat,  fit=NA) {
 	gene_info = bg__calc_variables(expr_mat);
-	if (is.na(fit)) {
+	if (is.na(fit)[1]) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
 	}
 	p_obs = gene_info$p;
@@ -78,7 +78,7 @@ hidden__test_DE_S_equiv <- function (expr_mat, fit=NA, method="propagate") {
 
 bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95), percent = NA, fdr_threshold = 0.1, direction="right", suppress.plot = FALSE) {
 	gene_info = bg__calc_variables(expr_mat);
-	if (is.na(fit)) {
+	if (is.na(fit)[1]) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
 	}
 	res = bg__horizontal_residuals_MM_log10(fit$K, gene_info$p, gene_info$s)

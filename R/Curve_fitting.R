@@ -6,7 +6,7 @@ bg__fit_MM <- function (p,s) {
 #	Kerr = exp(Kcoeff+Kerr)-exp(Kcoeff)
 #        predicted = fitted(fit)
 #        krt=summary(fit)$parameters[1,1]
-#	return(list(K=krt,Kerr=Kerr,predictions=predicted, model=c("MMenton",paste("Krt =",round(krt,digits=3))),SSr=round(sum((residuals(fit))^2)),SAr=round(sum(abs(residuals(fit))))))
+#	return(list(K=krt,Kerr=Kerr,predictions=predicted, model=c("MMenten",paste("Krt =",round(krt,digits=3))),SSr=round(sum((residuals(fit))^2)),SAr=round(sum(abs(residuals(fit))))))
 	if (length(p) != length(s)) {
 		stop(print("Error: p and s not same length. Cannot fit Michaelis-Menten."))
 	}
@@ -30,7 +30,7 @@ bg__fit_MM <- function (p,s) {
 	Kerr = fit@coef[2]
 	predicted = 1-(s/(krt+s))
 	residuals = p-predicted
-	return(list(K=krt,Kerr=Kerr,fitted_err = res_err,predictions=predicted, model=c("MMenton",paste("Krt =",round(krt,digits=3))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))
+	return(list(K=krt,Kerr=Kerr,fitted_err = res_err,predictions=predicted, model=c("MMenten",paste("K =",round(krt,digits=3))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))
 
 }
 bg__fit_logistic <- function(p,s) {
@@ -98,6 +98,6 @@ M3Drop_Dropout_Models <- function(expr_mat, xlim=NA, suppress.plot=FALSE) {
 		sizeloc = bg__add_model_to_plot(SCDE, BasePlot, lty=2, lwd=2.5, col="magenta3",legend_loc = c(sizeloc$rect$left+sizeloc$rect$w,sizeloc$rect$top-sizeloc$rect$h-0.05));
 		sizeloc = bg__add_model_to_plot(ZIFA, BasePlot, lty=3, lwd=2.5, col="red",legend_loc = c(sizeloc$rect$left+sizeloc$rect$w,sizeloc$rect$top-sizeloc$rect$h-0.05));
 	}
-	invisible(list(MMfit = MM, LogiFit = SCDE, ExpoFit = ZIFA));
+	invisible(list(MMFit = MM, LogiFit = SCDE, ExpoFit = ZIFA));
 }
 

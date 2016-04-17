@@ -17,7 +17,7 @@ bg__dropout_plot_base <- function (expr_mat, xlim = NA, suppress.plot=FALSE) {
 	if (!suppress.plot) {
         	par(fg="black")
 		if (!(sum(is.na(xlim)))) {
-	        	plot(xes,gene_info$p, main="", ylab="Dropout Proportion", xlab="log(expression)", col = dens.col,pch=16, xlim=xlim, ylim=c(0,1))
+	        	plot(xes,gene_info$p, main="", ylab="Dropout Proportion", xlab="log10(expression)", col = dens.col,pch=16, xlim=xlim, ylim=c(0,1))
 		} else {
 	        	plot(xes,gene_info$p, main="", ylab="Dropout Proportion", xlab="log(expression)", col = dens.col,pch=16)
 		}
@@ -55,10 +55,10 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 	if(!is.numeric(genes)) {
 		new_genes = match(genes, rownames(expr_mat));
 		nomatch = sum(is.na(new_genes));
-		if (nomatch > 0) {warning(paste(nomatch, " genes could not be matched to data, they will not be included in the heatmap."));}
+		if (nomatch > 0) {warning(paste("Warning: ",nomatch, " genes could not be matched to data, they will not be included in the heatmap."));}
 		genes = new_genes[!is.na(new_genes)];
 	}
-	if (length(genes) < 1) {warning("No genes for heatmap.");return();}
+	if (length(genes) < 1) {stop("Error: No genes for heatmap.");return();}
 	# Plot heatmap of expression
 	heatcolours <- rev(brewer.pal(11,"RdBu"))
 	col_breaks = c(-100,seq(-2,2,length=10),100)
@@ -71,7 +71,7 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 	if (!is.na(key_genes[1])) {
 		rownames(heat_data)[rownames(expr_mat[genes,]) %in% key_genes] = rownames(expr_mat[genes,])[rownames(expr_mat[genes,]) %in% key_genes]; 
 	}
-	colnames(heat_data) = rep("", length(heat_data[1,]));
+	colnames(heat_data) = 1:length(colnames(heat_data));
 	if (!is.na(key_cells[1])) {
 		colnames(heat_data)[colnames(expr_mat[genes,]) %in% key_cells] = colnames(expr_mat[genes,])[colnames(expr_mat[genes,]) %in% key_cells]; 
 	}
@@ -98,7 +98,11 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 	lmat=rbind(c(6,0,5),c(0,0,2),c(4,1,3))
 
 
-	heatmap_output = suppressWarnings(heatmap.2(heat_data, ColSideColors = ColColors, RowSideColors = RowColors, col=heatcolours, breaks=col_breaks, scale="row",symbreaks=T, trace="none", dendrogram="column", key=FALSE, Rowv=TRUE, Colv=TRUE,lwid=lwid, lhei=lhei,lmat=lmat, hclustfun=function(x){hclust(x,method="ward.D2")}))
+	if (dim(heat_data)[1] < 10000) {
+		heatmap_output = suppressWarnings(heatmap.2(heat_data, ColSideColors = ColColors, RowSideColors = RowColors, col=heatcolours, breaks=col_breaks, scale="row",symbreaks=T, trace="none", dendrogram="column", key=FALSE, Rowv=TRUE, Colv=TRUE,lwid=lwid, lhei=lhei,lmat=lmat, hclustfun=function(x){hclust(x,method="ward.D2")}))
+	} else {
+		heatmap_output = suppressWarnings(heatmap.2(heat_data, ColSideColors = ColColors, RowSideColors = RowColors, col=heatcolours, breaks=col_breaks, scale="row",symbreaks=T, trace="none", dendrogram="column", key=FALSE, Rowv=FALSE, Colv=TRUE,lwid=lwid, lhei=lhei,lmat=lmat, hclustfun=function(x){hclust(x,method="ward.D2")}))
+	}
 	# Custom key
 	par(fig = c(0, 1/(5.2),4/(5.2), 1), mar=c(4,1,1,1), new=TRUE)
 	scale01 <- function(x, low = min(x), high = max(x)) {
@@ -149,8 +153,54 @@ M3Drop_Expression_Heatmap <- function(genes, expr_mat, cell_labels=NA, interesti
 	if (is.numeric(key_cells) | is.logical(key_cells)) {
 		key_cells = rownames(expr_mat)[key_cells];
 	}
+	if (is.factor(genes)) {
+		genes = as.character(genes);
+	}
+	if (!is.vector(genes)) {
+		stop("Error: genes must be a vector.")
+	}
 	heatmap_output = bg__expression_heatmap(genes, expr_mat, cell_labels=cell_labels, gene_labels=as.numeric(gene_labels), key_genes=as.character(key_genes), key_cells=key_cells);
 	invisible(heatmap_output);
 }
 
-M3Drop_Get_Heatmap_Cell_Clusters <- function (heatmap_output, k) {cutree(as.hclust(heatmap_output$colDendrogram), k=k)}
+M3Drop_Get_Heatmap_Cell_Clusters <- function (heatmap_output, k) {
+	tryCatch(
+		returned_val <- cutree(as.hclust(heatmap_output$colDendrogram), k=k),
+		warning=function(w) {print(w)},
+		error=function(e){
+			print(e);
+			print("Dendrogram may have flat branches, trying again");
+			returned_val <-hidden_get_clusters(heatmap_output,k)
+			}
+	)
+	return(returned_val);
+}
+
+hidden_get_clusters<- function(heatout, k){
+        dendro=heatout$colDendrogram
+        curr_k = 1;
+        dendro_list = list(dendro)
+        dendro_heights = attr(dendro, "height")
+        while( curr_k < k ){
+                to_split = which(dendro_heights == max(dendro_heights))
+                to_split_dendro = dendro_list[[to_split]]
+                to_split_height =  dendro_heights[to_split]
+
+                children = as.list(to_split_dendro)
+                for (i in 1:length(children)) {
+                        dendro_heights = c(dendro_heights,attr(children[[i]],"height"))
+                        dendro_list[[length(dendro_list)+1]] <- children[[i]]
+                }
+                # Remove to split
+                dendro_list[to_split] = NULL
+                dendro_heights = dendro_heights[-to_split]
+                curr_k = curr_k-1+length(children)
+        }
+        # Make group vector
+        names_orig_order = labels(dendro)[order(heatout$colInd)]
+        groups = rep(0, times=length(names_orig_order))
+        for (i in 1:length(dendro_list)) {
+                groups[names_orig_order %in% labels(dendro_list[[i]])] = i
+        }
+        return(groups);
+}

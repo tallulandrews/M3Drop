@@ -11,13 +11,16 @@
   \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
   \item{genes_to_test}{vector of gene names to test.}
   \item{name}{string used to title the plot.}
-  \item{background}{vector of gene names to test against.}
+  \item{background}{vector of gene names to test against. (default = all genes)}
   \item{suppress.plot}{logical, whether to the fitted Michaelis-Menten curve and highlight the given set of genes to test.}
 }
-\details{Fits a Michaelis-Menten function to the dropout-rate of the provided data, then tests whether a given set of genes is significantly shifted left or right of the curve. Horizontal residuals are calculated as : \deqn{\log_{10} S - \log_{10} \frac{K*(1-P)}{P}}{log_10(S) - log_10( (K * (1 - P)) / P )}. Uses a Wilcox rank-sum test/Mann-Whitney U test to compare the residuals for the given genes to the residuals for all genes.
+\details{Fits a Michaelis-Menten function to the dropout-rate of the provided data, then tests whether a given set of genes (eg. pseudogenes) is significantly shifted left or right of the curve. Horizontal residuals are calculated as : \deqn{\log_{10} S - \log_{10} \frac{K*(1-P)}{P}}{log_10(S) - log_10( (K * (1 - P)) / P )}. Uses a Wilcox rank-sum test/Mann-Whitney U test to compare the residuals for the given genes to the residuals for all genes.
 }
 \value{
-A one row dataframe with columns: sample (sample median horizontal residual), pop (population median horizontal residual), p.value
+A one row dataframe with columns: 
+    sample (median horizontal residual of genes in the test set), 
+    pop (median horizontal residual of genes in the background set), 
+    p.value
 }
 \examples{
   library(M3DExampleData)
