@@ -17,10 +17,14 @@ bg__dropout_plot_base <- function (expr_mat, xlim = NA, suppress.plot=FALSE) {
 	if (!suppress.plot) {
         	par(fg="black")
 		if (!(sum(is.na(xlim)))) {
-	        	plot(xes,gene_info$p, main="", ylab="Dropout Proportion", xlab="log10(expression)", col = dens.col,pch=16, xlim=xlim, ylim=c(0,1))
+	        	plot(xes,gene_info$p, main="", ylab="", xlab="", col = dens.col,pch=16, xlim=xlim, ylim=c(0,1))
+#	        	plot(xes,gene_info$p, main="", ylab="Dropout Rate", xlab="log10(expression)", col = dens.col,pch=16, xlim=xlim, ylim=c(0,1))
 		} else {
-	        	plot(xes,gene_info$p, main="", ylab="Dropout Proportion", xlab="log(expression)", col = dens.col,pch=16)
+	        	plot(xes,gene_info$p, main="", ylab="", xlab="", col = dens.col,pch=16, ylim=c(0,1))
+#	        	plot(xes,gene_info$p, main="", ylab="Dropout Rate", xlab="log10(expression)", col = dens.col,pch=16)
 		}
+		title(ylab="Dropout rate", line=2)
+		title(xlab="log10(expression)", line=2)
 	}
 	invisible(list(p=gene_info$p, s=gene_info$s, xes=xes, data=expr_mat, order=put_in_order));
 }
