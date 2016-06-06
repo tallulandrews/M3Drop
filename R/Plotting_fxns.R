@@ -159,7 +159,12 @@ M3Drop_Expression_Heatmap <- function(genes, expr_mat, cell_labels=NA, interesti
 		genes = as.character(genes);
 	}
 	if (!is.vector(genes)) {
-		stop("Error: genes must be a vector.")
+		is.gene = grepl("gene",colnames(genes), ignore.case=TRUE)
+		if (sum(is.gene) == 1) {
+			genes = unlist(genes[,is.gene]);
+		} else {
+			stop("Error: please provide a vector of gene names not a table.")
+		}
 	}
 	heatmap_output = bg__expression_heatmap(genes, expr_mat, cell_labels=cell_labels, gene_labels=as.numeric(gene_labels), key_genes=as.character(key_genes), key_cells=key_cells);
 	invisible(heatmap_output);
@@ -175,6 +180,9 @@ M3Drop_Get_Heatmap_Cell_Clusters <- function (heatmap_output, k) {
 			returned_val <-hidden_get_clusters(heatmap_output,k)
 			}
 	)
+        dendro=heatmap_output$colDendrogram
+        names_orig_order = labels(dendro)[order(heatmap_output$colInd)]
+	names(returned_val) = names_orig_order;
 	return(returned_val);
 }
 
