@@ -73,7 +73,9 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 	if (!is.na(key_genes[1])) {
 		rownames(heat_data)[rownames(expr_mat[genes,]) %in% key_genes] = rownames(expr_mat[genes,])[rownames(expr_mat[genes,]) %in% key_genes]; 
 	}
-	colnames(heat_data) = 1:length(colnames(heat_data));
+	if(length(unique(colnames(heat_data))) < length(heat_data[1,])) {
+		colnames(heat_data) = 1:length(colnames(heat_data));
+	}
 	if (!is.na(key_cells[1])) {
 		colnames(heat_data)[colnames(expr_mat[genes,]) %in% key_cells] = colnames(expr_mat[genes,])[colnames(expr_mat[genes,]) %in% key_cells]; 
 	}
