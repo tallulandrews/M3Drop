@@ -41,6 +41,9 @@ M3Drop_getmarkers <- function(expr_mat, labels) {
         auc_df <- data.frame(matrix(unlist(aucs), ncol=3, byrow=T))
         rownames(auc_df) = rownames(expr_mat)
         colnames(auc_df) = c("AUC","Group", "pval")
+	if(sum(auc_df$Group == "-1") > 0) {
+		auc_df$Group[auc_df$Group == "-1"] = "Ambiguous";
+	}
         auc_df[,1] = as.numeric(as.character(auc_df[,1]))
         auc_df[,3] = as.numeric(as.character(auc_df[,3]))
         auc_df = auc_df[auc_df[,1] > 0,]

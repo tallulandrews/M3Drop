@@ -26,8 +26,8 @@ bg__fit_MM <- function (p,s) {
 	fit = mle2(LL,start=list(krt=3, sigma=0.25))
 	thing = summary(fit)
 	krt = fit@coef[1]
-	res_err = attributes(summary(fit))$coef[2,1]
-	Kerr = fit@coef[2]
+	res_err = fit@coef[2];
+	Kerr = max(fit@coef[2],attributes(summary(fit))$coef[1,2]);
 	predicted = 1-(s/(krt+s))
 	residuals = p-predicted
 	return(list(K=krt,Kerr=Kerr,fitted_err = res_err,predictions=predicted, model=c("MMenten",paste("K =",round(krt,digits=3))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))

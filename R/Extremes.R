@@ -19,6 +19,32 @@ bg__test_DE_K_equiv <- function (expr_mat, fit=NA) {
 	effect_size = K_equiv/fit$K;
 	return(list(pval = pval, fold_change = effect_size))
 }
+
+hidden__test_DE_K_equiv_log <- function(expr_mat, fit=NA) {
+	gene_info = bg__calc_variables(expr_mat);
+	if (is.na(fit)[1]) {
+		fit = bg__fit_MM(gene_info$p, gene_info$s);
+	}
+	p_obs = gene_info$p;
+	N = length(expr_mat[1,]);
+	p_err = gene_info$p_stderr;
+	S_mean = gene_info$s
+	S_err = gene_info$s_stderr
+	K_err = fit$Kerr;
+	K_obs = fit$K
+	K_equiv = p_obs*S_mean/(1-p_obs);
+	K_equiv_err = p_obs/(1-p_obs)*S_err
+
+	K_obs_log = log(fit$K)
+	K_err_log = K_err/K_obs
+	K_equiv_log = log(K_equiv)
+	K_equiv_err_log = K_equiv_err/K_equiv
+		
+	Z = (K_equiv_log - K_obs_log)/sqrt(K_equiv_err_log^2+K_err_log^2); # high = shifted right, low = shifted left
+	pval = pnorm(Z, lower.tail=F)
+	effect_size = K_equiv/fit$K;
+	return(list(pval = pval, fold_change = effect_size))
+}
 # Use the fact that errors of proportions are well define by converting S to proportion detected equivalents?
 hidden__test_DE_P_equiv <- function (expr_mat,  fit=NA) {
 	gene_info = bg__calc_variables(expr_mat);
