@@ -37,19 +37,23 @@ bg__test_DE_K_equiv <- function(expr_mat, fit=NA) {
 	K_equiv_err = abs(K_equiv)*sqrt((S_err/S_mean)^2 + (p_err/p_obs)^2)
 	Alternative = p_obs*S_err/(1-p_obs)
 	K_equiv_err[is.na(K_equiv_err)] = Alternative[is.na(K_equiv_err)]
+	K_equiv_err[K_equiv_err<Alternative] = Alternative[K_equiv_err<Alternative]
 
 	K_equiv[K_equiv==0] = min(K_equiv[K_equiv>0])/100
 	K_equiv_log = log(K_equiv)
-	K_equiv_err_log = K_equiv_err/K_equiv
+	K_equiv_err_log = K_equiv_err/K_equiv # This does not hold when K_equiv_err =~ K_equiv which is particularly problematic for lowly expressed genes
 	K_equiv_err_log[is.na(K_equiv_err_log)] = K_equiv_err[is.na(K_equiv_err_log)]
 	K_obs_log = log(fit$K)
 #	K_err_log = K_err/K_obs
 	K_err_log = sd(K_equiv_log-K_obs_log)/sqrt(length(K_equiv_log)) 
 		
 	Z = (K_equiv_log - K_obs_log)/sqrt(K_equiv_err_log^2+K_err_log^2); # high = shifted right, low = shifted left
+	Z_old = (K_equiv - fit$K)/sqrt(K_equiv_err^2+K_err^2); # high = shifted right, low = shifted left
 	pval = pnorm(Z, lower.tail=F)
+	pval_old = pnorm(Z_old, lower.tail=F)
+	p_val_final = apply(cbind(pval,pval_old), 1, max)
 	effect_size = K_equiv/fit$K;
-	return(list(pval = pval, fold_change = effect_size))
+	return(list(pval = p_val_final, fold_change = effect_size))
 }
 # Use the fact that errors of proportions are well define by converting S to proportion detected equivalents?
 hidden__test_DE_P_equiv <- function (expr_mat,  fit=NA) {
