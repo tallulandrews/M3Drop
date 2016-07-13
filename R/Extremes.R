@@ -21,7 +21,6 @@ hidden__test_DE_K_equiv_raw <- function (expr_mat, fit=NA) {
 }
 
 bg__test_DE_K_equiv <- function(expr_mat, fit=NA) {
-	# https://en.wikipedia.org/wiki/Propagation_of_uncertainty
 	gene_info = bg__calc_variables(expr_mat);
 	if (is.na(fit)[1]) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
@@ -45,7 +44,6 @@ bg__test_DE_K_equiv <- function(expr_mat, fit=NA) {
 #	K_equiv_err_log = K_equiv_err/K_equiv # This does not hold when K_equiv_err =~ K_equiv which is particularly problematic for lowly expressed genes
 	K_equiv_err_log[K_equiv-K_equiv_err <= 0 ] = 10^10
 	K_obs_log = log(fit$K)
-#	K_err_log = K_err/K_obs
 	K_err_log = sd(K_equiv_log-K_obs_log)/sqrt(length(K_equiv_log)) 
 		
 	Z = (K_equiv_log - K_obs_log)/sqrt(K_equiv_err_log^2+K_err_log^2); # high = shifted right, low = shifted left
@@ -69,7 +67,6 @@ hidden__test_DE_P_equiv <- function (expr_mat,  fit=NA) {
 	p_equiv = fit$predictions;
 	propagated_err_p_equiv = p_equiv*sqrt(((S_err+K_err)/(S_mean+fit$K))^2+(K_err/fit$K)^2)
 	fitted_err_p_equiv = fit$fitted_err
-#	Z = (p_equiv - p_obs)/sqrt(p_err^2+propagated_err_p_equiv^2); # low = shifted right, high = shifted left
 	Z = (p_equiv - p_obs)/fitted_err_p_equiv; # low = shifted right, high = shifted left
 	pval = pnorm(Z, lower.tail=T)
 	effect_size = p_obs/p_equiv;
@@ -211,8 +208,6 @@ M3Drop_Test_Shift <- function(expr_mat, genes_to_test, name="", background=rowna
 	res[is.infinite(res)] = NA;
 	mu = median(res[rownames(expr_mat) %in% as.character(background)], na.rm=TRUE); #sigma = sd(res, na.rm=TRUE);
 	s_mu = median(res[rownames(expr_mat) %in% as.character(genes_to_test)], na.rm=TRUE);
-	#Z = abs(s_mu-mu)/(sigma/sqrt(length(res)));
-	#pval = pnorm(Z, lower.tail=TRUE)
 	pval=suppressWarnings(wilcox.test(res[rownames(expr_mat) %in% as.character(genes_to_test)], res[rownames(expr_mat) %in% as.character(background)], na.rm=TRUE)$p.value)
 	return(data.frame(sample=s_mu, background=mu, p.value=pval));
 }
