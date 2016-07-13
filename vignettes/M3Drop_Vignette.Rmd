@@ -49,8 +49,10 @@ library(M3DExampleData)
 ## QC and Normalization
 The first step is to clean the data by remove cells with too few detected genes, genes that with very low expression, and to normalize the data. This can be done using any method but M3Drop includes a simple function that will clean the expression matrix and convert raw counts to counts per million (CPM).
 
-```{r eval=TRUE}
-Normalized_data = M3Drop_Clean_Data(Mmus_example_list$data, labels = Mmus_example_list$labels, is.counts=TRUE, min_detected_genes=2000) # Remove cells with <2,000 detected genes and apply CPM normalization
+```{r eval=TRUE} 
+# Remove cells with <2,000 detected genes and apply CPM normalization
+Normalized_data = M3Drop_Clean_Data(Mmus_example_list$data, labels = Mmus_example_list$labels, 
+					is.counts=TRUE, min_detected_genes=2000)
 dim(Normalized_data$data)
 length(Normalized_data$labels)
 ```
@@ -77,7 +79,8 @@ Here we see that the sum of squared residuals favours the flatter logistic curve
 Since the Michaelis-Menten equation is concave, averaging across a mixed population forces differentially expressed genes to be shifted to the right of the Michaelis-Menten curve. DE genes are identified by comparing the local $K$ calculated for a specific gene to the global $K$ fitted across all genes using a Z-test followed by multiple-testing correction. Here we find 1,248 DE genes at 1% FDR.
 
 ```{r}
-DE_genes = M3Drop_Differential_Expression(Normalized_data$data, mt_method="fdr", mt_threshold=0.01)
+DE_genes = M3Drop_Differential_Expression(Normalized_data$data, 
+			mt_method="fdr", mt_threshold=0.01)
 ```
 **Figure 2**: Differentially expressed genes at 1% FDR (purple).
 
@@ -88,7 +91,8 @@ Note that this function runs directly from the expression matrix, hence one coul
 To check that the identified genes are truly differentially expressed we can plot the normalised expression of the genes across cells.
 
 ```{r}
-heat_out = M3Drop_Expression_Heatmap(DE_genes$Gene, Normalized_data$data, cell_labels = Normalized_data$labels)
+heat_out = M3Drop_Expression_Heatmap(DE_genes$Gene, Normalized_data$data, 
+			cell_labels = Normalized_data$labels)
 ```
 **Figure 3**: Heatmap of expression of DE genes.
 
@@ -121,6 +125,7 @@ HVG = Brennecke_getVariableGenes(Normalized_data$data)
 **Figure 4**: 1,236 Significantly highly variable genes using all genes as spike-ins (10% FDR).
 
 ```{r}
-heat_out = M3Drop_Expression_Heatmap(HVG, Normalized_data$data, cell_labels = Normalized_data$labels)
+heat_out = M3Drop_Expression_Heatmap(HVG, Normalized_data$data, 
+		cell_labels = Normalized_data$labels)
 ```
 **Figure 5***: Heatmap of expression of highly variable genes across cells.
