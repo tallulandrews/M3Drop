@@ -10,3 +10,8 @@ Installation:
 
 >require("devtools")
 >install_github('tallulandrews/M3Drop',ref="release")
+
+OR
+
+>source("https://bioconductor.org/biocLite.R")
+>biocLite("M3Drop")
