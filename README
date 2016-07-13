@@ -4,10 +4,9 @@ This is an R package providing functions for fitting a modified Michaelis-Menten
 
 In addition analyses based on the MM equation, such as identifying differentially expressed genes or biased quantification, are provided with automatically generated visualizations. 
 
-For comparison, the algorith presented in Brennecke et al (2015) for detection of significantly highly variable genes is included.
+For comparison, the algorithm presented in Brennecke et al (2015) for detection of significantly highly variable genes is included.
 
 Installation:
 
 >require("devtools")
->install_github('tallulandrews/M3D') # Most recent build
->install_github('tallulandrews/M3D',ref="release") # Thoroughly tested release, also available as a tarball under "release".
+>install_github('tallulandrews/M3Drop',ref="release")
