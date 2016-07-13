@@ -7,11 +7,8 @@ output:
 ---
 
 ```{r knitr-options, echo=FALSE, warning=FALSE}
-## To render an HTML version that works nicely with github and web pages, do:
-## rmarkdown::render("vignettes/vignette.Rmd", "all")
 library(knitr)
 opts_chunk$set(fig.align = 'center', fig.width = 6, fig.height = 5, dev = 'png')
-#knitr::opts_chunk$set(echo=FALSE, fig.path='cellity/plot-', cache=TRUE)
 theme_set(theme_bw(12))
 ```
 
