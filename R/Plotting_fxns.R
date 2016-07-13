@@ -18,12 +18,10 @@ bg__dropout_plot_base <- function (expr_mat, xlim = NA, suppress.plot=FALSE) {
         	par(fg="black")
 		if (!(sum(is.na(xlim)))) {
 	        	plot(xes,gene_info$p, main="", ylab="", xlab="", col = dens.col,pch=16, xlim=xlim, ylim=c(0,1))
-#	        	plot(xes,gene_info$p, main="", ylab="Dropout Rate", xlab="log10(expression)", col = dens.col,pch=16, xlim=xlim, ylim=c(0,1))
 		} else {
 	        	plot(xes,gene_info$p, main="", ylab="", xlab="", col = dens.col,pch=16, ylim=c(0,1))
-#	        	plot(xes,gene_info$p, main="", ylab="Dropout Rate", xlab="log10(expression)", col = dens.col,pch=16)
 		}
-		title(ylab="Dropout rate", line=2)
+		title(ylab="Dropout Rate", line=2)
 		title(xlab="log10(expression)", line=2)
 	}
 	invisible(list(p=gene_info$p, s=gene_info$s, xes=xes, data=expr_mat, order=put_in_order));
@@ -75,7 +73,9 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 	if (!is.na(key_genes[1])) {
 		rownames(heat_data)[rownames(expr_mat[genes,]) %in% key_genes] = rownames(expr_mat[genes,])[rownames(expr_mat[genes,]) %in% key_genes]; 
 	}
-	colnames(heat_data) = 1:length(colnames(heat_data));
+	if(length(unique(colnames(heat_data))) < length(heat_data[1,])) {
+		colnames(heat_data) = 1:length(colnames(heat_data));
+	}
 	if (!is.na(key_cells[1])) {
 		colnames(heat_data)[colnames(expr_mat[genes,]) %in% key_cells] = colnames(expr_mat[genes,])[colnames(expr_mat[genes,]) %in% key_cells]; 
 	}
@@ -161,7 +161,12 @@ M3Drop_Expression_Heatmap <- function(genes, expr_mat, cell_labels=NA, interesti
 		genes = as.character(genes);
 	}
 	if (!is.vector(genes)) {
-		stop("Error: genes must be a vector.")
+		is.gene = grepl("gene",colnames(genes), ignore.case=TRUE)
+		if (sum(is.gene) == 1) {
+			genes = unlist(genes[,is.gene]);
+		} else {
+			stop("Error: please provide a vector of gene names not a table.")
+		}
 	}
 	heatmap_output = bg__expression_heatmap(genes, expr_mat, cell_labels=cell_labels, gene_labels=as.numeric(gene_labels), key_genes=as.character(key_genes), key_cells=key_cells);
 	invisible(heatmap_output);
@@ -177,6 +182,9 @@ M3Drop_Get_Heatmap_Cell_Clusters <- function (heatmap_output, k) {
 			returned_val <-hidden_get_clusters(heatmap_output,k)
 			}
 	)
+        dendro=heatmap_output$colDendrogram
+        names_orig_order = labels(dendro)[order(heatmap_output$colInd)]
+	names(returned_val) = names_orig_order;
 	return(returned_val);
 }
 

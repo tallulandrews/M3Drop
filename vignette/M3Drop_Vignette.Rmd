@@ -22,7 +22,7 @@ or from Bioconductor
 ```
 or from the package source
 ```{r eval=FALSE}
-install.package('M3Drop_0.99.0.tar.gz')
+install.package('M3Drop_0.99.0.tar.gz', type="source")
 ```
 
 # Example Workflow
@@ -60,7 +60,7 @@ Here we see that the sum of squared residuals favours the flatter logistic curve
 
 ## Identifying Differentially Expressed (DE) Genes
 
-Since the Michaelis-Menten equation is concave, averaging across a mixed population forces differentially expressed genes to be shifted to the right of the Michaelis-Menten curve. DE genes are identified by comparing the local $K$ calculated for a specific gene to the global $K$ fitted across all genes using a Z-test followed by multiple-testing correction. Here we find 1,365 DE genes at 5% FDR.
+Since the Michaelis-Menten equation is concave, averaging across a mixed population forces differentially expressed genes to be shifted to the right of the Michaelis-Menten curve. DE genes are identified by comparing the local $K$ calculated for a specific gene to the global $K$ fitted across all genes using a Z-test followed by multiple-testing correction. Here we find 1,248 DE genes at 1% FDR.
 
 ```{r}
 DE_genes = M3Drop_Differential_Expression(Normalized_data$data, mt_method="fdr", mt_threshold=0.01)
@@ -86,6 +86,8 @@ library("ROCR") # Calculating AUC of markers requires ROCR package
 marker_genes = M3Drop_getmarkers(Normalized_data$data, cell_populations)
 ```
 
+The first function cuts the dendrogram from the heatmap to produce k clusters of cells. These labels are stored in cell_populations. The second function tests all genes as marker genes for the provided clusters.
+
 Marker genes are ranked by the area-under the ROC curve (AUC) for predicting the population with the highest expression of the gene from the other groups. Significance is calculated using a Wilcox-rank-sum test. Now we can examine the marker genes of the two clusters of blastocyst cells more closely.
 
 ```{r}
@@ -97,7 +99,7 @@ This shows that the inner cell mass (ICM) marker Sox2 is one of the top 20 marke
 
 ## Comparing to Other Methods
 
-For comparison purposes, I have also included a function which implements the method to identify highly variable genes presented in Brennecke et al. (2013) with the added option run it without providing spike-ins, in which case all genes are used to fit the function between CV2 and mean expression.
+For comparison purposes, I have also included a function which implements the method to identify highly variable genes presented in Brennecke et al. (2013) with the added option to run it without providing spike-ins, in which case all genes are used to fit the function between CV2 and mean expression.
 
 ```{r}
 HVG = Brennecke_getVariableGenes(Normalized_data$data)

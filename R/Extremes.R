@@ -1,6 +1,6 @@
 # DE Genes functions
 
-bg__test_DE_K_equiv <- function (expr_mat, fit=NA) {
+hidden__test_DE_K_equiv_raw <- function (expr_mat, fit=NA) {
 	gene_info = bg__calc_variables(expr_mat);
 	if (is.na(fit)[1]) {
 		fit = bg__fit_MM(gene_info$p, gene_info$s);
@@ -16,6 +16,41 @@ bg__test_DE_K_equiv <- function (expr_mat, fit=NA) {
 		
 	Z = (K_equiv - fit$K)/sqrt(K_equiv_err^2+K_err^2); # high = shifted right, low = shifted left
 	pval = pnorm(Z, lower.tail=F)
+	effect_size = K_equiv/fit$K;
+	return(list(pval = pval, fold_change = effect_size))
+}
+
+bg__test_DE_K_equiv <- function(expr_mat, fit=NA) {
+	# https://en.wikipedia.org/wiki/Propagation_of_uncertainty
+	gene_info = bg__calc_variables(expr_mat);
+	if (is.na(fit)[1]) {
+		fit = bg__fit_MM(gene_info$p, gene_info$s);
+	}
+	p_obs = gene_info$p;
+	always_detected = p_obs==0
+	p_obs[p_obs==0] = min(p_obs[p_obs > 0])/2 # Here so that K_equiv for p_obs==0 will be 0 but K_equiv_err will not throw errors for such genes.
+	N = length(expr_mat[1,]);
+	p_err = gene_info$p_stderr;
+	S_mean = gene_info$s
+	S_err = gene_info$s_stderr
+	K_err = fit$Kerr;
+	K_obs = fit$K
+	K_equiv = p_obs*S_mean/(1-p_obs);
+	K_equiv_err = abs(K_equiv)*sqrt((S_err/S_mean)^2 + (p_err/p_obs)^2)
+
+
+	K_equiv_log = log(K_equiv)
+	thing = K_equiv-K_equiv_err; thing[thing <= 0 ] = 10^-100
+	K_equiv_err_log = abs(log(thing)-K_equiv_log) # Testing to the right so this is what we are interested in
+#	K_equiv_err_log = K_equiv_err/K_equiv # This does not hold when K_equiv_err =~ K_equiv which is particularly problematic for lowly expressed genes
+	K_equiv_err_log[K_equiv-K_equiv_err <= 0 ] = 10^10
+	K_obs_log = log(fit$K)
+#	K_err_log = K_err/K_obs
+	K_err_log = sd(K_equiv_log-K_obs_log)/sqrt(length(K_equiv_log)) 
+		
+	Z = (K_equiv_log - K_obs_log)/sqrt(K_equiv_err_log^2+K_err_log^2); # high = shifted right, low = shifted left
+	pval = pnorm(Z, lower.tail=F)
+	pval[always_detected] = 1;
 	effect_size = K_equiv/fit$K;
 	return(list(pval = pval, fold_change = effect_size))
 }

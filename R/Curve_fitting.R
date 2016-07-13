@@ -26,13 +26,64 @@ bg__fit_MM <- function (p,s) {
 	fit = mle2(LL,start=list(krt=3, sigma=0.25))
 	thing = summary(fit)
 	krt = fit@coef[1]
-	res_err = attributes(summary(fit))$coef[2,1]
-	Kerr = fit@coef[2]
+	res_err = fit@coef[2];
+	Kerr = max(fit@coef[2],attributes(summary(fit))$coef[1,2]);
 	predicted = 1-(s/(krt+s))
 	residuals = p-predicted
 	return(list(K=krt,Kerr=Kerr,fitted_err = res_err,predictions=predicted, model=c("MMenten",paste("K =",round(krt,digits=3))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))
 
 }
+
+hidden__fit_MM_lognormal<-function(p,s){
+	# This consistently underestimates K
+	if (length(p) != length(s)) {
+		stop(print("Error: p and s not same length. Cannot fit Michaelis-Menten."))
+	}
+	#require("bbmle")
+	p_c = p[p<1 & p>0]
+	s_c = s[p<1 & p>0]
+	LL <- function(krt,sigma) {
+		if (krt >0) {
+			obs_Ks = p_c/(1-p_c)*s_c
+			R = log(obs_Ks)-log(krt);
+			Qs = quantile(R,prob=c(0.25,0.5,0.75))
+			IQR = Qs[2]-Qs[1];
+
+			thing = densCols(p_c, log(s_c)/log(10), colramp = colorRampPalette(c("black","white")));
+			dens = colSums(col2rgb(thing))
+			thresh = quantile(dens, prob=0.05);
+
+			R = R[dens > thresh]
+			R = suppressWarnings(dnorm(R,0,sigma,log=TRUE))
+			-sum(R)
+		} else {
+			10^100
+		}
+	}
+	fit = mle2(LL,start=list(krt=6, sigma=0.25))
+	thing = summary(fit)
+	krt = fit@coef[1]
+	res_err = fit@coef[2];
+	Kerr = max(fit@coef[2],attributes(summary(fit))$coef[1,2]);
+	predicted = 1-(s/(krt+s))
+	residuals = p-predicted
+	return(list(K=krt,Kerr=Kerr,fitted_err = res_err,predictions=predicted, model=c("MMenten",paste("K =",round(krt,digits=3))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))
+}
+
+hidden__fit_MM_logistic <- function(p,s){
+	s_nozero = s[s>0];
+	p_nozero = p[s>0];
+	fit = glm(p_nozero ~ offset(-1*log(s_nozero)), family="binomial")
+	Kerr = summary(K_glm)$coeff[1,2];
+	Kcoeff = summary(K_glm)$coeff[1,1];
+	krt=exp(Kcoeff)
+	Kerr = Kerr*krt
+	predicted = rep(0, times=length(s));
+	predicted[s>0] = fitted(fit)
+	residuals = p-predicted
+	return(list(K=krt,Kerr=Kerr,predictions=predicted, model=c("MMenten",paste("K =",round(krt,digits=3))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))
+}
+
 bg__fit_logistic <- function(p,s) {
 	if (length(p) != length(s)) {
 		stop(print("Error: p and s not same length. Cannot fit Logistic Regression."))

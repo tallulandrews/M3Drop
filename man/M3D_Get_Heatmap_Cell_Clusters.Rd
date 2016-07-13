@@ -7,7 +7,7 @@
   \item{heatmap_output}{Output from a gene-expression heatmap.}
   \item{k}{Number of clusters.}
 }
-\details{Uses \code{cutree} to extract clusters from the column dendrogram of a heatmap.}
+\details{Uses \code{cutree} to extract clusters from the column dendrogram of a heatmap. If the dendrogram contains flat branches uses an algorithm to traverse down the tree and cut at the first point where there it at least k clusters.}
 \value{A vector of cluster labels for each cell.}
 \examples{
   library(M3DExampleData)
