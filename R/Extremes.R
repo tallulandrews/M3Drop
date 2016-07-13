@@ -15,7 +15,7 @@ hidden__test_DE_K_equiv_raw <- function (expr_mat, fit=NA) {
 	K_equiv_err = p_obs/(1-p_obs)*S_err
 		
 	Z = (K_equiv - fit$K)/sqrt(K_equiv_err^2+K_err^2); # high = shifted right, low = shifted left
-	pval = pnorm(Z, lower.tail=F)
+	pval = pnorm(Z, lower.tail=FALSE)
 	effect_size = K_equiv/fit$K;
 	return(list(pval = pval, fold_change = effect_size))
 }
@@ -47,7 +47,7 @@ bg__test_DE_K_equiv <- function(expr_mat, fit=NA) {
 	K_err_log = sd(K_equiv_log-K_obs_log)/sqrt(length(K_equiv_log)) 
 		
 	Z = (K_equiv_log - K_obs_log)/sqrt(K_equiv_err_log^2+K_err_log^2); # high = shifted right, low = shifted left
-	pval = pnorm(Z, lower.tail=F)
+	pval = pnorm(Z, lower.tail=FALSE)
 	pval[always_detected] = 1;
 	effect_size = K_equiv/fit$K;
 	return(list(pval = pval, fold_change = effect_size))
@@ -68,7 +68,7 @@ hidden__test_DE_P_equiv <- function (expr_mat,  fit=NA) {
 	propagated_err_p_equiv = p_equiv*sqrt(((S_err+K_err)/(S_mean+fit$K))^2+(K_err/fit$K)^2)
 	fitted_err_p_equiv = fit$fitted_err
 	Z = (p_equiv - p_obs)/fitted_err_p_equiv; # low = shifted right, high = shifted left
-	pval = pnorm(Z, lower.tail=T)
+	pval = pnorm(Z, lower.tail=TRUE)
 	effect_size = p_obs/p_equiv;
 	return(list(pval = pval, fold_change = effect_size))
 }
@@ -103,7 +103,7 @@ hidden__test_DE_S_equiv <- function (expr_mat, fit=NA, method="propagate") {
 	}
 
 	Z = (S_equiv - S_mean)/sqrt(S_err^2+S_equiv_err^2); # low = shifted right, high = shifted left
-	pval = pnorm(Z, lower.tail=T)*2
+	pval = pnorm(Z, lower.tail=TRUE)*2
 	effect_size = (S_mean-S_equiv)/S_equiv;
 	return(list(pval = pval, effect = effect_size))
 }
@@ -125,9 +125,9 @@ bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95
 		}
 	
 		if (direction=="right") {
-			pval =pnorm((res-mu)/sigma, lower.tail=F)
+			pval =pnorm((res-mu)/sigma, lower.tail=FALSE)
 		} else {
-			pval = pnorm((res-mu)/sigma, lower.tail=T)
+			pval = pnorm((res-mu)/sigma, lower.tail=TRUE)
 		}
 		qval = p.adjust(pval, method="fdr");
 		sig = qval < fdr_threshold;
