@@ -172,23 +172,7 @@ M3Drop_Expression_Heatmap <- function(genes, expr_mat, cell_labels=NA, interesti
 	invisible(heatmap_output);
 }
 
-M3Drop_Get_Heatmap_Cell_Clusters <- function (heatmap_output, k) {
-	tryCatch(
-		returned_val <- cutree(as.hclust(heatmap_output$colDendrogram), k=k),
-		warning=function(w) {print(w)},
-		error=function(e){
-			print(e);
-			print("Dendrogram may have flat branches, trying again");
-			returned_val <-hidden_get_clusters(heatmap_output,k)
-			}
-	)
-        dendro=heatmap_output$colDendrogram
-        names_orig_order = labels(dendro)[order(heatmap_output$colInd)]
-	names(returned_val) = names_orig_order;
-	return(returned_val);
-}
-
-hidden_get_clusters<- function(heatout, k){
+M3Drop_Get_Heatmap_Cell_Clusters<- function(heatout, k){
         dendro=heatout$colDendrogram
         curr_k = 1;
         dendro_list = list(dendro)
@@ -214,5 +198,6 @@ hidden_get_clusters<- function(heatout, k){
         for (i in 1:length(dendro_list)) {
                 groups[names_orig_order %in% labels(dendro_list[[i]])] = i
         }
+	names(groups) <- names_orig_order;
         return(groups);
 }
