@@ -198,6 +198,7 @@ M3Drop_Get_Heatmap_Cell_Clusters <- function (heatout, k) {
         for (i in 1:length(dendro_list)) {
                 groups[names_orig_order %in% labels(dendro_list[[i]])] = i
         }
+	names(groups) = names_orig_order;
         return(groups);
 }
 
