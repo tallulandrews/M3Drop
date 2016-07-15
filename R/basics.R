@@ -2,10 +2,10 @@ bg__calc_variables <- function(expr_mat) {
         # Calc variables
 	if (sum(expr_mat < 0) >0) {stop("Expression matrix contains negative values! M3Drop requires an expression matrix that is not log-transformed.")}
 	p = apply(expr_mat,1,function(x){y = x[!is.na(x)]; sum(y==0)/length(y)});
-	s = rowMeans(expr_mat, na.rm=T);
+	s = rowMeans(expr_mat, na.rm=TRUE);
 	s_stderr = unlist(apply(expr_mat,1,sd))/sqrt(length(expr_mat[1,]));
 	tmp = expr_mat; tmp[tmp == 0] = NA
-	s_stderr_nozero = unlist(apply(tmp,1,sd, na.rm=T))/sqrt(rowSums(expr_mat>0));
+	s_stderr_nozero = unlist(apply(tmp,1,sd, na.rm=TRUE))/sqrt(rowSums(expr_mat>0));
 	p_stderr = sqrt(p*(1-p)/length(expr_mat[1,]));
 	names(s) = rownames(expr_mat);
 	names(p) = rownames(expr_mat);
@@ -38,7 +38,7 @@ M3Drop_getmarkers <- function(expr_mat, labels) {
 		stop("Length of labels does not match number of cells.")
 	}
         aucs = apply(expr_mat,1,hidden_getAUC,labels=labels)
-        auc_df <- data.frame(matrix(unlist(aucs), ncol=3, byrow=T))
+        auc_df <- data.frame(matrix(unlist(aucs), ncol=3, byrow=TRUE))
         rownames(auc_df) = rownames(expr_mat)
         colnames(auc_df) = c("AUC","Group", "pval")
 	auc_df$Group = as.character(auc_df$Group)
@@ -51,4 +51,3 @@ M3Drop_getmarkers <- function(expr_mat, labels) {
 	auc_df = auc_df[order(-auc_df$AUC),]
         return(auc_df);
 }
-

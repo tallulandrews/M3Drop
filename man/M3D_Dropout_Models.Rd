@@ -21,11 +21,6 @@
   M3Drop_Dropout_Models(Mmus_example_list$data)
 } 
 
-\seealso{
-  \code{\link{bg__fit_MM}}
-  \code{\link{bg__fit_ZIFA}}
-  \code{\link{bg__fit_logistic}}
-}
 \references{
   [1] Keener, J.; Sneyd, J. (2008). Mathematical Physiology: I: Cellular Physiology (2 ed.). Springer. ISBN 978-0-387-75846-6 
   [2] Kharchenko, PV; Silberstein, L; Scadden, DT. (2014) Bayesian approach to single-cell differential expression analysis. Nature Methods. 11:740-742 

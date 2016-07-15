@@ -27,12 +27,11 @@
 	model : vector of string descriptors of the fit
 }
 \examples{
-  library(M3DExampleData)
-  gene_info = bg__calc_variables(Mmus_example_list$data)
-  MM_fit = bg__fit_MM(gene_info$p, gene_info$s)
-  logistic_fit = bg__fit_logistic(gene_info$p, gene_info$s)
-  ZIFA_fit = bg__fit_ZIFA(gene_info$p, gene_info$s)
-  
+#  library(M3DExampleData)
+#  gene_info = bg__calc_variables(Mmus_example_list$data)
+#  MM_fit = bg__fit_MM(gene_info$p, gene_info$s)
+#  logistic_fit = bg__fit_logistic(gene_info$p, gene_info$s)
+#  ZIFA_fit = bg__fit_ZIFA(gene_info$p, gene_info$s) 
 }
 \references{
   [1] Keener, J.; Sneyd, J. (2008). Mathematical Physiology: I: Cellular Physiology (2 ed.). Springer. ISBN 978-0-387-75846-6 

@@ -1,5 +1,16 @@
 ---
-title: 'M3Drop: How to model dropouts in scRNASeq using Michaelis-Menten'
+title: "Introduction to M3Drop: Michaelis-Menten modelling of dropouts in scRNASeq"
+author: "Tallulah Andrews"
+date: 13 July 2016
+output:
+    BiocStyle::html_document
+---
+
+```{r knitr-options, echo=FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(fig.align = 'center', fig.width = 6, fig.height = 5, dev = 'png')
+theme_set(theme_bw(12))
+```
 
 # Introduction
 Single-cell RNA sequencing is able to quantify the whole transcriptome from the small amount of RNA present in individual cells. However, a consequence of reverse-transcribing and amplifying small quantities of RNA is a large number of dropouts, genes with zero expression in particular cells. The frequency of dropout events is strongly non-linearly related to the measured expression levels of the respective genes. M3Drop posits that these dropouts are due to failures of reverse transcription, a simple enzyme reaction, thus should be modelled using the Michaelis-Menten equation as follows:
@@ -27,7 +38,7 @@ install.package('M3Drop_0.99.0.tar.gz', type="source")
 
 # Example Workflow
 We'll be using a portion of the Deng et al. (2014) dataset in this example. You can download the R-package containing this data [here](https://github.com/tallulandrews/M3DExampleData.git).
-```{r results=FALSE}
+```{r eval=TRUE,results=FALSE}
 library(M3Drop)
 library(M3DExampleData)
 ```
@@ -35,8 +46,10 @@ library(M3DExampleData)
 ## QC and Normalization
 The first step is to clean the data by remove cells with too few detected genes, genes that with very low expression, and to normalize the data. This can be done using any method but M3Drop includes a simple function that will clean the expression matrix and convert raw counts to counts per million (CPM).
 
-```{r}
-Normalized_data = M3Drop_Clean_Data(Mmus_example_list$data, labels = Mmus_example_list$labels, is.counts=TRUE, min_detected_genes=2000) # Remove cells with <2,000 detected genes and apply CPM normalization
+```{r eval=TRUE} 
+# Remove cells with <2,000 detected genes and apply CPM normalization
+Normalized_data = M3Drop_Clean_Data(Mmus_example_list$data, labels = Mmus_example_list$labels, 
+					is.counts=TRUE, min_detected_genes=2000)
 dim(Normalized_data$data)
 length(Normalized_data$labels)
 ```
@@ -63,7 +76,8 @@ Here we see that the sum of squared residuals favours the flatter logistic curve
 Since the Michaelis-Menten equation is concave, averaging across a mixed population forces differentially expressed genes to be shifted to the right of the Michaelis-Menten curve. DE genes are identified by comparing the local $K$ calculated for a specific gene to the global $K$ fitted across all genes using a Z-test followed by multiple-testing correction. Here we find 1,248 DE genes at 1% FDR.
 
 ```{r}
-DE_genes = M3Drop_Differential_Expression(Normalized_data$data, mt_method="fdr", mt_threshold=0.01)
+DE_genes = M3Drop_Differential_Expression(Normalized_data$data, 
+			mt_method="fdr", mt_threshold=0.01)
 ```
 **Figure 2**: Differentially expressed genes at 1% FDR (purple).
 
@@ -74,7 +88,8 @@ Note that this function runs directly from the expression matrix, hence one coul
 To check that the identified genes are truly differentially expressed we can plot the normalised expression of the genes across cells.
 
 ```{r}
-heat_out = M3Drop_Expression_Heatmap(DE_genes$Gene, Normalized_data$data, cell_labels = Normalized_data$labels)
+heat_out = M3Drop_Expression_Heatmap(DE_genes$Gene, Normalized_data$data, 
+			cell_labels = Normalized_data$labels)
 ```
 **Figure 3**: Heatmap of expression of DE genes.
 
@@ -107,6 +122,7 @@ HVG = Brennecke_getVariableGenes(Normalized_data$data)
 **Figure 4**: 1,236 Significantly highly variable genes using all genes as spike-ins (10% FDR).
 
 ```{r}
-heat_out = M3Drop_Expression_Heatmap(HVG, Normalized_data$data, cell_labels = Normalized_data$labels)
+heat_out = M3Drop_Expression_Heatmap(HVG, Normalized_data$data, 
+		cell_labels = Normalized_data$labels)
 ```
 **Figure 5***: Heatmap of expression of highly variable genes across cells.

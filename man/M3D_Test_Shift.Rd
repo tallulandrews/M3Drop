@@ -27,8 +27,4 @@ A one row dataframe with columns:
   gene_set = c("Dppa2","Tdgf1","Rnf130","Tet1","Uhrf1","Pttg1","Zfp600","Stat1")
   shift_output = M3Drop_Test_Shift(Mmus_example_list$data, gene_set)
 }
-\seealso{
-  \code{\link{bg__horizontal_residuals_MM_log10}}
-  \code{\link{bg__fit_MM}}
-}
 \keyword{residuals}

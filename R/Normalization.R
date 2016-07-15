@@ -2,11 +2,11 @@
 hidden__UQ <- function(x){quantile(x[x>0],0.75)};
 
 bg__filter_cells <- function(expr_mat,labels=NA, suppress.plot=FALSE, min_detected_genes=NA) {
-	num_detected =  colSums(expr_mat > 0, na.rm=T);
+	num_detected =  colSums(expr_mat > 0, na.rm=TRUE);
 	if (!is.na(min_detected_genes)) {
 		low_quality = num_detected < min_detected_genes;
 	} else {
-		num_zero = colSums(expr_mat == 0, na.rm=T);
+		num_zero = colSums(expr_mat == 0, na.rm=TRUE);
 		cell_zero = num_zero;
 		mu = mean(cell_zero);
 		sigma = sd(cell_zero);
@@ -15,7 +15,7 @@ bg__filter_cells <- function(expr_mat,labels=NA, suppress.plot=FALSE, min_detect
 			mu = mean(cell_zero[cell_zero < median(cell_zero)]);
 			sigma = sd(cell_zero[cell_zero < median(cell_zero)]);
 		}
-		low_quality = p.adjust(pnorm((cell_zero-mu)/sigma, lower.tail=F), method="fdr") < 0.05;
+		low_quality = p.adjust(pnorm((cell_zero-mu)/sigma, lower.tail=FALSE), method="fdr") < 0.05;
 		if (!suppress.plot) {
 			hist(cell_zero, col="grey75", xlab="Number of zeros (per cell)", main="", prob=TRUE)
 			curve(dnorm(x,mean=mu, sd=sigma), add=TRUE)
