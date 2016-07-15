@@ -21,19 +21,14 @@ Where $P_{i}$ is the proportion of cells where gene $i$ dropouts out, $S_{i}$ is
 
 # Installation
 M3Drop can be installed directly from Github.
-```{r eval=FALSE}
-library(devtools)
-install_github('tallulandrews/M3D')
+```{r}
+#library(devtools)
+#install_github('tallulandrews/M3D')
 ```
 or from Bioconductor
-```{r eval=FALSE}
-#Coming Soon!
+```{r}
 #source("http://bioconductor.org/biocLite.R")
 #biocLite("M3Drop")
-```
-or from the package source
-```{r eval=FALSE}
-install.package('M3Drop_0.99.0.tar.gz', type="source")
 ```
 
 # Example Workflow
