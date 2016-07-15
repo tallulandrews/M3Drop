@@ -21,19 +21,15 @@ Where $P_{i}$ is the proportion of cells where gene $i$ dropouts out, $S_{i}$ is
 
 # Installation
 M3Drop can be installed directly from Github.
-```{r eval=FALSE}
-library(devtools)
-install_github('tallulandrews/M3D')
+```{r}
+#library(devtools)
+#install_github('tallulandrews/M3Drop')
 ```
 or from Bioconductor
-```{r eval=FALSE}
+```{r}
 #Coming Soon!
 #source("http://bioconductor.org/biocLite.R")
 #biocLite("M3Drop")
-```
-or from the package source
-```{r eval=FALSE}
-install.package('M3Drop_0.99.0.tar.gz', type="source")
 ```
 
 # Example Workflow
@@ -49,7 +45,7 @@ The first step is to clean the data by remove cells with too few detected genes,
 ```{r eval=TRUE} 
 # Remove cells with <2,000 detected genes and apply CPM normalization
 Normalized_data = M3Drop_Clean_Data(Mmus_example_list$data, labels = Mmus_example_list$labels, 
-					is.counts=TRUE, min_detected_genes=2000)
+                    is.counts=TRUE, min_detected_genes=2000)
 dim(Normalized_data$data)
 length(Normalized_data$labels)
 ```
@@ -77,7 +73,7 @@ Since the Michaelis-Menten equation is concave, averaging across a mixed populat
 
 ```{r}
 DE_genes = M3Drop_Differential_Expression(Normalized_data$data, 
-			mt_method="fdr", mt_threshold=0.01)
+            mt_method="fdr", mt_threshold=0.01)
 ```
 **Figure 2**: Differentially expressed genes at 1% FDR (purple).
 
@@ -89,7 +85,7 @@ To check that the identified genes are truly differentially expressed we can plo
 
 ```{r}
 heat_out = M3Drop_Expression_Heatmap(DE_genes$Gene, Normalized_data$data, 
-			cell_labels = Normalized_data$labels)
+            cell_labels = Normalized_data$labels)
 ```
 **Figure 3**: Heatmap of expression of DE genes.
 
@@ -123,6 +119,6 @@ HVG = Brennecke_getVariableGenes(Normalized_data$data)
 
 ```{r}
 heat_out = M3Drop_Expression_Heatmap(HVG, Normalized_data$data, 
-		cell_labels = Normalized_data$labels)
+            cell_labels = Normalized_data$labels)
 ```
 **Figure 5***: Heatmap of expression of highly variable genes across cells.

@@ -18,6 +18,7 @@
 }
 \examples{
   library(M3DExampleData)
-  marker_gene_table = M3Drop_getmarkers(Mmus_example_list$data, Mmus_example_list$labels)
+  select_data = Mmus_example_list$data[100,]
+  marker_gene_table = M3Drop_getmarkers(select_data, Mmus_example_list$labels)
 }
 \keyword{markers}
