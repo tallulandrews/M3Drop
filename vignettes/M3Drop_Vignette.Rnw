@@ -3,6 +3,7 @@
 
 \title{Introduction to M3Drop: Michaelis-Menten modelling of dropouts in scRNASeq}
 \author{Tallulah Andrews}
+%\VignetteIndexEntry{Introduction to M3Drop}
 
 \maketitle
 
