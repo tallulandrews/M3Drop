@@ -1,5 +1,5 @@
 exportPattern("M3Drop*")
-export(Brennecke_getVariableGenes)
+export(BrenneckeGetVariableGenes)
 import(RColorBrewer)
 import(gplots)
 import(bbmle)
