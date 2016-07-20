@@ -274,7 +274,7 @@ ConvertSetstoTable <- function(set1, set2, set3, names)
 }
 
 # Top-level function
-M3Drop_ThreeSet_Venn <- function(set1,set2,set3,names){
+M3DropThreeSetVenn <- function(set1,set2,set3,names){
   table <- ConvertSetstoTable(as.character(set1), as.character(set2), as.character(set3), names=names)
   nicer_table <- table
   if (max(table$table) > 5*mean(table$table)) {

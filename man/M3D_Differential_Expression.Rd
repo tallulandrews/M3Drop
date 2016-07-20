@@ -1,11 +1,11 @@
-\name{M3Drop_Differential_Expression}
-\alias{M3Drop_Differential_Expression}
+\name{M3DropDifferentialExpression}
+\alias{M3DropDifferentialExpression}
 \title{Differentially Expressed Genes.}
 \description{
 	Use Michaelis-Menten curve to find differentially expressed (DE) genes.
 }
 \usage{
-  M3Drop_Differential_Expression(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE)
+  M3DropDifferentialExpression(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE)
 }
 \arguments{
   \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
@@ -19,7 +19,6 @@
 }
 \examples{
   library(M3DExampleData)
-  DE_genes = M3Drop_Differential_Expression(Mmus_example_list$data, suppress.plot=TRUE)
-  DE_genes = M3Drop_Differential_Expression(Mmus_example_list$data)
+  DE_genes = M3DropDifferentialExpression(Mmus_example_list$data, mt_method="fdr", mt_threshold=0.05) # 5% FDR
 }
 \keyword{differential expression}

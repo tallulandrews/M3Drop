@@ -1,11 +1,11 @@
-\name{M3Drop_Get_Extremes}
-\alias{M3Drop_Get_Extremes}
+\name{M3DropGetExtremes}
+\alias{M3DropGetExtremes}
 \title{Get outliers from MM curve.}
 \description{
 	Identifies outliers left and right of a fitted Michaelis-Menten curve.
 }
 \usage{
-  M3Drop_Get_Extremes(expr_mat, fdr_threshold=0.1, percent=NA, v_threshold=c(0.05,0.95), suppress.plot=FALSE)
+  M3DropGetExtremes(expr_mat, fdr_threshold=0.1, percent=NA, v_threshold=c(0.05,0.95), suppress.plot=FALSE)
 }
 \arguments{
   \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
@@ -18,15 +18,15 @@
 
 Only genes with dropout rates within v_threshold will be considered to avoid the skewing of residuals due to the exponential parts of the MM curve near P = 0 & P = 1.
 
-\code{M3Drop_Get_Extremes} identifies both left and right residuals using the provided thresholds in each direction. Eg. will return the \code{percent} smallest and \code{percent} largest residuals. It also plots the fitted MM curve and highlights the left and right extreme outliers unless suppress.plot=TRUE .
+\code{M3DropGetExtremes} identifies both left and right residuals using the provided thresholds in each direction. Eg. will return the \code{percent} smallest and \code{percent} largest residuals. It also plots the fitted MM curve and highlights the left and right extreme outliers unless suppress.plot=TRUE .
 
 }
 \value{
-  \code{M3Drop_Get_Extremes} List containing elements left and right, vectors of the names of the extreme genes to the left and right of the curve respectively.
+  \code{M3DropGetExtremes} List containing elements left and right, vectors of the names of the extreme genes to the left and right of the curve respectively.
 }
 \examples{
   library(M3DExampleData)
-  extreme_gene_lists = M3Drop_Get_Extremes(Mmus_example_list$data, fdr_threshold=0.1, suppress.plot=TRUE)
-  extreme_gene_lists = M3Drop_Get_Extremes(Mmus_example_list$data, percent=0.01) # plots fitted MM and highlights extreme genes.
+  extreme_gene_lists = M3DropGetExtremes(Mmus_example_list$data, fdr_threshold=0.1, suppress.plot=TRUE)
+  extreme_gene_lists = M3DropGetExtremes(Mmus_example_list$data, percent=0.01) # plots fitted MM and highlights extreme genes.
 }
 \keyword{extremes, outliers, residuals}

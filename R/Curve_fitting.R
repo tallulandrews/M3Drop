@@ -96,7 +96,7 @@ bg__fit_ZIFA <- function(p,s) {
 	return(list(lambda=lambda,Lerr=Lerr,fitted_err = res_err,predictions=predicted, model=c("p ~ e^(-lambda*S^2)",paste("lambda =",signif(lambda,digits=2))),SSr=round(sum((residuals)^2)),SAr=round(sum(abs(residuals)))))
 }
 
-M3Drop_Dropout_Models <- function(expr_mat, xlim=NA, suppress.plot=FALSE) {
+M3DropDropoutModels <- function(expr_mat, xlim=NA, suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = xlim, suppress.plot=suppress.plot);
 	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
 	SCDE <- bg__fit_logistic(BasePlot$p, BasePlot$s);

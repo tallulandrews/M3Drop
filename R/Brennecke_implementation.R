@@ -1,5 +1,5 @@
 #from : http://www.nature.com/nmeth/journal/v10/n11/full/nmeth.2645.html#supplementary-information
-Brennecke_getVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, fdr=0.1, minBiolDisp=0.5) {
+BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, fdr=0.1, minBiolDisp=0.5) {
         #require(statmod)
 
         rowVars <- function(x) { unlist(apply(x,1,var, na.rm=TRUE))}

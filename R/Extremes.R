@@ -154,7 +154,7 @@ bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95
 	}
 }
 ##### Assembled Analysis Chunks ####
-M3Drop_Differential_Expression <- function(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE) {
+M3DropDifferentialExpression <- function(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
 	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
 	if (!suppress.plot) {
@@ -173,7 +173,7 @@ M3Drop_Differential_Expression <- function(expr_mat, mt_method="bon", mt_thresho
 	return(TABLE)
 }
 
-M3Drop_Get_Extremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_threshold=c(0.05,0.95), suppress.plot=FALSE) {
+M3DropGetExtremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_threshold=c(0.05,0.95), suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
 	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
 	if (!suppress.plot) {

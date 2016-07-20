@@ -138,7 +138,7 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 	invisible(heatmap_output);
 }
 
-M3Drop_Expression_Heatmap <- function(genes, expr_mat, cell_labels=NA, interesting_genes=NA, key_genes=genes, key_cells=NA) {
+M3DropExpressionHeatmap <- function(genes, expr_mat, cell_labels=NA, interesting_genes=NA, key_genes=genes, key_cells=NA) {
 	# Converted known DE genes into heatmap labels 
 	gene_labels <- rep(1, times = length(genes));
 	if (is.na(interesting_genes[1])) {
@@ -172,7 +172,7 @@ M3Drop_Expression_Heatmap <- function(genes, expr_mat, cell_labels=NA, interesti
 	invisible(heatmap_output);
 }
 
-M3Drop_Get_Heatmap_Cell_Clusters <- function (heatout, k) {
+M3DropGetHeatmapCellClusters <- function (heatout, k) {
         dendro<-heatout$colDendrogram
         curr_k <- 1;
         dendro_list <- list(dendro)
