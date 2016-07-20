@@ -9,7 +9,7 @@ For comparison, the algorithm presented in Brennecke et al (2015) for detection 
 Installation:
 
 >require("devtools")
->install_github('tallulandrews/M3Drop',ref="release")
+>install_github('tallulandrews/M3Drop')
 
 OR
 
