@@ -96,11 +96,11 @@ The first function cuts the dendrogram from the heatmap to produce k clusters of
 Marker genes are ranked by the area-under the ROC curve (AUC) for predicting the population with the highest expression of the gene from the other groups. Significance is calculated using a Wilcox-rank-sum test. Now we can examine the marker genes of the two clusters of blastocyst cells more closely.
 
 <<>>=
-head(marker_genes[marker_genes$Group==3,],20) 
+head(marker_genes[marker_genes$Group==4,],20) 
 marker_genes[rownames(marker_genes)=="Cdx2",] 
 @
 
-This shows that the inner cell mass (ICM) marker Sox2 is one of the top 20 markers for group 3 and that the trophectoderm (TE) marker Cdx2 is a marker for group 2, suggesting these two clusters coorespond to ICM and TE cells within each blastocyst.
+This shows that the inner cell mass (ICM) marker Sox2 is one of the top 20 markers for group 4 and that the trophectoderm (TE) marker Cdx2 is a marker for group 3, suggesting these two clusters coorespond to ICM and TE cells within each blastocyst.
 
 \section*{Comparing to Other Methods}
 
