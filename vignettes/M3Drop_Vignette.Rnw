@@ -129,6 +129,6 @@ heat_out <- M3DropExpressionHeatmap(HVG, Normalized_data$data,
 
 \section*{References}
 
-Philip Brennecke, Simon Anders, Jong Kyoung Kim, Aleksandra A Kołodziejczyk, Xiuwei Zhang, Valentina Proserpio, Bianka Baying, Vladimir Benes, Sarah A Teichmann, John C Marioni and Marcus G Heisler. Accounting for technical noise in single-cell RNA-seq experiments. \textit{Nature Methods}, 10:1093-1095, 2013. doi:10.1038/nmeth.2645, PMID: 24056876
+Philip Brennecke, Simon Anders, Jong Kyoung Kim, Aleksandra A Kolodziejczyk, Xiuwei Zhang, Valentina Proserpio, Bianka Baying, Vladimir Benes, Sarah A Teichmann, John C Marioni and Marcus G Heisler. Accounting for technical noise in single-cell RNA-seq experiments. \textit{Nature Methods}, 10:1093-1095, 2013. doi:10.1038/nmeth.2645, PMID: 24056876
 
 \end{document}
