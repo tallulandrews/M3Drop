@@ -195,7 +195,7 @@ M3DropGetExtremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_thr
 	return(list(left=shifted_left,right=shifted_right));
 }
 
-hidden_Test_Shift <- function(expr_mat, genes_to_test, name="", background=rownames(expr_mat), suppress.plot=FALSE) {
+M3DropTestShift <- function(expr_mat, genes_to_test, name="", background=rownames(expr_mat), suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
 	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
 	if (!suppress.plot) {

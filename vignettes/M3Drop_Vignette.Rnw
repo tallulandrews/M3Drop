@@ -44,10 +44,12 @@ fits <- M3DropDropoutModels(Normalized_data$data)
 \textbf{Figure 1}: Fits of three different dropout models.
 \end{center}
 
-Visual inspection of the resulting plot shows that the Michaelis-Menten equation is the best fit to the data. However, we can also examine some statistics to confirm this:
+Visual inspection of the resulting plot (Figure 1) shows that the Michaelis-Menten equation is the best fit to the data. However, we can also examine some statistics to confirm this:
 <<>>=
+# Sum absolute residuals
 data.frame(MM=fits$MMFit$SAr, Logistic=fits$LogiFit$SAr,
-	   DoubleExpo=fits$ExpoFit$SAr)
+	   DoubleExpo=fits$ExpoFit$SAr) 
+# Sum squared residuals
 data.frame(MM=fits$MMFit$SSr, Logistic=fits$LogiFit$SSr,
 	   DoubleExpo=fits$ExpoFit$SSr)
 @
@@ -63,7 +65,7 @@ DE_genes <- M3DropDifferentialExpression(Normalized_data$data,
 			mt_method="fdr", mt_threshold=0.01)
 @
 \\
-\textbf{Figure 2}: Differentially expressed genes at 1% FDR (purple).
+\textbf{Figure 2}: Differentially expressed genes at 1\% FDR (purple).
 \end{center}
 
 Note that this function runs directly from the expression matrix, hence one could skip straight to identifying DE genes without comparing models and any external normalisation method can be applied to the raw counts prior to DE analysis. 
@@ -81,7 +83,7 @@ heat_out <- M3DropExpressionHeatmap(DE_genes$Gene, Normalized_data$data,
 \textbf{Figure 3}: Heatmap of expression of DE genes.
 \end{center}
 
-The heatmap shows that the identified DE genes are differentially expressed across timepoints. Furthermore, it shows that the blastocysts cluster into two different groups based on the expression of these genes. We can extract these groups and identify marker genes for them as follows:
+The heatmap (Figure 3) shows that the identified DE genes are differentially expressed across timepoints. Furthermore, it shows that the blastocysts cluster into two different groups based on the expression of these genes. We can extract these groups and identify marker genes for them as follows:
 
 <<>>=
 cell_populations <- M3DropGetHeatmapCellClusters(heat_out, k=4)
@@ -114,7 +116,7 @@ HVG <- BrenneckeGetVariableGenes(Normalized_data$data)
 
 This method is more sensitive to lowly expressed genes, and frequently picks up genes with fewer than 10 reads per million. In addition, the quadratic model it uses frequenly over estimates the expected variability of highly expressed genes thus only one gene with more than 1000 reads per million was detected as highly variable (Figure 4). This is in contrast with M3Drop (Figure 2) which recognizes the low information available for lowly expressed genes thus identifies few genes with expression < 10 reads per million as differentially expressed. 
 
-This difference can also be seen by comparing the heatmaps for the respective genes (Figure 3,5). The highly variable genes contains many more genes exhibiting noisy expression, whereas nearly all genes detected by M3Drop are clearly differentially expressed across the different cell populations. 
+This difference can also be seen by comparing the heatmaps for the respective genes (Figure 3,5). The highly variable genes contains many more genes exhibiting just noisy expression, whereas nearly all genes detected by M3Drop are clearly differentially expressed across the different cell populations. 
 
 \begin{center}
 <<fig=TRUE>>=
@@ -124,5 +126,9 @@ heat_out <- M3DropExpressionHeatmap(HVG, Normalized_data$data,
 \\
 \textbf{Figure 5}: Heatmap of expression of highly variable genes across cells.
 \end{center}
+
+\section*{References}
+
+Philip Brennecke, Simon Anders, Jong Kyoung Kim, Aleksandra A Kołodziejczyk, Xiuwei Zhang, Valentina Proserpio, Bianka Baying, Vladimir Benes, Sarah A Teichmann, John C Marioni and Marcus G Heisler. Accounting for technical noise in single-cell RNA-seq experiments. \textit{Nature Methods}, 10:1093-1095, 2013. doi:10.1038/nmeth.2645, PMID: 24056876
 
 \end{document}
