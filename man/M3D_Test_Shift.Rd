@@ -24,7 +24,7 @@ A one row dataframe with columns:
 }
 \examples{
   library(M3DExampleData)
-  gene_set = c("Dppa2","Tdgf1","Rnf130","Tet1","Uhrf1","Pttg1","Zfp600","Stat1")
-  shift_output = M3DropTestShift(Mmus_example_list$data, gene_set)
+  gene_set <- c("Dppa2","Tdgf1","Rnf130","Tet1","Uhrf1","Pttg1","Zfp600","Stat1")
+  shift_output <- M3DropTestShift(Mmus_example_list$data, gene_set)
 }
 \keyword{residuals}

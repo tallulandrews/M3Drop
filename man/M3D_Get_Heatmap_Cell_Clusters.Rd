@@ -11,7 +11,7 @@
 \value{A vector of cluster labels for each cell.}
 \examples{
   library(M3DExampleData)
-  heatmap_out = M3DropExpressionHeatmap(rownames(Mmus_example_list$data)[1:20], Mmus_example_list$data)
-  clusters = M3DropGetHeatmapCellClusters(heatmap_out, k=5)
+  heatmap_out <- M3DropExpressionHeatmap(rownames(Mmus_example_list$data)[1:20], Mmus_example_list$data)
+  clusters <- M3DropGetHeatmapCellClusters(heatmap_out, k=5)
 }
 \keyword{heatmap}
