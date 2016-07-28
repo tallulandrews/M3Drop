@@ -19,6 +19,9 @@
 }
 \examples{
   library(M3DExampleData)
-  DE_genes = M3DropDifferentialExpression(Mmus_example_list$data, mt_method="fdr", mt_threshold=0.05) # 5% FDR
+  Normalized_data <- M3DropCleanData(Mmus_example_list$data,
+                  labels = Mmus_example_list$labels,
+                  is.counts=TRUE, min_detected_genes=2000)
+  DE_genes <- M3DropDifferentialExpression(Normalized_data$data, mt_method="fdr", mt_threshold=0.01) # 1% FDR
 }
 \keyword{differential expression}
