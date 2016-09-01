@@ -19,7 +19,11 @@
 \value{list with elements: data, the normalized filtered expression matrix; and labels, labels of the remaining cells.}
 \examples{
   library(M3DExampleData)
-  cpm <- M3DropCleanData(Mmus_example_list$data, Mmus_example_list$labels, is.counts=TRUE, min_detected_genes=2000) # Remove all cells with < 2000 detected genes and convert to cpm 
-  filtered_only <- M3DropCleanData(Mmus_example_list$data, Mmus_example_list$labels, is.counts=FALSE) # Removes cells with significantly few detected genes (FDR=5%)
+  # Remove all cells with < 2000 detected genes and convert to cpm 
+  cpm <- M3DropCleanData(Mmus_example_list$data, Mmus_example_list$labels, 
+			is.counts=TRUE, min_detected_genes=2000)
+  # Removes cells with significantly few detected genes (FDR=5%)
+  filtered_only <- M3DropCleanData(Mmus_example_list$data, Mmus_example_list$labels, 
+			is.counts=FALSE)
 }
 \keyword{normalization, quality control}

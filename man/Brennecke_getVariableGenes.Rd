@@ -17,7 +17,7 @@
 \references{Brennecke et al. (2013) Accounting for technical noise in single-cell RNA-seq experiments. Nature Methods 10, 1093-1095. doi:10.1038/nmeth.2645}
 \examples{
   library(M3DExampleData)
-  BrenneckeGetVariableGenes(Mmus_example_list$data)
-  BrenneckeGetVariableGenes(Mmus_example_list$data, spikes=5550:5600)
+  HVG <- BrenneckeGetVariableGenes(Mmus_example_list$data)
+  HVG_spike <- BrenneckeGetVariableGenes(Mmus_example_list$data, spikes=5550:5600)
 }
 \keyword{highly variable genes}

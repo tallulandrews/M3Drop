@@ -26,7 +26,7 @@ Only genes with dropout rates within v_threshold will be considered to avoid the
 }
 \examples{
   library(M3DExampleData)
-  extreme_gene_lists <- M3DropGetExtremes(Mmus_example_list$data, fdr_threshold=0.1, suppress.plot=TRUE)
-  extreme_gene_lists <- M3DropGetExtremes(Mmus_example_list$data, percent=0.01) # plots fitted MM and highlights extreme genes.
+  extreme_gene_lists <- M3DropGetExtremes(Mmus_example_list$data, fdr_threshold=0.1)
+  extreme_gene_lists <- M3DropGetExtremes(Mmus_example_list$data, percent=0.01)
 }
 \keyword{extremes, outliers, residuals}
