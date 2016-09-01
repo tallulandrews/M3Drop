@@ -146,7 +146,7 @@ M3DropExpressionHeatmap <- function(genes, expr_mat, cell_labels=NA, interesting
 	}
  	if (is.list(interesting_genes)) {
                 for (i in 1:length(interesting_genes)) {
-                        gene_labels[genes %in% interesting_genes[[i]]] = i+1;
+                        gene_labels[genes %in% interesting_genes[[i]]] <- i+1;
                 }
         } else {
                 gene_labels[genes %in% interesting_genes] <- 2;

@@ -1,7 +1,7 @@
 bg__calc_variables <- function(expr_mat) {
         # Calc variables
 	if (sum(expr_mat < 0) >0) {stop("Expression matrix contains negative values! M3Drop requires an expression matrix that is not log-transformed.")}
-	p <- apply(expr_mat,1,function(x){y = x[!is.na(x)]; sum(y==0)/length(y)});
+	p <- apply(expr_mat,1,function(x){y <- x[!is.na(x)]; sum(y==0)/length(y)});
 	s <- rowMeans(expr_mat, na.rm=TRUE);
 	s_stderr <- unlist(apply(expr_mat,1,sd))/sqrt(length(expr_mat[1,]));
 	tmp <- expr_mat; tmp[tmp == 0] <- NA;
@@ -28,7 +28,7 @@ hidden_getAUC <- function(gene, labels) {
         pred <- ROCR::prediction(ranked,as.numeric(truth))
         val <- unlist(ROCR::performance(pred,"auc")@y.values)
         pval <- wilcox.test(gene[truth],gene[!truth])$p.value
-        if (!exists("pval")) {pval=1}
+        if (!exists("pval")) {pval <- 1}
 
         return(c(val,posgroup,pval))
 }
@@ -41,9 +41,9 @@ M3DropGetMarkers <- function(expr_mat, labels) {
         auc_df <- data.frame(matrix(unlist(aucs), ncol=3, byrow=TRUE))
         rownames(auc_df) <- rownames(expr_mat)
         colnames(auc_df) <- c("AUC","Group", "pval")
-	auc_df$Group = as.character(auc_df$Group)
+	auc_df$Group <- as.character(auc_df$Group)
 	if(sum(auc_df$Group == "-1") > 0) {
-		auc_df$Group[auc_df$Group == "-1"] = "Ambiguous";
+		auc_df$Group[auc_df$Group == "-1"] <- "Ambiguous";
 	}
         auc_df[,1] <- as.numeric(as.character(auc_df[,1]))
         auc_df[,3] <- as.numeric(as.character(auc_df[,3]))

@@ -188,7 +188,7 @@ PlaceLabels <- function(circles, d, labelsincircles) {
   threewayvalue <- d$table[2,2,2];
 
   # Names in circles above their one-way value
-  if (labelsincircles) {onewayvalues = paste(d$labels, onewayvalues, sep="\n");}
+  if (labelsincircles) {onewayvalues <- paste(d$labels, onewayvalues, sep="\n");}
 
   # 3-way intersection
   topLRintersection <- intersectionLR[which(intersectionLR[,2] == max(intersectionLR[,2])),];
@@ -202,7 +202,7 @@ PlaceLabels <- function(circles, d, labelsincircles) {
   # LR - take advantage of fact that L & R circles has centres at the same height/
   textx <- mean(intersectionLR[,1]); # mid-point betweed the intersection points
   lowestT <- min(leftTRintersection[2],rightTLintersection[2], topLRintersection[2]);
-  if (circles$x[topcircle] > rightTLintersection[1] & circles$x[topcircle] < leftTRintersection[1]) {lowestT = min(circles$bottom[topcircle], lowestT);}
+  if (circles$x[topcircle] > rightTLintersection[1] & circles$x[topcircle] < leftTRintersection[1]) {lowestT <- min(circles$bottom[topcircle], lowestT);}
   texty <- mean(c(min(intersectionLR[,2]), lowestT))
   text(textx, texty, twowayvalues[ceiling(leftcircle*rightcircle/2)])
 
@@ -211,14 +211,14 @@ PlaceLabels <- function(circles, d, labelsincircles) {
 
 # if intersect points are outside of the area wedge use the inner circle-pairwise intersection instead
   midpointv <- rbind(intersectionLT[which(intersectionLT[,1] == min(intersectionLT[,1])),], intersectpoint[which(intersectpoint[,1] == min(intersectpoint[,1])),]);
-  if (midpointv[2,1] > rightTLintersection[1]) {midpointv[2,] = rightTLintersection;}
+  if (midpointv[2,1] > rightTLintersection[1]) {midpointv[2,] <- rightTLintersection;}
   midpoint <- colMeans(midpointv); 
   text(midpoint[1], midpoint[2], twowayvalues[ceiling(leftcircle*topcircle/2)])
 
   # RT
   intersectpoint <- circle_line_intersection(circles$x[leftcircle], circles$y[leftcircle], circles$r[leftcircle], leftTRintersection[1], leftTRintersection[2], intersectionTR[which(intersectionTR[,1] !=  min(intersectionTR[,1])),1], intersectionTR[which(intersectionTR[,1] !=  min(intersectionTR[,1])),2])
   midpointv <- rbind(intersectionTR[which(intersectionTR[,1] !=  min(intersectionTR[,1])),], intersectpoint[which(intersectpoint[,1] == max(intersectpoint[,1])),]);
-  if (midpointv[2,1] < leftTRintersection[1]) {midpointv[2,] = leftTRintersection;}
+  if (midpointv[2,1] < leftTRintersection[1]) {midpointv[2,] <- leftTRintersection;}
   midpoint <- colMeans(midpointv);
   text(midpoint[1], midpoint[2], twowayvalues[ceiling(rightcircle*topcircle/2)])
   #1-way intersection

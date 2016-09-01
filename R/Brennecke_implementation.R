@@ -11,7 +11,7 @@ BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, 
         fullCountTable <- expr_mat;
 
         if (is.character(spikes)) {
-                sp = rownames(fullCountTable) %in% spikes;
+                sp <- rownames(fullCountTable) %in% spikes;
                 countsSp <- fullCountTable[sp,];
                 countsGenes <- fullCountTable[!sp,];
         } else if (is.numeric(spikes)) {
