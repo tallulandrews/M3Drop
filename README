@@ -15,3 +15,5 @@ OR
 
 >source("https://bioconductor.org/biocLite.R")
 >biocLite("M3Drop")
+
+Read More: DOI: 10.1101/065094
