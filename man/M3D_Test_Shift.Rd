@@ -8,7 +8,7 @@
   M3DropTestShift(expr_mat, genes_to_test, name="", background=rownames(expr_mat), suppress.plot=FALSE)
 }
 \arguments{
-  \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
+  \item{expr_mat}{a numeric matrix of normalized (not log-transformed) expression values, columns = samples, rows = genes.}
   \item{genes_to_test}{vector of gene names to test.}
   \item{name}{string used to title the plot.}
   \item{background}{vector of gene names to test against. (default = all genes)}

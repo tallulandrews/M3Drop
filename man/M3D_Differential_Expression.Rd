@@ -8,7 +8,7 @@
   M3DropDifferentialExpression(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE)
 }
 \arguments{
-  \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
+  \item{expr_mat}{a numeric matrix of normalized (not log-transformed) expression values, columns = samples, rows = genes.}
   \item{mt_method}{the multiple testing method used in p.adjust}
   \item{mt_threshold}{the threshold for identifying significantly DE genes.}
   \item{suppress.plot}{logical, whether to plot the fitted curve and highlight DE genes.}

@@ -8,7 +8,7 @@
   M3DropGetMarkers(expr_mat, labels)
 }
 \arguments{
-  \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
+  \item{expr_mat}{a numeric matrix of normalized expression values, columns = samples, rows = genes.}
   \item{labels}{a vector of group ids for each cell/sample.}
 }
 \details{Uses the ROCR package to calculate the AUC for each gene for the group with the highest average rank. Significant is calculated using a Wilcox rank-sum test. 

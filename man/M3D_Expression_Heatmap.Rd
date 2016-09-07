@@ -9,7 +9,7 @@
 }
 \arguments{
   \item{genes}{a character vector of gene names to be plot.}
-  \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
+  \item{expr_mat}{a numeric matrix of normalized (not log-transformed) expression values, columns = samples, rows = genes.}
   \item{cell_labels}{factor of labels for each cell in the expression matrix that will be used to coloured in a top bar of the heatmap.}
   \item{interesting_genes}{list of vectors of gene names that will be used to colour the bar to the left of the heatmap.}
   \item{key_genes}{a character vector of gene names to be labelled on the heatmap.}

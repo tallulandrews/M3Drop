@@ -8,7 +8,7 @@
   M3DropCleanData(expr_mat, labels = NA, is.counts = TRUE, suppress.plot = FALSE, pseudo_genes = NA, min_detected_genes = NA)
 }
 \arguments{
-  \item{expr_mat}{a numeric matrix of expression values, columns = samples/cells, rows = genes.}
+  \item{expr_mat}{a numeric matrix of raw or normalized (not log-transformed) expression values, columns = samples/cells, rows = genes.}
   \item{labels}{a vector of length equal to the number of columns of expr_mat with names or group IDs for each cell.}
   \item{is.counts}{logical, whether the provided data is unnormalized read/fragment counts.}
   \item{suppress.plot}{logical, whether to plot the distribution of number of detected genes per cell.}

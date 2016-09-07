@@ -6,7 +6,7 @@
 }
 \usage{BrenneckeGetVariableGenes(expr_mat, spikes=NA, suppress.plot=FALSE, fdr=0.1, minBiolDisp=0.5)}
 \arguments{
-  \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
+  \item{expr_mat}{a numeric matrix of normalized or raw (not log-transformed) expression values, columns = samples, rows = genes.}
   \item{spikes}{a vector of gene names of row numbers of spike-in genes which are subject to only technical variance.}
   \item{suppress.plot}{Whether to make the plot or just calculate the requisite values.}
   \item{fdr}{Use FDR to identify significantly highly variable genes.}

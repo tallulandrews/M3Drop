@@ -6,7 +6,7 @@
 }
 \usage{M3DropDropoutModels(expr_mat, xlim=NA, suppress.plot=FALSE)}
 \arguments{
-  \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
+  \item{expr_mat}{a numeric matrix of normalized (not log-transformed) expression values, columns = samples, rows = genes.}
   \item{xlim}{limits for x-axis of plot.}
   \item{suppress.plot}{logical, whether to plot fit curves or not.}
 }

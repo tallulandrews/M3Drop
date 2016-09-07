@@ -8,7 +8,7 @@
   M3DropGetExtremes(expr_mat, fdr_threshold=0.1, percent=NA, v_threshold=c(0.05,0.95), suppress.plot=FALSE)
 }
 \arguments{
-  \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
+  \item{expr_mat}{a numeric matrix of normalized (not log-transformed) expression values, columns = samples, rows = genes.}
   \item{fdr_threshold}{the threshold for identifying significant outliers after multiple testing correction.}
   \item{percent}{identify this percentage of data that is most extreme in each direction.}
   \item{v_threshold}{restrict to this range of dropout rates to avoid poorly fit regions of the data.}
