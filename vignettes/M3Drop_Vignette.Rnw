@@ -23,7 +23,7 @@ library(M3DExampleData)
 @
 
 \section*{QC and Normalization}
-The first step is to clean the data by remove cells with too few detected genes, genes that with very low expression, and to normalize the data. This can be done using any method but M3Drop includes a simple function that will clean the expression matrix and convert raw counts to counts per million (CPM).
+The first step is to clean the data by remove cells with too few detected genes, genes that with very low expression, and to normalize the data. This can be done using any method but M3Drop includes a simple function that will clean the expression matrix and convert raw counts to counts per million (CPM). If alternative normalization methods are used the input expression matrix must not be log-transformed, nor contain negative values. If normalization adjusts zero values then M3Drop will use the minimal expression value in the entire matrix as the value for dropouts. 
 
 <<>>=
 Normalized_data <- M3DropCleanData(Mmus_example_list$data, 

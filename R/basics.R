@@ -1,7 +1,20 @@
 bg__calc_variables <- function(expr_mat) {
         # Calc variables
 	if (sum(expr_mat < 0) >0) {stop("Expression matrix contains negative values! M3Drop requires an expression matrix that is not log-transformed.")}
-	if (sum(expr_mat == 0) < 0.1*sum(expr_mat >= 0)) {warning("Warning: Expression matrix contains few zero values (dropouts) this may lead to poor performance.")}
+	
+	# Deal with strangely normalized data
+	if (sum(expr_mat == 0) == 0) {
+		warning("Warning: No zero values (dropouts) detected will use minimum expression value instead.")
+		# If no zeros in expression matrix convert minimum value into zero
+		expr_mat <- round(expr_mat, digits=2) # Round to accomodate errors
+		min_val <- min(expr_mat)
+		expr_mat[expr_mat == min_val] <- 0;
+	}
+	if (sum(expr_mat == 0) < 0.1*sum(expr_mat >= 0)) {
+		# Less than 10% zeros
+		warning("Warning: Expression matrix contains few zero values (dropouts) this may lead to poor performance.")
+	}
+
 	p <- apply(expr_mat,1,function(x){y <- x[!is.na(x)]; sum(y==0)/length(y)});
 	s <- rowMeans(expr_mat, na.rm=TRUE);
 	s_stderr <- unlist(apply(expr_mat,1,sd))/sqrt(length(expr_mat[1,]));
