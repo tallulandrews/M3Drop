@@ -1,14 +1,14 @@
-\name{M3Drop_Test_Shift}
-\alias{M3Drop_Test_Shift}
+\name{M3DropTestShift}
+\alias{M3DropTestShift}
 \title{Test for horizontal shift.}
 \description{
 	Tests whether a given set of genes are significantly shifted to the left or right of the Michaelis-Menten curve.
 }
 \usage{
-  M3Drop_Test_Shift(expr_mat, genes_to_test, name="", background=rownames(expr_mat), suppress.plot=FALSE)
+  M3DropTestShift(expr_mat, genes_to_test, name="", background=rownames(expr_mat), suppress.plot=FALSE)
 }
 \arguments{
-  \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
+  \item{expr_mat}{a numeric matrix of normalized (not log-transformed) expression values, columns = samples, rows = genes.}
   \item{genes_to_test}{vector of gene names to test.}
   \item{name}{string used to title the plot.}
   \item{background}{vector of gene names to test against. (default = all genes)}
@@ -24,11 +24,7 @@ A one row dataframe with columns:
 }
 \examples{
   library(M3DExampleData)
-  gene_set = c("Dppa2","Tdgf1","Rnf130","Tet1","Uhrf1","Pttg1","Zfp600","Stat1")
-  shift_output = M3Drop_Test_Shift(Mmus_example_list$data, gene_set)
-}
-\seealso{
-  \code{\link{bg__horizontal_residuals_MM_log10}}
-  \code{\link{bg__fit_MM}}
+  gene_set <- c("Dppa2","Tdgf1","Rnf130","Tet1","Uhrf1","Pttg1","Zfp600","Stat1")
+  shift_output <- M3DropTestShift(Mmus_example_list$data, gene_set)
 }
 \keyword{residuals}

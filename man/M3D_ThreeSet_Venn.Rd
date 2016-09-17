@@ -1,11 +1,11 @@
-\name{M3Drop_ThreeSet_Venn}
-\alias{M3Drop_ThreeSet_Venn}
+\name{M3DropThreeSetVenn}
+\alias{M3DropThreeSetVenn}
 \title{Three-way Venn Diagram}
 \description{
 	Plot an area-proportional three-set Venn Diagram with labels.
 }
 \usage{
-  M3Drop_ThreeSet_Venn(set1, set2, set3, names)
+  M3DropThreeSetVenn(set1, set2, set3, names)
 }
 \arguments{
   \item{set1}{a vector of items in the first set.}
@@ -17,6 +17,9 @@
 }
 \value{None}
 \examples{
-  M3Drop_ThreeSet_Venn(c(1:20), c(15:30), c(5,10,15,20,25,30,35,40,45,50,55,60), names=c("A","B","C"))
+  SetA <- c(1:20)
+  SetB <- c(15:30)
+  SetC <- c(5,10,15,20,25,30,35,40,45,50,55,60)
+  M3DropThreeSetVenn(SetA, SetB, SetC, names=c("A","B","C"))
 }
 \keyword{Venn Diagram}

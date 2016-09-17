@@ -1,44 +1,44 @@
 #from : http://www.nature.com/nmeth/journal/v10/n11/full/nmeth.2645.html#supplementary-information
-Brennecke_getVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, fdr=0.1, minBiolDisp=0.5) {
+BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, fdr=0.1, minBiolDisp=0.5) {
         #require(statmod)
 
-        rowVars <- function(x) { unlist(apply(x,1,var, na.rm=T))}
+        rowVars <- function(x) { unlist(apply(x,1,var, na.rm=TRUE))}
 
-        colGenes = "black"
-        colSp = "blue"
+        colGenes <- "black"
+        colSp <- "blue"
 
 
         fullCountTable <- expr_mat;
 
         if (is.character(spikes)) {
-                sp = rownames(fullCountTable) %in% spikes;
+                sp <- rownames(fullCountTable) %in% spikes;
                 countsSp <- fullCountTable[sp,];
                 countsGenes <- fullCountTable[!sp,];
         } else if (is.numeric(spikes)) {
                 countsSp <- fullCountTable[spikes,];
                 countsGenes <- fullCountTable[-spikes,];
         } else {
-                countsSp = fullCountTable;
-                countsGenes = fullCountTable;
+                countsSp <- fullCountTable;
+                countsGenes <- fullCountTable;
         }
 
-        meansSp = rowMeans(countsSp, na.rm=T)
-        varsSp = rowVars(countsSp)
-        cv2Sp = varsSp/meansSp^2
-        meansGenes = rowMeans(countsGenes, na.rm=T)
-        varsGenes = rowVars(countsGenes)
-        cv2Genes = varsGenes/meansGenes^2
+        meansSp <- rowMeans(countsSp, na.rm=TRUE)
+        varsSp <- rowVars(countsSp)
+        cv2Sp <- varsSp/meansSp^2
+        meansGenes <- rowMeans(countsGenes, na.rm=TRUE)
+        varsGenes <- rowVars(countsGenes)
+        cv2Genes <- varsGenes/meansGenes^2
         # Fit Model
         minMeanForFit <- unname( quantile( meansSp[ which( cv2Sp > 0.3 ) ], 0.80))
         useForFit <- meansSp >= minMeanForFit
-        if (sum(useForFit, na.rm=T) < 20) {
+        if (sum(useForFit, na.rm=TRUE) < 20) {
                 warning("Too few spike-ins exceed minMeanForFit, recomputing using all genes.")
-                meansAll = c(meansGenes, meansSp)
-                cv2All = c(cv2Genes,cv2Sp)
+                meansAll <- c(meansGenes, meansSp)
+                cv2All <- c(cv2Genes,cv2Sp)
                 minMeanForFit <- unname( quantile( meansAll[ which( cv2All > 0.3 ) ], 0.80))
                 useForFit <- meansSp >= minMeanForFit
         }
-        if (sum(useForFit, na.rm=T) < 30) {warning(paste("Only", sum(useForFit), "spike-ins to be used in fitting, may result in poor fit."))}
+        if (sum(useForFit, na.rm=TRUE) < 30) {warning(paste("Only", sum(useForFit), "spike-ins to be used in fitting, may result in poor fit."))}
         fit <- glmgam.fit( cbind( a0 = 1, a1tilde = 1/meansSp[useForFit] ), cv2Sp[useForFit] )
         a0 <- unname( fit$coefficients["a0"] )
         a1 <- unname( fit$coefficients["a1tilde"])
@@ -46,7 +46,7 @@ Brennecke_getVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE,
         # Test
         psia1theta <- a1
         minBiolDisp <- minBiolDisp^2
-        m = ncol(countsSp);
+        m <- ncol(countsSp);
         cv2th <- a0 + minBiolDisp + a0 * minBiolDisp
         testDenom <- (meansGenes*psia1theta + meansGenes^2*cv2th)/(1+cv2th/m)
         p <- 1-pchisq(varsGenes * (m-1)/testDenom,m-1)

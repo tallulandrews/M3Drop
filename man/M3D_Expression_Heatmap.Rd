@@ -1,20 +1,17 @@
-\name{M3Drop_Expression_Heatmap}
-\alias{M3Drop_Expression_Heatmap}
-\alias{bg__expression_heatmap}
+\name{M3DropExpressionHeatmap}
+\alias{M3DropExpressionHeatmap}
 \title{Plot Heatmap of Gene Expression}
 \description{
 	Plots a customized heatmap of scaled log expression values.
 }
 \usage{
-  M3Drop_Expression_Heatmap(genes, expr_mat, cell_labels=NA, interesting_genes=NA, key_genes=genes, key_cells=NA)
-   bg__expression_heatmap(genes, expr_mat, cell_labels=NA, gene_labels=NA, key_genes=genes, key_cells=NA)
+  M3DropExpressionHeatmap(genes, expr_mat, cell_labels=NA, interesting_genes=NA, key_genes=genes, key_cells=NA)
 }
 \arguments{
   \item{genes}{a character vector of gene names to be plot.}
-  \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
+  \item{expr_mat}{a numeric matrix of normalized (not log-transformed) expression values, columns = samples, rows = genes.}
   \item{cell_labels}{factor of labels for each cell in the expression matrix that will be used to coloured in a top bar of the heatmap.}
   \item{interesting_genes}{list of vectors of gene names that will be used to colour the bar to the left of the heatmap.}
-  \item{gene_labels}{factor of labels for each gene in the expression matrix that will be used to colour the bar to the left of the heatmap.}
   \item{key_genes}{a character vector of gene names to be labelled on the heatmap.}
   \item{key_cells}{a character vector of cells to be labelled on the heatmap. Unlabelled cells will be assigned a numerical index}
 }
@@ -22,6 +19,6 @@
 \value{Invisibly, output from heatmap.2 call.}
 \examples{
   library(M3DExampleData)
-  M3Drop_Expression_Heatmap(head(rownames(Mmus_example_list$data),20),Mmus_example_list$data, cell_labels = Mmus_example_list$labels)
+  M3DropExpressionHeatmap(head(rownames(Mmus_example_list$data),20),Mmus_example_list$data, cell_labels = Mmus_example_list$labels)
 }
 \keyword{heatmap}

@@ -1,12 +1,12 @@
-\name{M3Drop_Dropout_Models}
-\alias{M3Drop_Dropout_Models}
+\name{M3DropDropoutModels}
+\alias{M3DropDropoutModels}
 \title{Fit functions to the dropouts vs expression distribution.}
 \description{
 	Fits the modified Michaelis-Menten equation (MM), a logistic regession (logistic), or a double exponential (ZIFA) function to the relationship between mean expression and dropout-rate (proportion of zero values).
 }
-\usage{M3Drop_Dropout_Models(expr_mat, xlim=NA, suppress.plot=FALSE)}
+\usage{M3DropDropoutModels(expr_mat, xlim=NA, suppress.plot=FALSE)}
 \arguments{
-  \item{expr_mat}{a numeric matrix of expression values, columns = samples, rows = genes.}
+  \item{expr_mat}{a numeric matrix of normalized (not log-transformed) expression values, columns = samples, rows = genes.}
   \item{xlim}{limits for x-axis of plot.}
   \item{suppress.plot}{logical, whether to plot fit curves or not.}
 }
@@ -18,14 +18,9 @@
 \value{Invisibly, a list of output from each fit (MMfit, LogiFit, ExpoFit).}
 \examples{
   library(M3DExampleData)
-  M3Drop_Dropout_Models(Mmus_example_list$data)
+  M3DropDropoutModels(Mmus_example_list$data)
 } 
 
-\seealso{
-  \code{\link{bg__fit_MM}}
-  \code{\link{bg__fit_ZIFA}}
-  \code{\link{bg__fit_logistic}}
-}
 \references{
   [1] Keener, J.; Sneyd, J. (2008). Mathematical Physiology: I: Cellular Physiology (2 ed.). Springer. ISBN 978-0-387-75846-6 
   [2] Kharchenko, PV; Silberstein, L; Scadden, DT. (2014) Bayesian approach to single-cell differential expression analysis. Nature Methods. 11:740-742 
