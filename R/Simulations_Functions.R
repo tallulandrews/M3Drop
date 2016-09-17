@@ -16,19 +16,19 @@ hidden_colVars <- function(x) {
 	unlist(apply(x, 2, var, na.rm = T))
 }
 
-M3DropMean2Disp <- function(mu, coeffs=c(3.967816,-1.855054)){
+bg_mean2disp <- function(mu, coeffs=c(3.967816,-1.855054)){
 		cv2 <- exp(coeffs[1]+coeffs[2]*(log(mu)/log(10)))
 		variance <- cv2*(mu^2)
 		disp <- mu^2/(variance-mu)
 		return(1/disp)
 }
 
-M3DropMakeSimData <- function(dispersion_fun, n_cells=300, dispersion_factor=1, base_means=10^runif(15000, min=-4, max=4), K=NULL) {
+M3DropMakeSimData <- function(dispersion_fun, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3) {
 	# Make Simulated Matrix
         n_genes <- length(base_means);
         expr_mat <- sapply(1:n_genes, function(x){
                     base <- rnbinom(n_cells, 
-			size<-dispersion_factor/dispersion_fun(base_means[x]), 
+			size<-1/(dispersion_factor*dispersion_fun(base_means[x])), 
 			mu<-base_means[x])
                     if (!is.null(K)) {
                          base <- add_dropouts(base,base_means[x],K)
@@ -41,20 +41,20 @@ M3DropMakeSimData <- function(dispersion_fun, n_cells=300, dispersion_factor=1, 
 	return(expr_mat);
 }
 
-M3DropMakeSimDE <- function(dispersion_func=M3DropMean2Disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3){
+M3DropMakeSimDE <- function(dispersion_fun=bg_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3){
         n_genes <- length(base_means);
         TP <- sample(1:n_genes, frac_change*n_genes)
         sub_pop <- round(sub_pop*n_cells)
         Pop_lab <- c(rep(1, times=n_cells-sub_pop),rep(2,times=sub_pop))
 	# Base Population
-	base <- M3DropMakeSimData(dispersion_fun=disperion_func, 
+	base <- M3DropMakeSimData(dispersion_fun=dispersion_fun, 
 			n_cells=sum(Pop_lab==1), 
 			dispersion_factor=dispersion_factor, 
 			base_means=base_means, K=K)
 	changed_means <- base_means;
 	changed_means[TP] <- base_means[TP]*fold_change;
 	# Changed Subpopulation
-	sub_pop <- M3DropMakeSimData(dispersion_fun=disperion_func, 
+	sub_pop <- M3DropMakeSimData(dispersion_fun=dispersion_fun, 
 			n_cells=sum(Pop_lab==2), 
 			dispersion_factor=dispersion_factor, 
 			base_means=changed_means, K=K)
@@ -62,19 +62,19 @@ M3DropMakeSimDE <- function(dispersion_func=M3DropMean2Disp, fold_change=10, fra
 }
 
 
-M3DropMakeSimDVar <- function(dispersion_fun=M3DropMean2Disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000, 1,1), K=10.3) {
+M3DropMakeSimDVar <- function(dispersion_fun=bg_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000, 1,1), K=10.3) {
 	# Make Simulated Matrix
         n_genes <- length(base_means);
         TP <- sample(1:n_genes, frac_change*n_genes)
         sub_pop <- round(sub_pop*n_cells)
         Pop_lab <- c(rep(1, times=n_cells-sub_pop),rep(2,times=sub_pop))
 	# Whole Population
-	base <- M3DropMakeSimData(dispersion_fun=disperion_func, 
+	base <- M3DropMakeSimData(dispersion_fun=dispersion_fun, 
 			n_cells=n_cells, 
 			dispersion_factor=dispersion_factor, 
 			base_means=base_means, K=K)
 	# Changed Vals
-	subpop <- M3DropMakeSimData(dispersion_fun=disperion_func, 
+	subpop <- M3DropMakeSimData(dispersion_fun=dispersion_fun, 
 			n_cells=sum(Pop_lab==2), 
 			dispersion_factor=fold_change*dispersion_factor, 
 			base_means=base_means[TP], K=K)
@@ -82,17 +82,17 @@ M3DropMakeSimDVar <- function(dispersion_fun=M3DropMean2Disp, fold_change=10, fr
 	return(list(data=base, cell_labels=Pop_lab, TP=TP));
 }
 
-M3DropMakeSimHVar <- function(dispersion_fun=M3DropMean2Disp, fold_change=10, frac_change=0.1, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000, 1,1), K=10.3) {
+M3DropMakeSimHVar <- function(dispersion_fun=bg_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000, 1,1), K=10.3) {
         n_genes <- length(base_means);
         TP <- sample(1:n_genes, frac_change*n_genes)
         Pop_lab <- rep(1, times=n_cells)
 	# Whole Population
-	base <- M3DropMakeSimData(dispersion_fun=disperion_func, 
+	base <- M3DropMakeSimData(dispersion_fun=dispersion_fun, 
 			n_cells=n_cells, 
 			dispersion_factor=dispersion_factor, 
 			base_means=base_means, K=K)
 	# Changed Vals
-	subpop <- M3DropMakeSimData(dispersion_fun=disperion_func, 
+	subpop <- M3DropMakeSimData(dispersion_fun=dispersion_fun, 
 			n_cells=n_cells, 
 			dispersion_factor=fold_change*dispersion_factor, 
 			base_means=base_means[TP], K=K)
