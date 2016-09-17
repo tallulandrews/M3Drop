@@ -16,14 +16,14 @@ hidden_colVars <- function(x) {
 	unlist(apply(x, 2, var, na.rm = T))
 }
 
-bg_mean2disp <- function(mu, coeffs=c(3.967816,-1.855054)){
+bg__mean2disp <- function(mu, coeffs=c(3.967816,-1.855054)){
 		cv2 <- exp(coeffs[1]+coeffs[2]*(log(mu)/log(10)))
 		variance <- cv2*(mu^2)
 		disp <- mu^2/(variance-mu)
 		return(1/disp)
 }
 
-M3DropMakeSimData <- function(dispersion_fun=bg_mean2disp, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3) {
+M3DropMakeSimData <- function(dispersion_fun=bg__mean2disp, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3) {
 	# Make Simulated Matrix
         n_genes <- length(base_means);
         expr_mat <- sapply(1:n_genes, function(x){
@@ -41,7 +41,7 @@ M3DropMakeSimData <- function(dispersion_fun=bg_mean2disp, n_cells=300, dispersi
 	return(expr_mat);
 }
 
-M3DropMakeSimDE <- function(dispersion_fun=bg_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3){
+M3DropMakeSimDE <- function(dispersion_fun=bg__mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3){
         n_genes <- length(base_means);
         TP <- sample(1:n_genes, frac_change*n_genes)
         sub_pop <- round(sub_pop*n_cells)
@@ -62,7 +62,7 @@ M3DropMakeSimDE <- function(dispersion_fun=bg_mean2disp, fold_change=10, frac_ch
 }
 
 
-M3DropMakeSimDVar <- function(dispersion_fun=bg_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000, 1,1), K=10.3) {
+M3DropMakeSimDVar <- function(dispersion_fun=bg__mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000, 1,1), K=10.3) {
 	# Make Simulated Matrix
         n_genes <- length(base_means);
         TP <- sample(1:n_genes, frac_change*n_genes)
@@ -82,7 +82,7 @@ M3DropMakeSimDVar <- function(dispersion_fun=bg_mean2disp, fold_change=10, frac_
 	return(list(data=base, cell_labels=Pop_lab, TP=TP));
 }
 
-M3DropMakeSimHVar <- function(dispersion_fun=bg_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000, 1,1), K=10.3) {
+M3DropMakeSimHVar <- function(dispersion_fun=bg__mean2disp, fold_change=10, frac_change=0.1, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000, 1,1), K=10.3) {
         n_genes <- length(base_means);
         TP <- sample(1:n_genes, frac_change*n_genes)
         Pop_lab <- rep(1, times=n_cells)
@@ -100,7 +100,7 @@ M3DropMakeSimHVar <- function(dispersion_fun=bg_mean2disp, fold_change=10, frac_
 	return(list(data=base, cell_labels=Pop_lab, TP=TP));
 }
 
-bg_get_stats <- function(sig, TP, ngenes) {
+bg__get_stats <- function(sig, TP, ngenes) {
 	TPs<-sum(sig %in% TP)
 	FPs<-length(sig)-TPs
 	FNs<-length(TP)-TPs
@@ -118,7 +118,7 @@ bg_get_stats <- function(sig, TP, ngenes) {
 	return(c(FDR,FNR));
 }
 
-bg_var_vs_drop <- function(pop_size, fixed_mean, K=10.3, suppress.plot=TRUE) {
+bg__var_vs_drop <- function(pop_size, fixed_mean, K=10.3, suppress.plot=TRUE) {
 	# Relationship between Fold Change and Var/Dropouts for fixed mean
         fc <- seq(from=1, to=100, by=1)
         labels <- c(rep(1, times=pop_size),rep(2,times=pop_size))
@@ -126,8 +126,8 @@ bg_var_vs_drop <- function(pop_size, fixed_mean, K=10.3, suppress.plot=TRUE) {
         test <- sapply(fc, function(f) {
                 low_mean <- lowmean_fun(f)
                 high_mean <- low_mean*f
-                base <- rnbinom(pop_size, size=1/bg_mean2disp(low_mean), mu=low_mean);
-                subpop <- rnbinom(pop_size, size=1/bg_mean2disp(high_mean), mu=high_mean)
+                base <- rnbinom(pop_size, size=1/bg__mean2disp(low_mean), mu=low_mean);
+                subpop <- rnbinom(pop_size, size=1/bg__mean2disp(high_mean), mu=high_mean)
                 base <- hidden_add_dropouts(base,low_mean,K)
                 subpop <- hidden_add_dropouts(subpop,high_mean*f,K)
                 return(c(base,subpop))
