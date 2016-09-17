@@ -1,20 +1,24 @@
 \name{M3DropMakeSimData}
-\alias{M3DropMakeSimData, M3DropMakeSimDE, M3DropMakeSimDVar, M3DropMakeSimHVar}
+\alias{M3DropMakeSimData}
+\alias{M3DropMakeSimDE}
+\alias{M3DropMakeSimDVar}
+\alias{M3DropMakeSimHVar}
 \title{Make Simulated Data}
 \description{
 	Makes simulated data based on a negative binomial distribution inflated with zeros based on the Michaelis-Menten equation.
 }
 \usage{
-	M3DropMakeSimData(dispersion_fun, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000, 1, 1), K=10.3)
+	M3DropMakeSimData(dispersion_fun=bg_mean2disp, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000, 1, 1), K=10.3)
 	M3DropMakeSimDE(dispersion_fun=bg_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3)
 	M3DropMakeSimDVar(dispersion_fun=bg_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3)
-	M3DropMakeSimHVar(dispersion_fun=bg_mean2disp, fold_change=10, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3)
+	M3DropMakeSimHVar(dispersion_fun=bg_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3)
 }
 \arguments{
   \item{dispersion_fun}{a function which takes mean experssion and returns the dispersion parameter of the negative binomial distribution.}
   \item{n_cells}{total number of cells (columns) in the simulated dataset.}
   \item{sub_pop}{proportion of cells with changed expression.}
   \item{frac_change}{proportion of genes with changed expression.}
+  \item{fold_change}{fold change in dispersion or mean expression.}
   \item{dispersion_factor}{a factor that multiplies the calculated mean-specific dispersion for all genes.}
   \item{base_means}{a vector of background mean expression values.}
   \item{K}{K of the Michaelis-Menten function}
