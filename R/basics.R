@@ -1,3 +1,19 @@
+#Copyright (c) 2015, 2016 Genome Research Ltd .
+#Author : Tallulah Andrews <tallulandrews@gmail.com>
+#This file is part of M3Drop.
+
+#M3Drop is free software : you can redistribute it and/or modify it under
+#the terms of the GNU General Public License as published by the Free Software
+#Foundation; either version 2 of the License, or (at your option) any later
+#version.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT
+#ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License along with
+#this program . If not , see <http://www.gnu.org/licenses/>.
+
 bg__calc_variables <- function(expr_mat) {
         # Calc variables
 	if (sum(expr_mat < 0) >0) {stop("Expression matrix contains negative values! M3Drop requires an expression matrix that is not log-transformed.")}
