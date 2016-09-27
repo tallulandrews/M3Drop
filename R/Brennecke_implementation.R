@@ -1,4 +1,20 @@
-#from : http://www.nature.com/nmeth/journal/v10/n11/full/nmeth.2645.html#supplementary-information
+#Copyright (c) 2015, 2016 Genome Research Ltd .
+#Author : Tallulah Andrews <tallulandrews@gmail.com>
+#This file is part of M3Drop.
+
+#M3Drop is free software : you can redistribute it and/or modify it under
+#the terms of the GNU General Public License as published by the Free Software
+#Foundation; either version 2 of the License, or (at your option) any later
+#version.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT
+#ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License along with
+#this program . If not , see <http://www.gnu.org/licenses/>.
+
+#Contains code from Brennecke et al. Published in: http://www.nature.com/nmeth/journal/v10/n11/full/nmeth.2645.html#supplementary-information
 BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, fdr=0.1, minBiolDisp=0.5) {
         #require(statmod)
 
