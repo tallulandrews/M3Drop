@@ -6,7 +6,7 @@ In addition analyses based on the MM equation, such as identifying differentiall
 
 For comparison, the algorithm presented in Brennecke et al (2015) for detection of significantly highly variable genes is included.
 
-Installation (currently under review at Bioconductor):
+Installation (accepted at Bioconductor - available from Oct 18 2016):
 
 >require("devtools")
 >install_github('tallulandrews/M3Drop')
