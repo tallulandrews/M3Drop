@@ -11,8 +11,8 @@
   \item{k}{Number of clusters.}
   \item{type}{One of "cell" or "gene" indicating whether to get clusters or names of cells(columns) or genes(rows).}
 }
-\details{M3DropGetHeatmapClusters : Traverses down the row or column dendrogram and cuts at the first point where there are at least k clusters.
-	 M3DropGetHeatmapNames: gets the names of the cells/genes in the order that they appear on the dendrogram.
+\details{\code{M3DropGetHeatmapClusters} : Traverses down the row or column dendrogram and cuts at the first point where there are at least k clusters.
+	 \code{M3DropGetHeatmapNames}: gets the names of the cells/genes in the order that they appear on the dendrogram.
 }
 \value{A vector of cluster labels for each cell.}
 \examples{
