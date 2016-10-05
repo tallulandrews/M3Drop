@@ -44,8 +44,8 @@ M3DropMakeSimData <- function(dispersion_fun=bg__mean2disp, n_cells=300, dispers
         n_genes <- length(base_means);
         expr_mat <- sapply(1:n_genes, function(x){
                     base <- rnbinom(n_cells, 
-			size<-1/(dispersion_factor*dispersion_fun(base_means[x])), 
-			mu<-base_means[x])
+			size=1/(dispersion_factor*dispersion_fun(base_means[x])), 
+			mu=base_means[x])
                     if (!is.null(K)) {
                          base <- hidden_add_dropouts(base,base_means[x],K)
                     }
