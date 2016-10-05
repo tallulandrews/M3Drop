@@ -20,7 +20,7 @@ hidden_get_K <- function(expr_mat) {
 	return(fit$K);
 }
 
-hidden_get_mean2disp <- function(expr_mat) {
+bg__get_mean2disp <- function(expr_mat) {
 	cv2 <- hidden_rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
 	xes <- log(rowMeans(expr_mat, na.rm=T))/log(10)
 	reg <- lm(log(cv2[xes > 0])~xes[xes>0])
@@ -66,7 +66,7 @@ M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(ex
 
 	for (b in 1:length(batch_levels)) {
 		Ks[b] <- hidden_get_K(expr_mat[,batches == batch_levels[b]]);
-		DispFun[[b]] <- hidden_get_mean2disp(expr_mat[,batches == batch_levels[b]]);
+		DispFun[[b]] <- bg__get_mean2disp(expr_mat[,batches == batch_levels[b]]);
 	}
 
 	Ms <- rowMeans(expr_mat, na.rm=T)
