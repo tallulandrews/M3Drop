@@ -189,8 +189,12 @@ M3DropExpressionHeatmap <- function(genes, expr_mat, cell_labels=NA, interesting
 	invisible(heatmap_output);
 }
 
-M3DropGetHeatmapCellClusters <- function (heatout, k) {
-        dendro<-heatout$colDendrogram
+M3DropGetHeatmapClusters <- function (heatout, k, type="cell") {
+	if (grepl("gene",type) | grepl("row",type)) {
+        	dendro<-heatout$rowDendrogram
+	} else if (grepl("cell",type) | grepl("col",type)) {
+        	dendro<-heatout$colDendrogram
+	}
         curr_k <- 1;
         dendro_list <- list(dendro)
         dendro_heights <- attr(dendro, "height")
@@ -217,4 +221,13 @@ M3DropGetHeatmapCellClusters <- function (heatout, k) {
         }
 	names(groups) <- names_orig_order;
         return(groups);
+}
+
+M3DropGetHeatmapNames <- function (heatout, type="cell") {
+	if (grepl("gene",type) | grepl("row",type)) {
+        	dendro<-heatout$rowDendrogram
+	} else if (grepl("cell",type) | grepl("col",type)) {
+        	dendro<-heatout$colDendrogram
+	}
+	return(labels(dendro))
 }
