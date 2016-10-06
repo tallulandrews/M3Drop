@@ -13,7 +13,7 @@ This is the development version which includes these new features (minimally tes
 Installation :
 
 >require("devtools")
->install_github('tallulandrews/M3Drop', ref="dev")
+>install_github('tallulandrews/M3D', ref="dev")
 
 Example Data:
 
