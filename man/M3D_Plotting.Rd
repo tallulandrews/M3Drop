@@ -8,13 +8,13 @@
 }
 \usage{
 	bg__dropout_plot_base(expr_mat, xlim=NA, suppress.plot=FALSE)
-	bg__add_model_to_plot(fitted_model, base_plot, lty=1, lwd=1, col="black", legen_loc="topright")
+	bg__add_model_to_plot(fitted_model, base_plot, lty=1, lwd=1, col="black", legend_loc="topright")
 	bg__highlight_genes(base_plot, genes, col="purple", pch=16)
 }
 \arguments{
   \item{expr_mat}{a numeric matrix of normalized (not log-transformed) expression values, columns = samples, rows = genes.}
   \item{xlim}{limits of x-axis of plot, for comparing distributions across many datasets.}
-  \item{suppres.plot}{Whether to make the plot or just return values.}
+  \item{suppress.plot}{Whether to make the plot or just return values.}
   \item{fitted_model}{output from fitting a model to dropout rate vs mean expression, see \code{bg__fit_MM},\code{bg__fit_ZIFA},\code{bg__fit_logistic}}
   \item{base_plot}{output from \code{bg__dropout_plot_base}}
   \item{legend_loc}{coordinates of top-right corner of the legend.}
@@ -44,7 +44,7 @@
   Baseplot <-bg__dropout_plot_base(Mmus_example_list$data)
   MM <- bg__fit_MM(Baseplot$p, Baseplot$s)
   bg__add_model_to_plot(MM, Baseplot)
-  erccs <- grep("ercc",rownames(Mmus_example_list$data), ignore.case=T)
+  erccs <- grep("ercc",rownames(Mmus_example_list$data), ignore.case=TRUE)
   bg__highlight_genes(Baseplot, erccs, col="black")
 }
 \keyword{plotting, background}
