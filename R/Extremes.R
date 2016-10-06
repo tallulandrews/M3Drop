@@ -207,8 +207,8 @@ M3DropGetExtremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_thr
 
 	}
 	if (!suppress.plot) {
-		bg__highlight_genes(BasePlot, shifted_right, colour="orange");
-		bg__highlight_genes(BasePlot, shifted_left, colour="purple");
+		bg__highlight_genes(BasePlot, shifted_right, col="orange");
+		bg__highlight_genes(BasePlot, shifted_left, col="purple");
 	}
 	return(list(left=shifted_left,right=shifted_right));
 }
@@ -218,7 +218,7 @@ M3DropTestShift <- function(expr_mat, genes_to_test, name="", background=rowname
 	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
 	if (!suppress.plot) {
 		sizeloc <- bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
-		bg__highlight_genes(BasePlot, genes_to_test, colour="purple");
+		bg__highlight_genes(BasePlot, genes_to_test);
 		title(main=name);
 	}
 
