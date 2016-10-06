@@ -8,6 +8,7 @@ For comparison, the algorithm presented in Brennecke et al (2015) for detection 
 
 This is the development version which includes these new features (minimally tested):
 (1) Producing simulated data from a zero-inflated negative binomial distribution
+(2) Traditional multi-group differential expression
 
 Installation :
 
