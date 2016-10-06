@@ -147,7 +147,7 @@ bg__get_stats <- function(sig, TP, ngenes) {
 	return(c(FDR,FNR));
 }
 
-bg__var_vs_drop <- function(pop_size, fixed_mean, K=10.3, suppress.plot=TRUE) {
+bg__var_vs_drop <- function(pop_size, fixed_mean, K=10.3, mean2disp_fun=bg__mean2disp, suppress.plot=TRUE) {
 	# Relationship between Fold Change and Var/Dropouts for fixed mean
         fc <- seq(from=1, to=100, by=1)
         labels <- c(rep(1, times=pop_size),rep(2,times=pop_size))
@@ -155,8 +155,8 @@ bg__var_vs_drop <- function(pop_size, fixed_mean, K=10.3, suppress.plot=TRUE) {
         test <- sapply(fc, function(f) {
                 low_mean <- lowmean_fun(f)
                 high_mean <- low_mean*f
-                base <- rnbinom(pop_size, size=1/bg__mean2disp(low_mean), mu=low_mean);
-                subpop <- rnbinom(pop_size, size=1/bg__mean2disp(high_mean), mu=high_mean)
+                base <- rnbinom(pop_size, size=1/mean2disp_fun(low_mean), mu=low_mean);
+                subpop <- rnbinom(pop_size, size=1/mean2disp_fun(high_mean), mu=high_mean)
                 base <- hidden_add_dropouts(base,low_mean,K)
                 subpop <- hidden_add_dropouts(subpop,high_mean*f,K)
                 return(c(base,subpop))
