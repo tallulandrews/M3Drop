@@ -8,8 +8,8 @@
 	bg__var_vs_drop(pop_size, fixed_mean, K=10.3, mean2disp_fun=bg__mean2disp, suppress.plot=TRUE)
 }
 \arguments{
-  \item{pop_size} {size of each subpopulation, i.e. 1/2 the total number of cells.}
-  \item{fixed_mean} {expected mean expression across all cells.}
+  \item{pop_size}{size of each subpopulation, i.e. 1/2 the total number of cells.}
+  \item{fixed_mean}{expected mean expression across all cells.}
   \item{K}{K of the Michaelis-Menten function.}
   \item{mean2disp_fun}{function which calculates the dispersion parameter of the negative binomial distribution given the mean expression of the gene.}
   \item{suppress.plot}{Whether to plot variance vs fold change and dropout rate vs fold change plots.}
