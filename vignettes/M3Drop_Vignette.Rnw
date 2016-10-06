@@ -86,7 +86,7 @@ heat_out <- M3DropExpressionHeatmap(DE_genes$Gene, Normalized_data$data,
 The heatmap (Figure 3) shows that the identified DE genes are differentially expressed across timepoints. Furthermore, it shows that the blastocysts cluster into two different groups based on the expression of these genes. We can extract these groups and identify marker genes for them as follows:
 
 <<>>=
-cell_populations <- M3DropGetHeatmapCellClusters(heat_out, k=4)
+cell_populations <- M3DropGetHeatmapClusters(heat_out, k=4, type="cell")
 library("ROCR") 
 marker_genes <- M3DropGetMarkers(Normalized_data$data, cell_populations)
 @

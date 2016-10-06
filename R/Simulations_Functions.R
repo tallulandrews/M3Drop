@@ -25,6 +25,19 @@ hidden_add_dropouts <- function(x,mu,K){
 	return(x);
 }
 
+hidden_amplification1 <- function (x, rounds=12, efficiency=0.97) {
+	tot = sum(x);
+	if (tot == 0) {return(x)} # Nothing to be done if all zero already
+	# Amplify
+	for (i in 1:rounds) {
+		x <- sapply(x, function(y) {y+rbinom(1,size=y, prob=efficiency)})
+	}
+	amped = sum(x)
+	# Downsample back to starting amounts
+	x <- sapply(x, function(z) {rbinom(1,size=z, prob=1/((1+efficiency)^rounds))})
+	return(x);
+}
+
 hidden_rowVars <- function(x) {
 	unlist(apply(x, 1, var, na.rm = T))
 }
@@ -44,8 +57,8 @@ M3DropMakeSimData <- function(dispersion_fun=bg__mean2disp, n_cells=300, dispers
         n_genes <- length(base_means);
         expr_mat <- sapply(1:n_genes, function(x){
                     base <- rnbinom(n_cells, 
-			size<-1/(dispersion_factor*dispersion_fun(base_means[x])), 
-			mu<-base_means[x])
+			size=1/(dispersion_factor*dispersion_fun(base_means[x])), 
+			mu=base_means[x])
                     if (!is.null(K)) {
                          base <- hidden_add_dropouts(base,base_means[x],K)
                     }
@@ -134,7 +147,7 @@ bg__get_stats <- function(sig, TP, ngenes) {
 	return(c(FDR,FNR));
 }
 
-bg__var_vs_drop <- function(pop_size, fixed_mean, K=10.3, suppress.plot=TRUE) {
+bg__var_vs_drop <- function(pop_size, fixed_mean, K=10.3, mean2disp_fun=bg__mean2disp, suppress.plot=TRUE) {
 	# Relationship between Fold Change and Var/Dropouts for fixed mean
         fc <- seq(from=1, to=100, by=1)
         labels <- c(rep(1, times=pop_size),rep(2,times=pop_size))
@@ -142,8 +155,8 @@ bg__var_vs_drop <- function(pop_size, fixed_mean, K=10.3, suppress.plot=TRUE) {
         test <- sapply(fc, function(f) {
                 low_mean <- lowmean_fun(f)
                 high_mean <- low_mean*f
-                base <- rnbinom(pop_size, size=1/bg__mean2disp(low_mean), mu=low_mean);
-                subpop <- rnbinom(pop_size, size=1/bg__mean2disp(high_mean), mu=high_mean)
+                base <- rnbinom(pop_size, size=1/mean2disp_fun(low_mean), mu=low_mean);
+                subpop <- rnbinom(pop_size, size=1/mean2disp_fun(high_mean), mu=high_mean)
                 base <- hidden_add_dropouts(base,low_mean,K)
                 subpop <- hidden_add_dropouts(subpop,high_mean*f,K)
                 return(c(base,subpop))

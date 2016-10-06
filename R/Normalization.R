@@ -44,7 +44,7 @@ bg__filter_cells <- function(expr_mat,labels=NA, suppress.plot=FALSE, min_detect
 		if (length(labels)==length(expr_mat[1,])) {labels = labels[!low_quality]}
 		expr_mat <- expr_mat[,!low_quality];
 	}
-	return(list(expr_mat = expr_mat, labels = labels));
+	return(list(data = expr_mat, labels = labels));
 }
 
 hidden__normalize <- function(data) {
@@ -65,8 +65,8 @@ M3DropCleanData <- function(expr_mat, labels = NA, is.counts=TRUE, suppress.plot
 
 	data_list <- bg__filter_cells(expr_mat, labels, suppress.plot = suppress.plot, min_detected_genes=min_detected_genes);
 	
-        detected <- rowSums(data_list$expr_mat > 0) > 3;
-        expr_mat <- data_list$expr_mat[detected,];
+        detected <- rowSums(data_list$data> 0) > 3;
+        expr_mat <- data_list$data[detected,];
 	labels   <- data_list$labels
 
 	spikes <- grep("ercc",rownames(expr_mat), ignore.case=TRUE)
