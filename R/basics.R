@@ -15,31 +15,30 @@
 #this program . If not , see <http://www.gnu.org/licenses/>.
 
 bg__calc_variables <- function(expr_mat) {
-        # Calc variables
-	if (sum(expr_mat < 0) >0) {stop("Expression matrix contains negative values! M3Drop requires an expression matrix that is not log-transformed.")}
-	
-	# Deal with strangely normalized data
-	if (sum(expr_mat == 0) == 0) {
-		warning("Warning: No zero values (dropouts) detected will use minimum expression value instead.")
-		# If no zeros in expression matrix convert minimum value into zero
-		expr_mat <- round(expr_mat, digits=2) # Round to accomodate errors
-		min_val <- min(expr_mat)
-		expr_mat[expr_mat == min_val] <- 0;
-	}
-	if (sum(expr_mat == 0) < 0.1*sum(expr_mat >= 0)) {
-		# Less than 10% zeros
-		warning("Warning: Expression matrix contains few zero values (dropouts) this may lead to poor performance.")
-	}
-
-	p <- apply(expr_mat,1,function(x){y <- x[!is.na(x)]; sum(y==0)/length(y)});
-	s <- rowMeans(expr_mat, na.rm=TRUE);
-	s_stderr <- unlist(apply(expr_mat,1,sd))/sqrt(length(expr_mat[1,]));
-	tmp <- expr_mat; tmp[tmp == 0] <- NA;
-	s_stderr_nozero <- unlist(apply(tmp,1,sd, na.rm=TRUE))/sqrt(rowSums(expr_mat>0));
-	p_stderr <- sqrt(p*(1-p)/length(expr_mat[1,]));
-	names(s) <- rownames(expr_mat);
-	names(p) <- rownames(expr_mat);
-	return(list(s = s, p = p, s_stderr = s_stderr, s_stderr_nozero = s_stderr_nozero, p_stderr = p_stderr))
+    # Calc variables
+    sum_neg <- sum(expr_mat < 0)
+    sum_zero <- sum(expr_mat == 0)
+    sum_pos <- sum(expr_mat >= 0)
+    if (sum_neg > 0) {stop("Expression matrix contains negative values! M3Drop requires an expression matrix that is not log-transformed.")}
+    
+    # Deal with strangely normalized data
+    if (sum_zero == 0) {
+        warning("Warning: No zero values (dropouts) detected will use minimum expression value instead.")
+        # If no zeros in expression matrix convert minimum value into zero
+        expr_mat <- round(expr_mat, digits=2) # Round to accomodate errors
+        min_val <- min(expr_mat)
+        expr_mat[expr_mat == min_val] <- 0;
+    }
+    if (sum_zero < 0.1*sum_pos) {
+        # Less than 10% zeros
+        warning("Warning: Expression matrix contains few zero values (dropouts) this may lead to poor performance.")
+    }
+    
+    p <- apply(expr_mat,1,function(x){sum(x==0)/length(x)})
+    p_stderr <- sqrt(p*(1-p)/ncol(expr_mat))
+    s <- rowMeans(expr_mat)
+    s_stderr <- unlist(apply(expr_mat,1,sd))/sqrt(ncol(expr_mat))
+    return(list(s = s, p = p, s_stderr = s_stderr, p_stderr = p_stderr))
 }
 
 hidden__invert_MM <- function (K, p) {K*(1-p)/(p)}
