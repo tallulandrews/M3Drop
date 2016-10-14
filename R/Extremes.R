@@ -167,16 +167,16 @@ bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95
 ##### Assembled Analysis Chunks ####
 M3DropDifferentialExpression <- function(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
-	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
+	MM <- bg__fit_MM(BasePlot$gene_info$p, BasePlot$gene_info$s);
 	if (!suppress.plot) {
 		sizeloc <- bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
 	}
-	DEoutput <- bg__test_DE_K_equiv(gene_info, fit=MM);
+	DEoutput <- bg__test_DE_K_equiv(BasePlot$gene_info, fit=MM);
 	sig <- which(p.adjust(DEoutput$pval, method=mt_method) < mt_threshold);
 	DEgenes <- rownames(expr_mat)[sig];
 	DEgenes <- DEgenes[!is.na(DEgenes)];
 	if (!suppress.plot) {
-		bg__highlight_genes(BasePlot, DEgenes);
+		bg__highlight_genes(BasePlot, expr_mat, DEgenes);
 	}
 	
 	TABLE <- data.frame(Gene = DEgenes, p.value = DEoutput$pval[sig], q.value= p.adjust(DEoutput$pval, method=mt_method)[sig])

@@ -40,7 +40,7 @@ bg__dropout_plot_base <- function (expr_mat, xlim = NA, suppress.plot=FALSE) {
 		title(ylab="Dropout Rate", line=2)
 		title(xlab="log10(expression)", line=2)
 	}
-	invisible(list(p=gene_info$p, s=gene_info$s, xes=xes, data=expr_mat, order=put_in_order));
+	invisible(list(gene_info = gene_info, xes=xes, order=put_in_order));
 }
 
 bg__add_model_to_plot <- function(fitted_model, base_plot, lty=1, lwd=1, col="black",legend_loc = "topright") {
@@ -55,16 +55,16 @@ bg__add_model_to_plot <- function(fitted_model, base_plot, lty=1, lwd=1, col="bl
 	invisible(this_loc)
 }
 
-bg__highlight_genes <- function (base_plot, genes, colour="purple", pch=16) {
+bg__highlight_genes <- function (base_plot, data, genes, colour="purple", pch=16) {
 	if(!is.numeric(genes) && !is.logical(genes)) {
-		genes <- match(as.character(genes), rownames(base_plot$data));
+		genes <- match(as.character(genes), rownames(data));
 		nomatch <- sum(is.na(genes));
 		if (nomatch > 0) {warning(paste(nomatch, " genes could not be matched to data, they will not be highlighted."));}
 		if (nomatch == length(genes)) {invisible(cbind(c(NA,NA),c(NA,NA)))}
 		genes <- genes[!is.na(genes)];
 	}
-	points(base_plot$xes[genes],base_plot$p[genes],col=colour, pch=pch)
-	invisible(cbind(base_plot$s[genes],base_plot$p[genes]));
+	points(base_plot$xes[genes],base_plot$gene_info$p[genes],col=colour, pch=pch)
+	invisible(cbind(base_plot$gene_info$s[genes],base_plot$gene_info$p[genes]));
 }
 
 bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels=NA, key_genes=genes, key_cells=NA) { 
