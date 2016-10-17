@@ -36,15 +36,10 @@ hidden__test_DE_K_equiv_raw <- function (expr_mat, fit=NA) {
 	return(list(pval = pval, fold_change = effect_size))
 }
 
-bg__test_DE_K_equiv <- function(expr_mat, fit=NA) {
-	gene_info <- bg__calc_variables(expr_mat);
-	if (is.na(fit)[1]) {
-		fit <- bg__fit_MM(gene_info$p, gene_info$s);
-	}
+bg__test_DE_K_equiv <- function(gene_info, fit=NA) {
 	p_obs <- gene_info$p;
 	always_detected <- p_obs==0
 	p_obs[p_obs==0] <- min(p_obs[p_obs > 0])/2 # Here so that K_equiv for p_obs==0 will be 0 but K_equiv_err will not throw errors for such genes.
-	N <- length(expr_mat[1,]);
 	p_err <- gene_info$p_stderr;
 	S_mean <- gene_info$s
 	S_err <- gene_info$s_stderr
@@ -174,17 +169,16 @@ bg__get_extreme_residuals <- function (expr_mat, fit=NA, fdr_threshold = 0.1, pe
 ##### Assembled Analysis Chunks ####
 M3DropDifferentialExpression <- function(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
-	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
+	MM <- bg__fit_MM(BasePlot$gene_info$p, BasePlot$gene_info$s);
 	if (!suppress.plot) {
 		sizeloc <- bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
 	}
-	DEoutput <- bg__test_DE_K_equiv(expr_mat, fit=MM);
-
+	DEoutput <- bg__test_DE_K_equiv(BasePlot$gene_info, fit=MM);
 	sig <- which(p.adjust(DEoutput$pval, method=mt_method) < mt_threshold);
 	DEgenes <- rownames(expr_mat)[sig];
 	DEgenes <- DEgenes[!is.na(DEgenes)];
 	if (!suppress.plot) {
-		bg__highlight_genes(BasePlot, DEgenes);
+		bg__highlight_genes(BasePlot, expr_mat, DEgenes);
 	}
 	
 	TABLE <- data.frame(Gene = DEgenes, p.value = DEoutput$pval[sig], q.value= p.adjust(DEoutput$pval, method=mt_method)[sig])
