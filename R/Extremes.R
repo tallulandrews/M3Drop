@@ -60,12 +60,14 @@ bg__test_DE_K_equiv <- function(expr_mat, fit=NA) {
 #	K_equiv_err_log = K_equiv_err/K_equiv # This does not hold when K_equiv_err =~ K_equiv which is particularly problematic for lowly expressed genes
 	K_equiv_err_log[K_equiv-K_equiv_err <= 0 ] <- 10^10
 	K_obs_log <- log(fit$K)
-	K_err_log <- sd(K_equiv_log-K_obs_log)/sqrt(length(K_equiv_log)) 
+	K_err_log <- sd(K_equiv_log-K_obs_log, na.rm=T)/sqrt(length(K_equiv_log)) 
 		
 	Z <- (K_equiv_log - K_obs_log)/sqrt(K_equiv_err_log^2+K_err_log^2); # high = shifted right, low = shifted left
 	pval <- pnorm(Z, lower.tail=FALSE)
 	pval[always_detected] <- 1;
+	pval[is.na(pval)] <- 1; # deal with never detected
 	effect_size <- K_equiv/fit$K;
+	effect_size[is.na(effect_size)] <- 1; # deal with never detected
 	return(list(pval = pval, fold_change = effect_size))
 }
 # Use the fact that errors of proportions are well define by converting S to proportion detected equivalents?
@@ -124,7 +126,7 @@ hidden__test_DE_S_equiv <- function (expr_mat, fit=NA, method="propagate") {
 	return(list(pval = pval, effect = effect_size))
 }
 
-bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95), percent = NA, fdr_threshold = 0.1, direction="right", suppress.plot = FALSE) {
+bg__get_extreme_residuals <- function (expr_mat, fit=NA, fdr_threshold = 0.1, percent = NA, v_threshold=c(0.05,0.95), direction="right", suppress.plot = FALSE) {
 	gene_info = bg__calc_variables(expr_mat);
 	if (is.na(fit)[1]) {
 		fit <- bg__fit_MM(gene_info$p, gene_info$s);
@@ -205,8 +207,8 @@ M3DropGetExtremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_thr
 
 	}
 	if (!suppress.plot) {
-		bg__highlight_genes(BasePlot, shifted_right, colour="orange");
-		bg__highlight_genes(BasePlot, shifted_left, colour="purple");
+		bg__highlight_genes(BasePlot, shifted_right, col="orange");
+		bg__highlight_genes(BasePlot, shifted_left, col="purple");
 	}
 	return(list(left=shifted_left,right=shifted_right));
 }
@@ -216,7 +218,7 @@ M3DropTestShift <- function(expr_mat, genes_to_test, name="", background=rowname
 	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
 	if (!suppress.plot) {
 		sizeloc <- bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
-		bg__highlight_genes(BasePlot, genes_to_test, colour="purple");
+		bg__highlight_genes(BasePlot, genes_to_test);
 		title(main=name);
 	}
 

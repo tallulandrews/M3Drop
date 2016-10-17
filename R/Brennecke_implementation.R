@@ -15,8 +15,6 @@
 #this program . If not , see <http://www.gnu.org/licenses/>.
 
 #This contains code by Brennecke et al. published in http://www.nature.com/nmeth/journal/v10/n11/full/nmeth.2645.html#supplementary-information
-
-
 BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, fdr=0.1, minBiolDisp=0.5) {
         #require(statmod)
 
