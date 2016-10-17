@@ -6,24 +6,18 @@ In addition analyses based on the MM equation, such as identifying differentiall
 
 For comparison, the algorithm presented in Brennecke et al (2015) for detection of significantly highly variable genes is included.
 
-Installation (currently under review at Bioconductor):
+This is the development version which includes these new features (minimally tested):
+(1) Producing simulated data from a zero-inflated negative binomial distribution
+(2) Traditional multi-group differential expression
+
+Installation :
 
 >require("devtools")
->install_github('tallulandrews/M3Drop')
-
-OR
-
->source("https://bioconductor.org/biocLite.R")
->biocLite("M3Drop")
+>install_github('tallulandrews/M3D')
 
 Example Data:
 
 >require("devtools")
 >install_github('tallulandrews/M3DExampleData')
-
-OR
-
->source("https://bioconductor.org/biocLite.R")
->biocLite("M3DExampleData")
 
 Read More: DOI: 10.1101/065094
