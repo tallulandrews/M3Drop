@@ -114,9 +114,9 @@ bg__fit_ZIFA <- function(p,s) {
 
 M3DropDropoutModels <- function(expr_mat, xlim=NA, suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = xlim, suppress.plot=suppress.plot);
-	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
-	SCDE <- bg__fit_logistic(BasePlot$p, BasePlot$s);
-	ZIFA <- bg__fit_ZIFA(BasePlot$p, BasePlot$s);
+	MM <- bg__fit_MM(BasePlot$gene_info$p, BasePlot$gene_info$s);
+	SCDE <- bg__fit_logistic(BasePlot$gene_info$p, BasePlot$gene_info$s);
+	ZIFA <- bg__fit_ZIFA(BasePlot$gene_info$p, BasePlot$gene_info$s);
 	if (!suppress.plot) {
 	  	sizeloc <- bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
 		sizeloc <- bg__add_model_to_plot(SCDE, BasePlot, lty=2, lwd=2.5, col="magenta3",legend_loc = c(sizeloc$rect$left+sizeloc$rect$w,sizeloc$rect$top-sizeloc$rect$h-0.05));
