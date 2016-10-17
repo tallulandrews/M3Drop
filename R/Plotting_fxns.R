@@ -55,9 +55,9 @@ bg__add_model_to_plot <- function(fitted_model, base_plot, lty=1, lwd=1, col="bl
 	invisible(this_loc)
 }
 
-bg__highlight_genes <- function (base_plot, data, genes, col="purple", pch=16) {
+bg__highlight_genes <- function (base_plot, expr_mat, genes, col="purple", pch=16) {
 	if(!is.numeric(genes) && !is.logical(genes)) {
-		genes <- match(as.character(genes), rownames(data));
+		genes <- match(as.character(genes), rownames(expr_mat));
 		nomatch <- sum(is.na(genes));
 		if (nomatch > 0) {warning(paste(nomatch, " genes could not be matched to data, they will not be highlighted."));}
 		if (nomatch == length(genes)) {invisible(cbind(c(NA,NA),c(NA,NA)))}

@@ -187,7 +187,7 @@ M3DropDifferentialExpression <- function(expr_mat, mt_method="bon", mt_threshold
 
 M3DropGetExtremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_threshold=c(0.05,0.95), suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
-	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
+	MM <- bg__fit_MM(BasePlot$gene_info$p, BasePlot$gene_info$s);
 	if (!suppress.plot) {
 		sizeloc <- bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
 	}
@@ -201,22 +201,22 @@ M3DropGetExtremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_thr
 
 	}
 	if (!suppress.plot) {
-		bg__highlight_genes(BasePlot, shifted_right, col="orange");
-		bg__highlight_genes(BasePlot, shifted_left, col="purple");
+		bg__highlight_genes(BasePlot, expr_mat, shifted_right, col="orange");
+		bg__highlight_genes(BasePlot, expr_mat, shifted_left, col="purple");
 	}
 	return(list(left=shifted_left,right=shifted_right));
 }
 
 M3DropTestShift <- function(expr_mat, genes_to_test, name="", background=rownames(expr_mat), suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
-	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
+	MM <- bg__fit_MM(BasePlot$gene_info$p, BasePlot$gene_info$s);
 	if (!suppress.plot) {
 		sizeloc <- bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
-		bg__highlight_genes(BasePlot, genes_to_test);
+		bg__highlight_genes(BasePlot, expr_mat, genes_to_test);
 		title(main=name);
 	}
 
-	res <- bg__horizontal_residuals_MM_log10(MM$K, BasePlot$p, BasePlot$s)
+	res <- bg__horizontal_residuals_MM_log10(MM$K, BasePlot$gene_info$p, BasePlot$gene_info$s)
 	res[is.infinite(res)] <- NA;
 	mu <- median(res[rownames(expr_mat) %in% as.character(background)], na.rm=TRUE); #sigma = sd(res, na.rm=TRUE);
 	s_mu <- median(res[rownames(expr_mat) %in% as.character(genes_to_test)], na.rm=TRUE);
