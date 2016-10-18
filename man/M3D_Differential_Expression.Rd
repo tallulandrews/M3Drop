@@ -15,7 +15,7 @@
   \item{mt_threshold}{the threshold for identifying significantly DE genes.}
   \item{suppress.plot}{logical, whether to plot the fitted curve and highlight DE genes.}
   \item{fit}{Output from fitting the Michaelis-Menten equation (see: \code{bg__fit_MM}}
-  \item{gene_info) {List of calculated gene-specific values output by \code{bg__calc_variables}}
+  \item{gene_info}{List of calculated gene-specific values output by \code{bg__calc_variables}}
 }
 \details{Fits a Michaelis-Menten function to the dropout-rate (if not provided) of the provided expression matrix. Identifies genes where the gene-specific K calculated as (S = mean expression, P = dropout rate): \deqn{K=\frac{S*P}{1-P}}{K = (S * P)/(1 - P)} is significantly larger than the K fitted to the entire dataset. Combines standard errors of the fitted K, the gene-specific dropout rate and the gene-specific average expression using error propagation rules. Determines the signficance of the gene-specific K using a Z-test of the log-transformed Ks with the propagated error then applies the specified multiple testing correction to identify DE genes. Plots the dropout rate vs gene expression with the fitted MM curve and highlights in purple the significantly DE genes.}
 \value{ 
