@@ -45,6 +45,6 @@
   MM <- bg__fit_MM(Baseplot$p, Baseplot$s)
   bg__add_model_to_plot(MM, Baseplot)
   erccs <- grep("ercc",rownames(Mmus_example_list$data), ignore.case=TRUE)
-  bg__highlight_genes(Baseplot, erccs, col="black")
+  bg__highlight_genes(Baseplot, Mmus_example_list$data, erccs, col="black")
 }
 \keyword{plotting, background}
