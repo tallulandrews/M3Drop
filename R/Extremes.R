@@ -37,6 +37,9 @@ hidden__test_DE_K_equiv_raw <- function (expr_mat, fit=NA) {
 }
 
 bg__test_DE_K_equiv <- function(gene_info, fit=NA) {
+	if (is.na(fit)[1]) {
+		fit <- bg__fit_MM(gene_info$p, gene_info$s);
+	}
 	p_obs <- gene_info$p;
 	always_detected <- p_obs==0
 	p_obs[p_obs==0] <- min(p_obs[p_obs > 0])/2 # Here so that K_equiv for p_obs==0 will be 0 but K_equiv_err will not throw errors for such genes.
