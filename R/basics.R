@@ -34,10 +34,11 @@ bg__calc_variables <- function(expr_mat) {
         warning("Warning: Expression matrix contains few zero values (dropouts) this may lead to poor performance.")
     }
     
-    p <- apply(expr_mat,1,function(x){sum(x==0)/length(x)})
+    p <- rowSums(expr_mat == 0)/ncol(expr_mat)
     p_stderr <- sqrt(p*(1-p)/ncol(expr_mat))
     s <- rowMeans(expr_mat)
-    s_stderr <- unlist(apply(expr_mat,1,sd))/sqrt(ncol(expr_mat))
+    s_stderr <- rowSds(expr_mat)/sqrt(ncol(expr_mat))
+    names(s_stderr) <- rownames(expr_mat)
     return(list(s = s, p = p, s_stderr = s_stderr, p_stderr = p_stderr))
 }
 
