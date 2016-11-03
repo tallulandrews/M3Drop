@@ -5,7 +5,7 @@ Title: Michaelis-Menten Modelling of Dropouts in single-cell RNASeq
 Author: Tallulah Andrews <tallulandrews@gmail.com>
 Maintainer: Tallulah Andrews <tallulandrews@gmail.com>
 Depends: R (>= 3.2.2), numDeriv
-Imports: RColorBrewer, gplots, bbmle, statmod, grDevices, graphics, stats
+Imports: RColorBrewer, gplots, bbmle, statmod, grDevices, graphics, stats, matrixStats
 Suggests: ROCR, knitr, M3DExampleData
 VignetteBuilder: knitr
 biocViews: RNASeq, Sequencing, Transcriptomics, GeneExpression, Software, DifferentialExpression, DimensionReduction, FeatureExtraction
