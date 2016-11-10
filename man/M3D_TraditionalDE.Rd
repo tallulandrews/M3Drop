@@ -6,13 +6,14 @@
 	Performs traditional (i.e. compare defined groups) differential expression using a negative binomial model with MM zero-inflation.
 }
 \usage{
-	M3DropTraditionalDE(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])))
+	M3DropTraditionalDE(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05)
 	bg__get_mean2disp(expr_mat)
 }
 \arguments{
   \item{expr_mat}{a numeric matrix of library-size normalized expression values, columns = samples, rows = genes.}
   \item{groups}{a vector of biological group IDs for each cell(columns).}
   \item{batches}{a vector of technical batch IDs for each cell(columns)}
+  \item{fdr}{false discovery rate threshold for returning results.}
 }
 \details{
 THIS FUNCTION SHOULD BE CONSIDERED UNSTABLE.
@@ -31,6 +32,6 @@ Normalized_data <- M3DropCleanData(Mmus_example_list$data,
                   labels = Mmus_example_list$labels,
                   is.counts=TRUE, min_detected_genes=2000)
 DE_output <- M3DropTraditionalDE(Normalized_data$data[1:100,], Normalized_data$labels)
-DE_output_batches <- M3DropTraditionalDE(Normalized_data$data[1:100,], Normalized_data$labels, batches=Normalized_data$labels)
+DE_output_batches <- M3DropTraditionalDE(Normalized_data$data[1:100,], Normalized_data$labels, batches=Normalized_data$labels) # each biological condition was performed separately
 }
 \keyword{differential expression}

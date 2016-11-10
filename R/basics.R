@@ -15,6 +15,9 @@
 #this program . If not , see <http://www.gnu.org/licenses/>.
 
 bg__calc_variables <- function(expr_mat) {
+    if (!is.matrix(expr_mat)) {
+	expr_mat <- as.matrix(expr_mat)
+    }
     # Calc variables
     sum_neg <- sum(expr_mat < 0)
     sum_zero <- sum(expr_mat == 0)
