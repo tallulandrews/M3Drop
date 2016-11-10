@@ -58,6 +58,8 @@ BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, 
         fit <- glmgam.fit( cbind( a0 = 1, a1tilde = 1/meansSp[useForFit] ), cv2Sp[useForFit] )
         a0 <- unname( fit$coefficients["a0"] )
         a1 <- unname( fit$coefficients["a1tilde"])
+	res <- cv2Genes - (a0 + a1/meansGenes);
+
 
         # Test
         psia1theta <- a1
@@ -90,6 +92,8 @@ BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, 
                 # Add a curve showing the expectation for the chosen biological CV^2 thershold
                 lines( xg, psia1theta/xg + a0 + minBiolDisp, lty="dashed", col="#C0007090", lwd=3)
         }
-        return(names(meansGenes)[sig])
+	TABLE <- data.frame(Gene = names(meansGenes)[sig], effect.size=res[sig], p.value = p[sig], q.value= padj[sig])
+	TABLE <- TABLE[order(-TABLE[,2]),];
+        return(TABLE)
 }
 

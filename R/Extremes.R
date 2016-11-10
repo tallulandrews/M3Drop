@@ -184,7 +184,8 @@ M3DropDifferentialExpression <- function(expr_mat, mt_method="bon", mt_threshold
 		bg__highlight_genes(BasePlot, expr_mat, DEgenes);
 	}
 	
-	TABLE <- data.frame(Gene = DEgenes, p.value = DEoutput$pval[sig], q.value= p.adjust(DEoutput$pval, method=mt_method)[sig])
+	TABLE <- data.frame(Gene = DEgenes, effect.size=DEoutput$fold_change[sig], p.value = DEoutput$pval[sig], q.value= p.adjust(DEoutput$pval, method=mt_method)[sig])
+	TABLE <- TABLE[order(-TABLE[,2]),];
 	return(TABLE)
 }
 

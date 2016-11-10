@@ -47,7 +47,7 @@ hidden_calc_p <- function(obs, mu, K, mean2disp) {
 	}
 	return(p);
 }
-M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,]))) {
+M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
 	# Check Input
 	if (!is.factor(batches)) {
 		batches <- factor(batches)	
@@ -94,6 +94,7 @@ M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(ex
 	}
 	rownames(AllOut) <- rownames(expr_mat)
 	AllOut <- cbind(AllOut, p.adjust(AllOut[,length(AllOut[1,])], method="fdr"));		
+	AllOut <- AllOut[AllOut[,length(AllOut[1,])] < fdr,]
 	colnames(AllOut) <- c(levels(factor(groups)), levels(batches), "p.value", "q.value")
 	return(AllOut);
 }
