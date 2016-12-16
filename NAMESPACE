@@ -1,3 +1,4 @@
+useDynLib(M3Drop)
 exportPattern("M3Drop*")
 exportPattern("bg__*")
 export(BrenneckeGetVariableGenes)

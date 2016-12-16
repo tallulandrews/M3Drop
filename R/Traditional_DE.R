@@ -34,6 +34,13 @@ bg__get_mean2disp <- function(expr_mat) {
 	return(mean2disp_fun)
 }
 
+hidden__cv2coeffs <- function(expr_mat) {
+	cv2 <- hidden_rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
+	xes <- log(rowMeans(expr_mat, na.rm=T))/log(10)
+	reg <- lm(log(cv2[xes > 0])~xes[xes>0])
+	return(c(reg$coeff[1], reg$coeff[2]))
+}
+
 hidden_calc_p <- function(obs, mu, K, mean2disp) {
 	if (mu == 0 & obs != 0) {stop("Error:non-zero obs has zero mean")}
 	if (obs == 0) {
@@ -61,17 +68,15 @@ M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(ex
 	}
 	# Fit Batches
 	batch_levels <- levels(batches)
-	Ks <- vector(length=length(batch_levels))
-	DispFun <- list(length=length(batch_levels))
-
-	for (b in 1:length(batch_levels)) {
-		Ks[b] <- hidden_get_K(expr_mat[,batches == batch_levels[b]]);
-		DispFun[[b]] <- bg__get_mean2disp(expr_mat[,batches == batch_levels[b]]);
-	}
+	Ks <- sapply(batch_levels, function(b){hidden_get_K(expr_mat[,batches == batch_levels[b]])})
+	DispFits <- sapply(batch_levels, function(b){bg__get_mean2disp(expr_mat[,batches == batch_levels[b]])})
 
 	Ms <- rowMeans(expr_mat, na.rm=T)
 	Mis <- by(t(expr_mat), factor(groups), colMeans)
-	for (g in 1:length(expr_mat[,1])) {
+
+	#### Move to C? ####
+	AllOut <- sapply(1:length(expr_mat[,1]), function(g) {
+#	for (g in 1:length(expr_mat[,1])) {
 		probs <- sapply(1:length(expr_mat[1,]), function(i) {
 				obs<-expr_mat[g,i]
 				M <- Ms[g]
@@ -86,12 +91,14 @@ M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(ex
 		df <- length(unique(groups))-1
 		pval <- pchisq(D, df=df, lower.tail=FALSE)
 		output <- c(as.vector(by(expr_mat[g,], factor(groups), mean)),as.vector(by(expr_mat[g,], factor(batches), mean)), pval)
-		if (g == 1) {
-			AllOut <- output
-		} else {
-			AllOut = rbind(AllOut, output)
-		}
-	}
+	})
+#		if (g == 1) {
+#			AllOut <- output
+#		} else {
+#			AllOut = rbind(AllOut, output)
+#		}
+#	}
+	#### --------- ####
 	rownames(AllOut) <- rownames(expr_mat)
 	AllOut <- cbind(AllOut, p.adjust(AllOut[,length(AllOut[1,])], method="fdr"));		
 	AllOut <- AllOut[AllOut[,length(AllOut[1,])] < fdr,]
