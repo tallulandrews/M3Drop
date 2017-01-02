@@ -21,7 +21,7 @@ hidden_get_K <- function(expr_mat) {
 }
 
 bg__get_mean2disp <- function(expr_mat) {
-	cv2 <- hidden_rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
+	cv2 <- rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
 	xes <- log(rowMeans(expr_mat, na.rm=T))/log(10)
 	reg <- lm(log(cv2[xes > 0])~xes[xes>0])
 	mean2disp_fun <- function(mu){
@@ -35,7 +35,7 @@ bg__get_mean2disp <- function(expr_mat) {
 }
 
 hidden__cv2coeffs <- function(expr_mat) {
-	cv2 <- hidden_rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
+	cv2 <- rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
 	xes <- log(rowMeans(expr_mat, na.rm=T))/log(10)
 	reg <- lm(log(cv2[xes > 0])~xes[xes>0])
 	return(c(reg$coeff[1], reg$coeff[2]))
@@ -68,8 +68,8 @@ M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(ex
 	}
 	# Fit Batches
 	batch_levels <- levels(batches)
-	Ks <- sapply(batch_levels, function(b){hidden_get_K(expr_mat[,batches == batch_levels[b]])})
-	DispFits <- sapply(batch_levels, function(b){bg__get_mean2disp(expr_mat[,batches == batch_levels[b]])})
+	Ks <- sapply(batch_levels, function(b){hidden_get_K(expr_mat[,batches == b])})
+	DispFits <- sapply(batch_levels, function(b){bg__get_mean2disp(expr_mat[,batches == b])})
 
 	Ms <- rowMeans(expr_mat, na.rm=T)
 	Mis <- by(t(expr_mat), factor(groups), colMeans)
