@@ -79,7 +79,7 @@ obsolete__fit_size_to_drop <- function(obs, mu_vec, max_size, min_size=10^-10, c
                 last2 <- last; last <- diff;
                 if (size_fit > max_size) {return(max_size);}
        }
-       warn("Fitting size did not converge.");
+       warning("Fitting size did not converge.");
        return(size_fit);
 }
 
@@ -111,17 +111,18 @@ bg__fit_size_to_var <- function(obs, mu_vec, max_size, min_size=10^-10, converge
                 last2 <- last; last <- diff;
                 if (size_fit > max_size) {return(max_size);}
        }
-       warn("Fitting size did not converge.");
+       warning("Fitting size did not converge.");
        return(size_fit);
 }
 
 #### Dispersion vs Mean & Feature Selection ####
 NBumiFitDispVsMean <- function(fit, suppress.plot=TRUE) {
 	vals <- fit$vals;
-	forfit <- fit$size < max(fit$size) & vals$tjs > 0 & fit$size > 0
-	reg <- lm( log(size[forfit])~ log((vals$tjs/vals$nc)[forfit]) )
+	size_g <- fit$sizes
+	forfit <- fit$size < max(size_g) & vals$tjs > 0 & size_g > 0
+	reg <- lm( log(size_g[forfit])~ log((vals$tjs/vals$nc)[forfit]) )
 	if (!suppress.plot) {
-		plot(log( (vals$tjs/vals$nc)[forfit] ), log(size[forfit]), xlab="Log Mean Expression", ylab="Log Size" )
+		plot(log( (vals$tjs/vals$nc)[forfit] ), log(size_g[forfit]), xlab="Log Mean Expression", ylab="Log Size" )
 		abline(reg, col="red")
 	}
 	return(reg$coefficients)
@@ -136,7 +137,7 @@ NBumiFeatureSelectionHighVar <- function(fit, window_size=1000) {
 	vals <- fit$vals;
 	mean_order <- order(vals$tjs);
 	obs_mean <- vals$tjs[mean_order]/vals$nc
-	fit_disp <- fit$size[mean_order]
+	fit_disp <- fit$sizes[mean_order]
 	names(fit_disp) <- names(vals$tjs)
 	keep <- fit_disp < max(fit_disp)
 	fit_disp <- log(fit_disp[keep])
@@ -197,6 +198,7 @@ PoissonUMIFeatureSelectionDropouts <- function(vals, fit) {
 
 NBumiGroupDE <- function(counts, fit, groups, mean2disp_coeffs) {
 	vals <- fit$vals;
+	size_g <- fit$sizes
 	group_specific_factor <- aggregate(t(counts), by=list(groups), sum)
 	rownames(group_specific_factor) <- group_specific_factor[,1]
 	group_specific_factor <- group_specific_factor[,-1]
@@ -214,9 +216,9 @@ NBumiGroupDE <- function(counts, fit, groups, mean2disp_coeffs) {
 		prob_test <- 0;
 		for (i in 1:vals$nc) {
 			group <- which(colnames(group_specific_factor) == groups[i])
-			p1 <- dnbinom(counts[j,i], mu=mus[j,i], size=size[j], log=TRUE)
-			group_mu <- mus[j,i]*group_specific_factor[j,group]
-			shifted_size <- hidden_shift_size(mus[j,i],size[j],group_mu,coeffs);
+			p1 <- dnbinom(counts[j,i], mu=fit$mus[j,i], size=size_g[j], log=TRUE)
+			group_mu <- fit$mus[j,i]*group_specific_factor[j,group]
+			shifted_size <- hidden_shift_size(fit$mus[j,i],size_g[j],group_mu,coeffs);
 			p2 <- dnbinom(counts[j,i], mu=group_mu, size=shifted_size, log=TRUE)
 			# Collect ps across i
 			prob_null <- prob_null+p1

@@ -59,6 +59,9 @@ M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(ex
 	if (!is.factor(batches)) {
 		batches <- factor(batches)	
 	}
+	if (!is.factor(groups)) {
+		groups <- factor(groups)	
+	}
 	if (length(batches) != length(groups) | 
 	    length(batches) != length(expr_mat[1,])) {
 		stop("Error: length of groups and batches must match number of cells (columns of expr_mat)");
@@ -72,7 +75,7 @@ M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(ex
 	DispFits <- sapply(batch_levels, function(b){bg__get_mean2disp(expr_mat[,batches == b])})
 
 	Ms <- rowMeans(expr_mat, na.rm=T)
-	Mis <- by(t(expr_mat), factor(groups), colMeans)
+	Mis <- by(t(expr_mat), groups, colMeans)
 
 	#### Move to C? ####
 	AllOut <- sapply(1:length(expr_mat[,1]), function(g) {
@@ -81,16 +84,16 @@ M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(ex
 				obs<-expr_mat[g,i]
 				M <- Ms[g]
 				b <- as.numeric(batches[i])
-				group <- as.numeric(factor(groups)[i])
+				group <- as.numeric(groups[i])
 				Mi <- Mis[[group]][g]
-				p1 <- hidden_calc_p(round(obs),M,Ks[b], DispFun[[b]])
-				p2 <- hidden_calc_p(round(obs),Mi,Ks[b], DispFun[[b]])
+				p1 <- hidden_calc_p(round(obs),M,Ks[b], DispFits[[b]])
+				p2 <- hidden_calc_p(round(obs),Mi,Ks[b], DispFits[[b]])
 				return(cbind(p1,p2))
 			})
 		D <- -2*(sum(log(probs[1,]))-sum(log(probs[2,])))
-		df <- length(unique(groups))-1
+		df <- length(levels(groups))-1
 		pval <- pchisq(D, df=df, lower.tail=FALSE)
-		output <- c(as.vector(by(expr_mat[g,], factor(groups), mean)),as.vector(by(expr_mat[g,], factor(batches), mean)), pval)
+		output <- c(as.vector(by(expr_mat[g,], groups, mean)),as.vector(by(expr_mat[g,], batches, mean)), pval)
 	})
 #		if (g == 1) {
 #			AllOut <- output
@@ -99,10 +102,11 @@ M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(ex
 #		}
 #	}
 	#### --------- ####
+	AllOut <- t(AllOut)
 	rownames(AllOut) <- rownames(expr_mat)
 	AllOut <- cbind(AllOut, p.adjust(AllOut[,length(AllOut[1,])], method="fdr"));		
+	colnames(AllOut) <- c(levels(groups), levels(batches), "p.value", "q.value")
 	AllOut <- AllOut[AllOut[,length(AllOut[1,])] < fdr,]
-	colnames(AllOut) <- c(levels(factor(groups)), levels(batches), "p.value", "q.value")
 	return(AllOut);
 }
 
@@ -124,7 +128,7 @@ M3DropCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
 
 	# Fit K & Disp
 	Ks <- hidden_get_K(expr_mat)
-	DispFits <- bg__get_mean2disp(expr_mat)
+	DispFits <- hidden__cv2coeffs(expr_mat)
 
 	Ms <- rowMeans(expr_mat, na.rm=T)
 	Mis <- by(t(expr_mat), groups, colMeans)
@@ -141,7 +145,7 @@ M3DropCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
 
 	AllOut <- cbind(Mis, pvalues, p.adjust(pvalues, method="fdr"));
 	rownames(AllOut) <- rownames(expr_mat)
-	colnames(AllOut) <- c(levels(factor(groups)), levels(batches), "p.value", "q.value")
+	colnames(AllOut) <- c(levels(factor(groups)), "p.value", "q.value")
 	AllOut <- AllOut[AllOut[,length(AllOut[1,])] < fdr,]
 	return(AllOut);
 }

@@ -58,6 +58,7 @@ hidden__normalize <- function(data) {
 }
 
 M3DropCleanData <- function(expr_mat, labels = NA, is.counts=TRUE, suppress.plot=FALSE, pseudo_genes=NA, min_detected_genes=NA) {
+	expr_mat[is.na(expr_mat)] = 0;
 	if (length(pseudo_genes) > 1) {
 		is_pseudo <- rownames(expr_mat) %in% as.character(pseudo_genes);
 	        expr_mat <- expr_mat[!is_pseudo,];
