@@ -127,6 +127,7 @@ NBumiFitDispVsMean <- function(fit, suppress.plot=TRUE) {
 	}
 	return(reg$coefficients)
 }
+
 hidden_shift_size <- function(mu_all, size_all, mu_group, coeffs) {
 	b <- log(size_all)-coeffs[2]*log(mu_all)
 	size_group <- exp(coeffs[2]*log(mu_group)+b)
@@ -196,7 +197,7 @@ PoissonUMIFeatureSelectionDropouts <- function(vals, fit) {
 }
 #### Differential Expression #####
 
-NBumiGroupDE <- function(counts, fit, groups, mean2disp_coeffs) {
+NBumiGroupDE <- function(counts, fit, groups) {
 	vals <- fit$vals;
 	size_g <- fit$sizes
 	group_specific_factor <- aggregate(t(counts), by=list(groups), sum)
