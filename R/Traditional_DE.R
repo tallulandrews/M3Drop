@@ -136,11 +136,12 @@ M3DropCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
 	colnames(Mis) <- levels(groups);
 
 	# Do tests in C
-	prob <- rep(1, length=ng);
+	prob <- rep(-0.1, times=ng);
 
-	out <- .C("loglikehood_m3d", as.integer(round(expr_mat)), as.double(Ms), as.integer(groups), as.double(Mis), as.integer(nc), as.integer(ng), as.double(DispFits[2]), as.double(DispFits[1]), as.double(Ks), as.double(prob));
+	out <- .C("loglikehood_m3d", as.integer(round(expr_mat)), as.double(Ms), as.integer(groups), as.double(Mis), as.integer(nc), as.integer(ng), as.double(DispFits), as.double(Ks));
+#	out <- .C("loglikehood_m3d", as.integer(as.matrix(round(expr_mat))), as.double(Ms), as.integer(ng));
 	
-	pvalues <- out[[length(out)]];
+	pvalues <- out[[2]];
 	#### --------- ####
 
 	AllOut <- cbind(Mis, pvalues, p.adjust(pvalues, method="fdr"));

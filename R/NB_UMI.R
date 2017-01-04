@@ -1,13 +1,12 @@
 #### Fitting #####
 hidden_calc_vals <- function(counts) {
         if (sum(counts < 0) >0) {stop("Expression matrix contains negative values! Please provide raw UMI counts!")}
-        if (sum(!is.integer(counts)) >0) {stop("Expression matrix is not integers! Please provide raw UMI counts!")}
+        if (sum(!is.integer(counts)) >0) {stop("Expression matrix is not integers! Please provide a matrix (not data.frame) raw UMI counts!")}
 
-        p = apply(counts,1,function(x){y = x[!is.na(x)]; sum(y==0)/length(y)});
-        s = rowMeans(counts, na.rm=T);
-
-        tis = colSums(counts, na.rm=T) # Total molecules/cell
         tjs = rowSums(counts, na.rm=T) # Total molecules/gene
+	if (sum(tjs <= 0) > 0) {stop("Error: all genes must have at least one detected molecule.")}
+        tis = colSums(counts, na.rm=T) # Total molecules/cell
+	if (sum(tis <= 0) > 0) {stop("Error: all cells must have at least one detected molecule.")}
         djs = rowSums(counts == 0, na.rm=T) # Observed Dropouts per gene
         dis = colSums(counts == 0, na.rm=T) # Observed Dropouts per cell
         nc = length(counts[1,]) # Number of cells
@@ -237,3 +236,33 @@ NBumiGroupDE <- function(counts, fit, groups) {
 	colnames(output) <- c(colnames(group_specific_factor), "p.value","q.value")
 	return(output);
 }
+
+
+NBumiCGroupDE <- function(counts, fit, groups) {
+	if (!is.factor(groups)) {
+		groups <- factor(groups);
+	}
+	vals <- fit$vals;
+	size_g <- fit$sizes
+	group_specific_factor <- aggregate(t(counts), by=list(groups), sum)
+	rownames(group_specific_factor) <- group_specific_factor[,1]
+	group_specific_factor <- group_specific_factor[,-1]
+	group_specific_factor <- t(group_specific_factor)
+	group_specific_tjs <- group_specific_factor; 
+	group_total <- colSums(group_specific_tjs)
+	group_specific_factor <- t(t(group_specific_tjs)/group_total) / (vals$tjs/vals$total) # Relative expression level in group vs across whole dataset.
+	group_specific_factor[vals$tjs == 0,] <- rep(1, length(group_specific_factor[1,]))
+
+	coeffs <- NBumiFitDispVsMean(fit, suppress.plot=TRUE);
+	pvals <- rep(-0.1, times=vals$ng);
+
+	out <- .C("loglikehood_nbumi", as.integer(as.matrix(round(counts))), as.double(fit$mus), as.integer(groups), as.double(group_specific_factor), as.double(size_g), as.integer(vals$nc), as.integer(vals$ng), as.double(coeffs[2]), as.double(pvals));
+
+	pvals = out[[5]];
+	# Format output.
+	output <- cbind(group_specific_factor, pvals, p.adjust(pvals, method="fdr"));
+	rownames(output) <- rownames(counts);
+	colnames(output) <- c(colnames(group_specific_factor), "p.value","q.value")
+	return(output);
+}
+
