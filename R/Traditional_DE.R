@@ -187,7 +187,7 @@ M3DropTraditionalDE_shiftDisp <- function(expr_mat, groups, batches=rep(1, times
 	Ms <- rowMeans(expr_mat, na.rm=T)
 	Mis <- by(t(expr_mat), groups, colMeans)
 	V <- rowVars(expr_mat)
-	V[V<=mu] <- mu[V<=mu] + 10^-10;
+	V[V<=Ms] <- Ms[V<=Ms] + 10^-10;
 	nb_size <- Ms^2/(V-Ms); # gene-specific dataset-wide dispersion
 
 	#### Move to C? ####
