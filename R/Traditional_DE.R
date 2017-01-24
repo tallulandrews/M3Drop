@@ -34,6 +34,17 @@ bg__get_mean2disp <- function(expr_mat) {
 	return(mean2disp_fun)
 }
 
+bg__fitdispersion <- function(expr_mat) {
+	V <- rowVars(expr_mat)
+	mu <- rowMeans(expr_mat)
+	xes <- log(mu)/log(10)
+	V[V <= mu] <- mu[V <= mu]+10^-10;
+	nb_size <- mu^2/(V-mu);
+
+	reg <- lm(log(nb_size[xes>0])~xes[xes>0])
+	return(reg$coefficients[2]);
+}
+
 hidden__cv2coeffs <- function(expr_mat) {
 	cv2 <- rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
 	xes <- log(rowMeans(expr_mat, na.rm=T))/log(10)
@@ -41,12 +52,11 @@ hidden__cv2coeffs <- function(expr_mat) {
 	return(c(reg$coeff[1], reg$coeff[2]))
 }
 
-hidden_calc_p <- function(obs, mu, K, mean2disp) {
+hidden_calc_p <- function(obs, mu, K, disp) {
 	if (mu == 0 & obs != 0) {stop("Error:non-zero obs has zero mean")}
 	if (obs == 0) {
 		p <- 1-mu/(mu+K)
 	} else {
-		disp <- mean2disp(mu)
 		p <- dnbinom(obs, size=1/disp, mu=mu)
 		if (p < 10^-200) {
 			p = 10^-200
@@ -55,6 +65,7 @@ hidden_calc_p <- function(obs, mu, K, mean2disp) {
 	return(p);
 }
 M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
+	# Batch-specific mean-variance
 	# Check Input
 	if (!is.factor(batches)) {
 		batches <- factor(batches)	
@@ -86,8 +97,8 @@ M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(ex
 				b <- as.numeric(batches[i])
 				group <- as.numeric(groups[i])
 				Mi <- Mis[[group]][g]
-				p1 <- hidden_calc_p(round(obs),M,Ks[b], DispFits[[b]])
-				p2 <- hidden_calc_p(round(obs),Mi,Ks[b], DispFits[[b]])
+				p1 <- hidden_calc_p(round(obs),M,Ks[b], DispFits[[b]](M))
+				p2 <- hidden_calc_p(round(obs),Mi,Ks[b], DispFits[[b]](Mi))
 				return(cbind(p1,p2))
 			})
 		D <- -2*(sum(log(probs[1,]))-sum(log(probs[2,])))
@@ -111,7 +122,8 @@ M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(ex
 }
 
 
-M3DropCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
+bg__M3DropCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
+	# Seg faults!
 	# Check Input
 	if ( length(groups) != length(expr_mat[1,])) {
 		stop("Error: length of groups must match number of cells (columns of expr_mat)");
@@ -147,6 +159,73 @@ M3DropCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
 	AllOut <- cbind(Mis, pvalues, p.adjust(pvalues, method="fdr"));
 	rownames(AllOut) <- rownames(expr_mat)
 	colnames(AllOut) <- c(levels(factor(groups)), "p.value", "q.value")
+	AllOut <- AllOut[AllOut[,length(AllOut[1,])] < fdr,]
+	return(AllOut);
+}
+
+M3DropTraditionalDE_shiftDisp <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
+	# Batch specific mean-variance, gene-specific variance.
+	# Check Input
+	if (!is.factor(batches)) {
+		batches <- factor(batches)	
+	}
+	if (!is.factor(groups)) {
+		groups <- factor(groups)	
+	}
+	if (length(batches) != length(groups) | 
+	    length(batches) != length(expr_mat[1,])) {
+		stop("Error: length of groups and batches must match number of cells (columns of expr_mat)");
+	}
+	if (!is.matrix(expr_mat)) {
+		expr_mat <- as.matrix(expr_mat);
+	}
+	# Fit Batches
+	batch_levels <- levels(batches)
+	Ks <- sapply(batch_levels, function(b){hidden_get_K(expr_mat[,batches == b])})
+	DispFits <- sapply(batch_levels, function(b){bg__fitdispersion(expr_mat[,batches == b])}) # Fit mean-variance for each batch
+
+	Ms <- rowMeans(expr_mat, na.rm=T)
+	Mis <- by(t(expr_mat), groups, colMeans)
+	V <- rowVars(expr_mat)
+	V[V<=mu] <- mu[V<=mu] + 10^-10;
+	nb_size <- Ms^2/(V-Ms); # gene-specific dataset-wide dispersion
+
+	#### Move to C? ####
+	AllOut <- sapply(1:length(expr_mat[,1]), function(g) {
+#	for (g in 1:length(expr_mat[,1])) {
+		probs <- sapply(1:length(expr_mat[1,]), function(i) {
+				obs<-expr_mat[g,i]
+				M <- Ms[g]
+				b <- as.numeric(batches[i])
+				group <- as.numeric(groups[i])
+				Mi <- Mis[[group]][g]
+				# Shift Dispersion
+				slope <- DispFits[b]
+				disp1 <- nb_size[g]
+				if (disp1 <= 0) {disp1 = 10^-10}
+				tmp_intercept <- log(disp1)-slope*log(M)
+				disp2 <- exp(slope*log(Mi)+tmp_intercept)
+				if (disp2 <= 0) {disp2 = 10^-10}
+				p1 <- hidden_calc_p(round(obs),M,Ks[b], 1/disp1)
+				p2 <- hidden_calc_p(round(obs),Mi,Ks[b], 1/disp2)
+				return(cbind(p1,p2))
+			})
+		D <- -2*(sum(log(probs[1,]))-sum(log(probs[2,])))
+		df <- length(levels(groups))-1
+		pval <- pchisq(D, df=df, lower.tail=FALSE)
+		output <- c(as.vector(by(expr_mat[g,], groups, mean)),as.vector(by(expr_mat[g,], batches, mean)), pval)
+	})
+#		if (g == 1) {
+#			AllOut <- output
+#		} else {
+#			AllOut = rbind(AllOut, output)
+#		}
+#	}
+	#### --------- ####
+	AllOut <- t(AllOut)
+	rownames(AllOut) <- rownames(expr_mat)
+	AllOut <- cbind(AllOut, p.adjust(AllOut[,length(AllOut[1,])], method="fdr"));		
+	colnames(AllOut) <- c(levels(groups), levels(batches), "p.value", "q.value")
 	AllOut <- AllOut[AllOut[,length(AllOut[1,])] < fdr,]
 	return(AllOut);
 }
