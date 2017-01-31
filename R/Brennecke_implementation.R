@@ -15,7 +15,7 @@
 #this program . If not , see <http://www.gnu.org/licenses/>.
 
 #This contains code by Brennecke et al. published in http://www.nature.com/nmeth/journal/v10/n11/full/nmeth.2645.html#supplementary-information
-BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, fdr=0.1, minBiolDisp=0.5) {
+BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, fdr=0.1, minBiolDisp=0.5, fitMeanQuantile=0.8) {
         #require(statmod)
 
         rowVars <- function(x) { unlist(apply(x,1,var, na.rm=TRUE))}
@@ -45,7 +45,7 @@ BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, 
         varsGenes <- rowVars(countsGenes)
         cv2Genes <- varsGenes/meansGenes^2
         # Fit Model
-        minMeanForFit <- unname( quantile( meansSp[ which( cv2Sp > 0.3 ) ], 0.80))
+        minMeanForFit <- unname( quantile( meansSp[ which( cv2Sp > 0.3 ) ], fitMeanQuantile))
         useForFit <- meansSp >= minMeanForFit
         if (sum(useForFit, na.rm=TRUE) < 20) {
                 warning("Too few spike-ins exceed minMeanForFit, recomputing using all genes.")
@@ -96,4 +96,3 @@ BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, 
 	TABLE <- TABLE[order(-TABLE[,2]),];
         return(TABLE)
 }
-
