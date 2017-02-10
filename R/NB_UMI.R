@@ -80,21 +80,18 @@ NBumiCompareModels <- function(counts, size_factor=(colSums(counts)/median(colSu
 	check_adjust <- NBumiCheckFit(counts, fit_adjust, suppress.plot=TRUE)
 	check_basic <- NBumiCheckFit(norm, fit_basic, suppress.plot=TRUE)
 	nc = fit_adjust$vals$nc
-#	plot( log(fit_adjust$vals$tjs/fit_adjust$vals$nc)/log(10), fit_adjust$vals$djs, col="white" )
-#	arrows(log(fit_adjust$vals$tjs/fit_adjust$vals$nc)/log(10), fit_adjust$vals$djs, 
-#		log(fit_adjust$vals$tjs/fit_adjust$vals$nc)/log(10), rowSums(check_adjust$exp_ps), col="navy",
-#		length=0)
-#	arrows(log(fit_adjust$vals$tjs/fit_adjust$vals$nc)/log(10), fit_basic$vals$djs, 
-#		log(fit_adjust$vals$tjs/fit_adjust$vals$nc)/log(10), rowSums(check_basic$exp_ps), col="purple", 
-#		length=0)
+
 	plot( fit_adjust$vals$tjs/nc, fit_adjust$vals$djs/nc, col="black", pch=16, xlab="Expression", log="x", ylab= "Dropout Rate", cex=0.75)
-	points( fit_adjust$vals$tjs/nc, fit_basic$vals$djs/nc, col="black", pch=16, cex=0.75)
+#	points( fit_adjust$vals$tjs/nc, fit_basic$vals$djs/nc, col="black", pch=16, cex=0.75)
 	points( fit_adjust$vals$tjs/nc, rowSums(check_adjust$exp_ps)/nc, col="goldenrod1", pch=16, cex=0.5 )
 	points( fit_adjust$vals$tjs/nc, rowSums(check_basic$exp_ps)/nc, col="purple", pch=16, cex=0.5 )
+
 	err_adj <- sum(abs(rowSums(check_adjust$exp_ps)/nc-fit_adjust$vals$djs/nc))
-	err_bas <- sum(abs(rowSums(check_basic$exp_ps)/nc-fit_basic$vals$djs/nc))
-	legend("bottomleft", paste(c("Depth-Adjusted\nError:", "Normalized\nError:"), round(c(err_adj, err_bas)), c("\n","\n")), col=c("goldenrod1","purple"), pch=16, bty="n", cex=0.75)
-	return(c(err_adj, err_bas))
+#	err_bas <- sum(abs(rowSums(check_basic$exp_ps)/nc-fit_basic$vals$djs/nc))
+	err_bas <- sum(abs(rowSums(check_basic$exp_ps)/nc-fit_adjust$vals$djs/nc))
+	legend("bottomleft", paste(c("Depth-Adjusted\nError:", "Basic\nError:"), round(c(err_adj, err_bas)), c("\n","\n")), col=c("goldenrod1","purple"), pch=16, bty="n", cex=0.75)
+	out <- c(err_adj, err_bas); names(out) <- c("Depth-Adjusted", "Basic");
+	return(out)
 }
 
 obsolete__fit_size_to_drop <- function(obs, mu_vec, max_size, min_size=10^-10, convergence=0.001) {

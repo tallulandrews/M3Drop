@@ -41,7 +41,7 @@ void loglikehood_m3d (int* counts, double* mus, int* groups, double* group_mus, 
 	double disp_slope = disp_coeff[2];
 	double disp_intercept = disp_coeff[1];
 	int i, j;
-	GetRNGstate();
+//	GetRNGstate();
 	for (j = 0; j < *ng; j++) {
 		double p_null = 0.0;
 		double p_test = 0.0;
@@ -63,7 +63,7 @@ void loglikehood_m3d (int* counts, double* mus, int* groups, double* group_mus, 
 		double p = pchisq(D, df, 0, 0);
 		mus[j] = p;
 	}
-	PutRNGstate();
+//	PutRNGstate();
 }
 
 /* NBumi */
@@ -81,6 +81,7 @@ void loglikehood_nbumi (int* counts, double* mus, int* groups, double* group_fac
 		double p_null = 0;
 		double p_test = 0;
 		for (i = 0; i < *nc; i++) {
+i = 0;
 			int group = groups[i];
 			int coords = convert_2D_indices_to_1D(j, i, ng, nc);
 			double this_mu = mus[coords];
@@ -97,11 +98,11 @@ void loglikehood_nbumi (int* counts, double* mus, int* groups, double* group_fac
 			double p2 = dnbinom_mu(this_obs, shifted_disp, group_mu, TRUE);
 			p_null = p_null+p;
 			p_test = p_test+p2;
+disps[j] = p_null;
 		}
 		double D = -2*(p_null-p_test);
 		int df = *n_group -1;
-		double p = pchisq(D, df, FALSE, FALSE);
-		disps[j] = p;
+//		double p = pchisq(D, df, FALSE, FALSE);
 	}
 //	PutRNGstate();
 }

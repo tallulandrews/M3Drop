@@ -163,7 +163,7 @@ bg__M3DropCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
 	return(AllOut);
 }
 
-M3DropTraditionalDE_shiftDisp <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
+M3DropTraditionalDEShiftDisp <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
 	# Batch specific mean-variance, gene-specific variance.
 	# Check Input
 	if (!is.factor(batches)) {
@@ -206,6 +206,7 @@ M3DropTraditionalDE_shiftDisp <- function(expr_mat, groups, batches=rep(1, times
 				tmp_intercept <- log(disp1)-slope*log(M)
 				disp2 <- exp(slope*log(Mi)+tmp_intercept)
 				if (disp2 <= 0) {disp2 = 10^-10}
+				# Calculate probability
 				p1 <- hidden_calc_p(round(obs),M,Ks[b], 1/disp1)
 				p2 <- hidden_calc_p(round(obs),Mi,Ks[b], 1/disp2)
 				return(cbind(p1,p2))

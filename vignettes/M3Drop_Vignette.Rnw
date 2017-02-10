@@ -61,7 +61,7 @@ Since the Michaelis-Menten equation is concave, averaging across a mixed populat
 
 \begin{center}
 <<fig=TRUE>>=
-DE_genes <- M3DropDifferentialExpression(Normalized_data$data, 
+DE_genes <- M3DropFeatureSelection(Normalized_data$data, 
 			mt_method="fdr", mt_threshold=0.01)
 @
 \\
