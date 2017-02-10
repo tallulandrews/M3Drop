@@ -170,7 +170,7 @@ bg__get_extreme_residuals <- function (expr_mat, fit=NA, fdr_threshold = 0.1, pe
 	}
 }
 ##### Assembled Analysis Chunks ####
-M3DropDifferentialExpression <- function(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE) {
+M3DropFeatureSelection <- function(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
 	MM <- bg__fit_MM(BasePlot$gene_info$p, BasePlot$gene_info$s);
 	if (!suppress.plot) {

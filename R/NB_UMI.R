@@ -12,7 +12,14 @@ hidden_calc_vals <- function(counts) {
         nc = length(counts[1,]) # Number of cells
         ng = length(counts[,1]) # Number of genes
         total = sum(tis, na.rm=T) # Total molecules sampled
-        return(list(tis=tis, tjs=tjs, djs=djs, dis=dis, total=total,nc=nc,ng=ng));
+        return(list(tis=tis, tjs=tjs, dis=dis, djs=djs, total=total,nc=nc,ng=ng));
+}
+
+NBumiConvertToInteger <- function(mat) {
+        mat <- round(as.matrix(mat))
+        storage.mode(mat) <- "integer"
+        mat = mat[rowSums(mat) > 0,]
+        return(mat)
 }
 
 NBumiFitModel <- function(counts) {
@@ -26,29 +33,68 @@ NBumiFitModel <- function(counts) {
 		 bg__fit_size_to_var(var(counts[j,]-mus[j,]), mus[j,], max_size=max_size, min_size=10^-10, convergence=0.001)
 		})
 	return(list(mus=mus, sizes=size, vals=vals))
-
 }
 
-NBumiCheckFit <- function(counts, fit) {
+NBumiFitBasicModel <- function(counts) {
+	vals <- hidden_calc_vals(counts);
+	mus <- vals$tjs/vals$nc
+	v <- rowVars(counts)
+	errs <- v < mus;
+	v[errs] <- mus[errs]+10^-10;
+	size <- mus^2/(v-mus)
+	max_size <- max(mus)^2;
+	size[errs] <- max_size;
+	mus_mat <- matrix(rep(mus, times=vals$nc), ncol=vals$nc, byrow=FALSE)
+	return(list(mus=mus_mat, sizes=size, vals=vals))
+}
+
+NBumiCheckFit <- function(counts, fit, suppress.plot=FALSE) {
 	vals <- fit$vals;
-	size_mat <- matrix(rep(fit$sizes, times=vals$nc), ncol=vals$nc, byrow=F)
+	size_mat <- matrix(rep(fit$sizes, times=vals$nc), ncol=vals$nc, byrow=FALSE)
 	vs <- fit$mus+fit$mus*fit$mus/size_mat
 	thing <- apply(counts-fit$mus, 1, var)
-	plot(thing, rowMeans(vs), log="xy", xlab="Observed", ylab="Expected", main="Gene-specific Variance")
-	abline(a=0, b=1, col="red")
+#	plot(thing, rowMeans(vs), log="xy", xlab="Observed", ylab="Expected", main="Gene-specific Variance")
+#	abline(a=0, b=1, col="red")
 
 	exp_ps <- (1+fit$mus/size_mat)^(-size_mat)
-	plot(vals$djs, rowSums(exp_ps), xlab="Observed", ylab="Fit", main="Gene-specific Dropouts")
-	abline(a=0, b=1, col="red")
+	if (!suppress.plot) {
+		plot(vals$djs, rowSums(exp_ps), xlab="Observed", ylab="Fit", main="Gene-specific Dropouts")
+		abline(a=0, b=1, col="red")
 
-	plot(vals$dis, colSums(exp_ps), xlab="Observed", ylab="Expected", main="Cell-specific Dropouts")
-	abline(a=0, b=1, col="red")
+		plot(vals$dis, colSums(exp_ps), xlab="Observed", ylab="Expected", main="Cell-specific Dropouts")
+		abline(a=0, b=1, col="red")
+	}
 
 #	plot(vals$tjs/vals$nc, rowMeans(fit$mus), xlab="Observed", ylab="Fit", main="Gene Mean Expression")
 #	abline(a=0, b=1, col="red")
 
 #	plot(vals$tis, colSums(fit$mus), xlab="Observed", ylab="Fit", main="Cell Count Total")
 #	abline(a=0, b=1, col="red")
+	invisible(list(gene_error = sum((vals$djs-rowSums(exp_ps))^2), cell_error = sum((vals$dis-colSums(exp_ps))^2), exp_ps = exp_ps));
+}
+
+NBumiCompareModels <- function(counts, size_factor=(colSums(counts)/median(colSums(counts)))) {
+	norm <- NBumiConvertToInteger(t(t(counts)/size_factor));
+	fit_adjust <- NBumiFitModel(counts);
+	fit_basic <- NBumiFitBasicModel(norm);
+	check_adjust <- NBumiCheckFit(counts, fit_adjust, suppress.plot=TRUE)
+	check_basic <- NBumiCheckFit(norm, fit_basic, suppress.plot=TRUE)
+	nc = fit_adjust$vals$nc
+#	plot( log(fit_adjust$vals$tjs/fit_adjust$vals$nc)/log(10), fit_adjust$vals$djs, col="white" )
+#	arrows(log(fit_adjust$vals$tjs/fit_adjust$vals$nc)/log(10), fit_adjust$vals$djs, 
+#		log(fit_adjust$vals$tjs/fit_adjust$vals$nc)/log(10), rowSums(check_adjust$exp_ps), col="navy",
+#		length=0)
+#	arrows(log(fit_adjust$vals$tjs/fit_adjust$vals$nc)/log(10), fit_basic$vals$djs, 
+#		log(fit_adjust$vals$tjs/fit_adjust$vals$nc)/log(10), rowSums(check_basic$exp_ps), col="purple", 
+#		length=0)
+	plot( fit_adjust$vals$tjs/nc, fit_adjust$vals$djs/nc, col="black", pch=16, xlab="Expression", log="x", ylab= "Dropout Rate", cex=0.75)
+	points( fit_adjust$vals$tjs/nc, fit_basic$vals$djs/nc, col="black", pch=16, cex=0.75)
+	points( fit_adjust$vals$tjs/nc, rowSums(check_adjust$exp_ps)/nc, col="goldenrod1", pch=16, cex=0.5 )
+	points( fit_adjust$vals$tjs/nc, rowSums(check_basic$exp_ps)/nc, col="purple", pch=16, cex=0.5 )
+	err_adj <- sum(abs(rowSums(check_adjust$exp_ps)/nc-fit_adjust$vals$djs/nc))
+	err_bas <- sum(abs(rowSums(check_basic$exp_ps)/nc-fit_basic$vals$djs/nc))
+	legend("bottomleft", paste(c("Depth-Adjusted\nError:", "Normalized\nError:"), round(c(err_adj, err_bas)), c("\n","\n")), col=c("goldenrod1","purple"), pch=16, bty="n", cex=0.75)
+	return(c(err_adj, err_bas))
 }
 
 obsolete__fit_size_to_drop <- function(obs, mu_vec, max_size, min_size=10^-10, convergence=0.001) {
@@ -119,6 +165,10 @@ NBumiFitDispVsMean <- function(fit, suppress.plot=TRUE) {
 	vals <- fit$vals;
 	size_g <- fit$sizes
 	forfit <- fit$size < max(size_g) & vals$tjs > 0 & size_g > 0
+	higher <- log(vals$tjs/vals$nc)/log(2) > 4; # As per-Grun et al.
+	if (sum(higher == TRUE) > 2000) {
+		forfit = higher & forfit;
+	}
 	reg <- lm( log(size_g[forfit])~ log((vals$tjs/vals$nc)[forfit]) )
 	if (!suppress.plot) {
 		plot(log( (vals$tjs/vals$nc)[forfit] ), log(size_g[forfit]), xlab="Log Mean Expression", ylab="Log Size" )
@@ -133,7 +183,7 @@ hidden_shift_size <- function(mu_all, size_all, mu_group, coeffs) {
 	return(size_group)
 }
 
-NBumiFeatureSelectionHighVar <- function(fit, window_size=1000) {
+bg__NBumiFeatureSelectionHighVarDist2Med <- function(fit, window_size=1000) {
 	vals <- fit$vals;
 	mean_order <- order(vals$tjs);
 	obs_mean <- vals$tjs[mean_order]/vals$nc
@@ -152,11 +202,21 @@ NBumiFeatureSelectionHighVar <- function(fit, window_size=1000) {
 		high <- min(length(fit_disp), x+flank);
 		return(fit_disp[x]-median(fit_disp[seq(from=low, to=high, by=1)]))
 	}
-	score <- -1*sapply(1:length(fit_disp), dist_from_med)
-	return(rev(sort(score)))
+	score <- sapply(1:length(fit_disp), dist_from_med)
+	return(sort(score))
 }
 
-NBumiFeatureSelectionDropouts <- function(fit) {
+NBumiFeatureSelectionHighVar <- function(fit) {
+	# Global mean-variance
+	vals <- fit$vals;
+	coeffs <- NBumiFitDispVsMean(fit, suppress.plot=TRUE);
+	exp_size <- exp( coeffs[1] + coeffs[2]*log(vals$tjs/vals$nc) )
+	res <- log(fit$size) - log(exp_size);
+	return(sort(res))
+}
+
+bg__NBumiFeatureSelectionDropouts <- function(fit) {
+	# Gene-specific variance, mean
 	vals <- fit$vals;
 	size_mat <- matrix(rep(fit$sizes, times=vals$nc), ncol=vals$nc, byrow=F)
 	Exp_p <- (1+fit$mus/size_mat)^(-size_mat)
@@ -176,8 +236,34 @@ NBumiFeatureSelectionDropouts <- function(fit) {
 	return(sort(pvalue))
 }
 
-PoissonUMIFeatureSelectionDropouts <- function(vals, fit) {
-#	size_mat <-  matrix(rep(fit$sizes, times=vals$nc), ncol=vals$nc, byrow=F)
+NBumiFeatureSelectionCombinedDrop <- function(fit) {
+	# Global mean-variance, gene-specific mean
+	vals <- fit$vals;
+
+	coeffs <- NBumiFitDispVsMean(fit, suppress.plot=TRUE);
+	exp_size <- exp( coeffs[1] + coeffs[2]*log(vals$tjs/vals$nc) )
+
+	size_mat <- matrix(rep(exp_size, times=vals$nc), ncol=vals$nc, byrow=F)
+	Exp_p <- (1+fit$mus/size_mat)^(-size_mat)
+	Exp_p_var <- Exp_p*(1-Exp_p)
+
+	droprate_exp <- rowSums(Exp_p)/vals$nc
+	droprate_exp[droprate_exp < 1/vals$nc] <- 1/vals$nc # Is this necessary?
+	droprate_exp_err <- sqrt(rowSums(Exp_p_var)/(vals$nc^2))
+	droprate_obs <- vals$djs/vals$nc
+	droprate_obs_err <- sqrt(droprate_obs*(1-droprate_obs)/vals$nc)
+
+	diff <- droprate_obs-droprate_exp
+	combined_err <- droprate_exp_err
+	Zed <- diff/combined_err
+        pvalue <- pnorm(Zed, lower.tail = FALSE)
+	names(pvalue) <- names(vals$tjs)
+	return(sort(pvalue))
+}
+
+PoissonUMIFeatureSelectionDropouts <- function(fit) {
+	# Poisson distribution
+	vals <- fit$vals
 	Exp_p <- exp(-fit$mus)
 	Exp_p_var <- Exp_p*(1-Exp_p)
 
@@ -194,9 +280,37 @@ PoissonUMIFeatureSelectionDropouts <- function(vals, fit) {
 	names(pvalue) <- names(vals$tjs)
 	return(sort(pvalue))
 }
+
+#PoissonUMIFeatureSelectionCV <- function(counts, fit) {
+#	# Poisson distribution
+#	vals <- fit$vals
+#	g_means <- vals$tjs/vals$nc
+#	CVexp <- 1/sqrt(g_means) # expected
+#	CVobs <-  sqrt(apply(counts-fit$mus, 1, var))/g_means;
+#
+#	CVexp_log <- log(CVexp)
+#	CVobs_log <- log(CVobs)
+#	mean_log <- log(g_means)
+#
+#	res <- CVobs_log-CVexp_log;
+#	res_sd <- sd(res);
+#
+#	# Variance of sample variance from http://mathworld.wolfram.com/SampleVarianceDistribution.html
+#	# Kenney and Keeping 1951, p. 164; Rose and Smith 2002, p. 264
+#	u4 <- g_means*(1+3*g_means) # central moment
+#	u2 <- g_means
+#	N <- vals$nc
+#	V <- (N-1)^2/N^3*u4-(N-1)*(N-3)/N^3*u2^2
+#
+#	Zed <- (CVobs-CVexp)/sqrt(V)
+#        pvalue <- pnorm(Zed, lower.tail = FALSE)
+#	names(pvalue) <- names(vals$tjs)
+#	return(sort(pvalue))
+#}
 #### Differential Expression #####
 
 NBumiGroupDE <- function(counts, fit, groups) {
+	# Global mean-variance, gene-specific variance & mean
 	vals <- fit$vals;
 	size_g <- fit$sizes
 	group_specific_factor <- aggregate(t(counts), by=list(groups), sum)
@@ -238,12 +352,15 @@ NBumiGroupDE <- function(counts, fit, groups) {
 }
 
 
-NBumiCGroupDE <- function(counts, fit, groups) {
+bg__NBumiCGroupDE <- function(counts, fit, groups) {
+	# Seg faults!
 	if (!is.factor(groups)) {
 		groups <- factor(groups);
 	}
 	vals <- fit$vals;
 	size_g <- fit$sizes
+	nc = length(counts[1,]);
+	ng = length(counts[,1]);
 	group_specific_factor <- aggregate(t(counts), by=list(groups), sum)
 	rownames(group_specific_factor) <- group_specific_factor[,1]
 	group_specific_factor <- group_specific_factor[,-1]
@@ -256,7 +373,7 @@ NBumiCGroupDE <- function(counts, fit, groups) {
 	coeffs <- NBumiFitDispVsMean(fit, suppress.plot=TRUE);
 	pvals <- rep(-0.1, times=vals$ng);
 
-	out <- .C("loglikehood_nbumi", as.integer(as.matrix(round(counts))), as.double(fit$mus), as.integer(groups), as.double(group_specific_factor), as.double(size_g), as.integer(vals$nc), as.integer(vals$ng), as.double(coeffs[2]), as.double(pvals));
+	out <- .C("loglikehood_nbumi", as.integer(as.matrix(round(counts))), as.double(fit$mus), as.integer(groups), as.double(group_specific_factor), as.double(size_g), as.integer(nc), as.integer(ng), as.double(coeffs[2]), as.double(pvals));
 
 	pvals = out[[5]];
 	# Format output.
