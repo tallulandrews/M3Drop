@@ -73,6 +73,34 @@ NBumiCheckFit <- function(counts, fit, suppress.plot=FALSE) {
 	invisible(list(gene_error = sum((vals$djs-rowSums(exp_ps))^2), cell_error = sum((vals$dis-colSums(exp_ps))^2), exp_ps = exp_ps));
 }
 
+NBumiCheckFitFS <- function(counts, fit, suppress.plot=FALSE) {
+	vals <- fit$vals;
+	size_coeffs = NBumiFitDispVsMean(fit, suppress.plot=TRUE) 
+	smoothed_size = exp( size_coeffs[1] + size_coeffs[2]*log(vals$tjs/vals$nc) )
+	size_mat <- matrix(rep(smoothed_size, times=vals$nc), ncol=vals$nc, byrow=FALSE)
+	vs <- fit$mus+fit$mus*fit$mus/size_mat
+	thing <- apply(counts-fit$mus, 1, var)
+#	plot(thing, rowMeans(vs), log="xy", xlab="Observed", ylab="Expected", main="Gene-specific Variance")
+#	abline(a=0, b=1, col="red")
+
+	exp_ps <- (1+fit$mus/size_mat)^(-size_mat)
+	if (!suppress.plot) {
+		plot(vals$djs, rowSums(exp_ps), xlab="Observed", ylab="Fit", main="Gene-specific Dropouts")
+		abline(a=0, b=1, col="red")
+
+		plot(vals$dis, colSums(exp_ps), xlab="Observed", ylab="Expected", main="Cell-specific Dropouts")
+		abline(a=0, b=1, col="red")
+	}
+
+#	plot(vals$tjs/vals$nc, rowMeans(fit$mus), xlab="Observed", ylab="Fit", main="Gene Mean Expression")
+#	abline(a=0, b=1, col="red")
+
+#	plot(vals$tis, colSums(fit$mus), xlab="Observed", ylab="Fit", main="Cell Count Total")
+#	abline(a=0, b=1, col="red")
+	invisible(list(gene_error = sum((vals$djs-rowSums(exp_ps))^2), cell_error = sum((vals$dis-colSums(exp_ps))^2), exp_ps = exp_ps));
+}
+
+
 NBumiCompareModels <- function(counts, size_factor=(colSums(counts)/median(colSums(counts)))) {
 	norm <- NBumiConvertToInteger(t(t(counts)/size_factor));
 	fit_adjust <- NBumiFitModel(counts);
