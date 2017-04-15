@@ -39,12 +39,4 @@
 \code{bg__add_model_to_plot} Invisibly location of the plotted legend.
 \code{bg__highlight_genes} Invisibly the coordinates of the highlighted genes.
 }
-\examples{
-  library(M3DExampleData)
-  Baseplot <-bg__dropout_plot_base(Mmus_example_list$data)
-  MM <- bg__fit_MM(Baseplot$p, Baseplot$s)
-  bg__add_model_to_plot(MM, Baseplot)
-  erccs <- grep("ercc",rownames(Mmus_example_list$data), ignore.case=TRUE)
-  bg__highlight_genes(Baseplot, Mmus_example_list$data, erccs, col="black")
-}
 \keyword{plotting, background}

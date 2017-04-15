@@ -19,8 +19,8 @@
 }
 \value{ Value of horizontal residual.}
 \examples{
-  s <- c(10,100,100)
-  p <- c(0.9, 0.5, 0.1)
-  res <- bg__horizontal_residuals_MM_log10(10, p, s)
+#  s <- c(10,100,100)
+#  p <- c(0.9, 0.5, 0.1)
+#  res <- bg__horizontal_residuals_MM_log10(10, p, s)
 }
 \keyword{background}

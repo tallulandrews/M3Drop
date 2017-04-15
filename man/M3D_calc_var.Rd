@@ -19,11 +19,4 @@
 	p = vector of dropout rate for each gene
 	p_stderr = vector of dropout rate standard error for each gene
 }
-\examples{
-  library(M3DExampleData)
-  Normalized_data <- M3DropCleanData(Mmus_example_list$data,
-                  labels = Mmus_example_list$labels,
-                  is.counts=TRUE, min_detected_genes=2000)
-  vals <- bg__calc_variables(Normalized_data$data[1:10,])
-}
 \keyword{background}

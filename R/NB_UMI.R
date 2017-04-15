@@ -103,10 +103,11 @@ NBumiCheckFitFS <- function(counts, fit, suppress.plot=FALSE) {
 
 NBumiCompareModels <- function(counts, size_factor=(colSums(counts)/median(colSums(counts)))) {
 	norm <- NBumiConvertToInteger(t(t(counts)/size_factor));
+	counts <- counts[rownames(counts) %in% rownames(norm),]; # necessary for plotting
 	fit_adjust <- NBumiFitModel(counts);
 	fit_basic <- NBumiFitBasicModel(norm);
-	check_adjust <- NBumiCheckFit(counts, fit_adjust, suppress.plot=TRUE)
-	check_basic <- NBumiCheckFit(norm, fit_basic, suppress.plot=TRUE)
+	check_adjust <- NBumiCheckFitFS(counts, fit_adjust, suppress.plot=TRUE)
+	check_basic <- NBumiCheckFitFS(norm, fit_basic, suppress.plot=TRUE)
 	nc = fit_adjust$vals$nc
 
 	plot( fit_adjust$vals$tjs/nc, fit_adjust$vals$djs/nc, col="black", pch=16, xlab="Expression", log="x", ylab= "Dropout Rate", cex=0.75)
@@ -334,7 +335,7 @@ PoissonUMIFeatureSelectionDropouts <- function(fit) {
 #}
 #### Differential Expression #####
 
-NBumiGroupDE <- function(counts, fit, groups) {
+bg__NBumiGroupDE <- function(counts, fit, groups) {
 	# Global mean-variance, gene-specific variance & mean
 	vals <- fit$vals;
 	size_g <- fit$sizes
@@ -377,7 +378,7 @@ NBumiGroupDE <- function(counts, fit, groups) {
 }
 
 
-bg__NBumiCGroupDE <- function(counts, fit, groups) {
+broken__nbumiCGroupDE <- function(counts, fit, groups) {
 	# Seg faults!
 	if (!is.factor(groups)) {
 		groups <- factor(groups);

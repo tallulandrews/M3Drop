@@ -32,10 +32,10 @@ Name list of values:
 	Vwithin = vector of within subpopulation variances
 }
 \examples{
-	mu100_N200 <- bg__var_vs_drop(100,100, suppress.plot=FALSE)
-	mu100_N2000 <- bg__var_vs_drop(1000,100)
-	mu1000_N200 <- bg__var_vs_drop(1000,100)
-	c(mu100_N200$var_r,mu100_N2000$var_r,mu1000_N200$var_r)
+#	mu100_N200 <- bg__var_vs_drop(100,100, suppress.plot=FALSE)
+#	mu100_N2000 <- bg__var_vs_drop(1000,100)
+#	mu1000_N200 <- bg__var_vs_drop(1000,100)
+#	c(mu100_N200$var_r,mu100_N2000$var_r,mu1000_N200$var_r)
 }
 \keyword{simulations, variance, dropouts, differential expression}
 \references{

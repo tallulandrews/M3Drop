@@ -64,7 +64,7 @@ hidden_calc_p <- function(obs, mu, K, disp) {
 	}
 	return(p);
 }
-M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
+bg__M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
 	# Batch-specific mean-variance
 	# Check Input
 	if (!is.factor(batches)) {
@@ -122,7 +122,7 @@ M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(ex
 }
 
 
-bg__M3DropCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
+broken__m3dropCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
 	# Seg faults!
 	# Check Input
 	if ( length(groups) != length(expr_mat[1,])) {
@@ -163,7 +163,7 @@ bg__M3DropCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
 	return(AllOut);
 }
 
-M3DropTraditionalDEShiftDisp <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
+bg__M3DropTraditionalDEShiftDisp <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
 	# Batch specific mean-variance, gene-specific variance.
 	# Check Input
 	if (!is.factor(batches)) {

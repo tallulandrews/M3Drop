@@ -14,9 +14,9 @@
 }
 \value{vector of two elements: (FDR, FNR).}
 \examples{
-	Calls <- c(1,3,5,8,10)
-	Truth <- c(2,3,5,9)
-	total=10
-	stats <- bg__get_stats(Calls, Truth, total)
+#	Calls <- c(1,3,5,8,10)
+#	Truth <- c(2,3,5,9)
+#	total=10
+#	stats <- bg__get_stats(Calls, Truth, total)
 }
 \keyword{simulations, statistics}
