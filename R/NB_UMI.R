@@ -209,7 +209,7 @@ hidden_shift_size <- function(mu_all, size_all, mu_group, coeffs) {
 	return(size_group)
 }
 
-bg__NBumiFeatureSelectionHighVarDist2Med <- function(fit, window_size=1000) {
+bg__nbumiFeatureSelectionHighVarDist2Med <- function(fit, window_size=1000) {
 	vals <- fit$vals;
 	mean_order <- order(vals$tjs);
 	obs_mean <- vals$tjs[mean_order]/vals$nc
@@ -241,7 +241,7 @@ NBumiFeatureSelectionHighVar <- function(fit) {
 	return(sort(res))
 }
 
-bg__NBumiFeatureSelectionDropouts <- function(fit) {
+bg__nbumiFeatureSelectionDropouts <- function(fit) {
 	# Gene-specific variance, mean
 	vals <- fit$vals;
 	size_mat <- matrix(rep(fit$sizes, times=vals$nc), ncol=vals$nc, byrow=F)
@@ -335,7 +335,7 @@ PoissonUMIFeatureSelectionDropouts <- function(fit) {
 #}
 #### Differential Expression #####
 
-bg__NBumiGroupDE <- function(counts, fit, groups) {
+bg__nbumiGroupDE <- function(counts, fit, groups) {
 	# Global mean-variance, gene-specific variance & mean
 	vals <- fit$vals;
 	size_g <- fit$sizes

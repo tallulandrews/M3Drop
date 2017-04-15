@@ -64,7 +64,7 @@ hidden_calc_p <- function(obs, mu, K, disp) {
 	}
 	return(p);
 }
-bg__M3DropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
+bg__m3dropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
 	# Batch-specific mean-variance
 	# Check Input
 	if (!is.factor(batches)) {
@@ -163,7 +163,7 @@ broken__m3dropCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
 	return(AllOut);
 }
 
-bg__M3DropTraditionalDEShiftDisp <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
+bg__m3dropTraditionalDEShiftDisp <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
 	# Batch specific mean-variance, gene-specific variance.
 	# Check Input
 	if (!is.factor(batches)) {
