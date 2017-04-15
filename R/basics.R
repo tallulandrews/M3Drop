@@ -38,6 +38,12 @@ bg__calc_variables <- function(expr_mat) {
     }
     
     p <- rowSums(expr_mat == 0)/ncol(expr_mat)
+    if (sum(p == 1) > 0) {
+	warning(paste("Warning: Removing", sum(p==1),"invariant genes."))
+	expr_mat <- expr_mat[p < 1,]
+        p <- rowSums(expr_mat == 0)/ncol(expr_mat)
+    }
+
     p_stderr <- sqrt(p*(1-p)/ncol(expr_mat))
     s <- rowMeans(expr_mat)
     s_stderr <- rowSds(expr_mat)/sqrt(ncol(expr_mat))

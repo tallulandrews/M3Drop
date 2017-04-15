@@ -10,7 +10,7 @@
 \arguments{
   \item{expr_mat}{a numeric matrix of normalized (not log-transformed) expression values, columns = samples, rows = genes.}
 }
-\details{ Calculates mean expression and its standard error ( sd/sqrt(n) ), and the dropout rate, proportion of observations that are zero, and its standard error ( sqrt(p*(1-p)/n) ) for each gene in the dataset. Performs various checks to ensure expression matrix is of suitable format for M3Drop.
+\details{ Calculates mean expression and its standard error ( sd/sqrt(n) ), and the dropout rate, proportion of observations that are zero, and its standard error ( sqrt(p*(1-p)/n) ) for each gene in the dataset. Performs various checks to ensure expression matrix is of suitable format for M3Drop. Removes undetected genes if they are present.
 }
 \value{
 	Named list of calculated values:
