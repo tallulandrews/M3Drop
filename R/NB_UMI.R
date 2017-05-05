@@ -409,3 +409,7 @@ broken__nbumiCGroupDE <- function(counts, fit, groups) {
 	return(output);
 }
 
+NBumiImputeZeros <- function(counts, fit) {
+	counts[counts==0] = fit$mus[counts==0];
+	return(counts);
+}
