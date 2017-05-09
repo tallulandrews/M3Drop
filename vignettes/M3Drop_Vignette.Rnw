@@ -55,7 +55,7 @@ data.frame(MM=fits$MMFit$SSr, Logistic=fits$LogiFit$SSr,
 @
 Here we see that the sum of squared residuals favours the flatter logistic curve due to the noise in the data, where as sum of absolute residuals shows the Michaelis-Menten is the best fit to the data.
 
-\section*{Identifying Differentially Expressed (DE) Genes}
+\section*{Feature Selection for Differentially Expressed (DE) Genes}
 
 Since the Michaelis-Menten equation is concave, averaging across a mixed population forces differentially expressed genes to be shifted to the right of the Michaelis-Menten curve. DE genes are identified by comparing the local $K$ calculated for a specific gene to the global $K$ fitted across all genes using a Z-test followed by multiple-testing correction. Here we find 1,248 DE genes at 1\% FDR.
 
@@ -70,7 +70,7 @@ DE_genes <- M3DropFeatureSelection(Normalized_data$data,
 
 Note that this function runs directly from the expression matrix, hence one could skip straight to identifying DE genes without comparing models and any external normalisation method can be applied to the raw counts prior to DE analysis. 
 
-\section*{Examining DE Genes and Identifying Subpopulations of Cells}
+\section*{Examining Features and Identifying Subpopulations of Cells}
 
 To check that the identified genes are truly differentially expressed we can plot the normalised expression of the genes across cells.
 
@@ -126,6 +126,44 @@ heat_out <- M3DropExpressionHeatmap(HVG, Normalized_data$data,
 \\
 \textbf{Figure 5}: Heatmap of expression of highly variable genes across cells.
 \end{center}
+
+\section*{Depth Adjusted Negative Binomial}
+
+The Michaelis-Menten equation fits full-transcript single-cell RNASeq data well, but often struggles to fit data tagged with unique molecular identifiers (UMIs). This is a result of UMI datasets typically not being sequenced to saturation, thus many dropouts are a result of low sequencing coverage rather than a failure of reverse transcription. 
+
+To account for zeros resulting from insufficient sequencing depth, the M3Drop packaged includes the depth-adjusted negative binomial model (DANB). DANB models each observation as a negative binomial distribution with mean proportional to the mean expression of the respective gene and the relative sequencing depth of the respective cell. The dispersion parameter of the negative binomial is fit to the variance of each gene. 
+
+Functions relating to the DANB model are tagged with the "NBumi" prefix. We will continue using the example data despite it not using UMIs for demonstration purposes.
+<<>>=
+count_mat <- NBumiConvertToInteger(Mmus_example_list$data)
+DANB_fit <- NBumiFitModel(count_mat)
+@
+
+Next we check how well this model is fitting the data:
+
+\begin{center}
+<<fig=TRUE>>=
+# Smoothed gene-specific variances
+stats <- NBumiCheckFitFS(mount_mat, DANB_fit)
+print(c(stats$gene_error,stats$cell_error))
+@
+\\
+\textbf{Figure 6}: Fits of the depth-adjusted negative binomial.
+\end{center}
+
+
+We can now perform feature selection on the basis of variance:
+<<>>=
+DispFS <- NBumiFeatureSelectionHighVar(DANB_fit)
+top_dispfeatures <- DispFS[1:1500]
+@
+or dropouts:
+<<>>=
+DropFS <- NBumiFeatureSelectionCombinedDrop(DANB_fit)
+top_dropfeatures <- DispFS[1:1500]
+@
+
+We can then compare the features identified with different methods:
 
 \section*{References}
 
