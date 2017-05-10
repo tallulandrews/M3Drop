@@ -131,7 +131,14 @@ heat_out <- M3DropExpressionHeatmap(HVG, Normalized_data$data,
 
 The Michaelis-Menten equation fits full-transcript single-cell RNASeq data well, but often struggles to fit data tagged with unique molecular identifiers (UMIs). This is a result of UMI datasets typically not being sequenced to saturation, thus many dropouts are a result of low sequencing coverage rather than a failure of reverse transcription. 
 
-To account for zeros resulting from insufficient sequencing depth, the M3Drop packaged includes the depth-adjusted negative binomial model (DANB). DANB models each observation as a negative binomial distribution with mean proportional to the mean expression of the respective gene and the relative sequencing depth of the respective cell. The dispersion parameter of the negative binomial is fit to the variance of each gene. 
+To account for zeros resulting from insufficient sequencing depth, the M3Drop packaged includes the depth-adjusted negative binomial model (DANB). DANB models each observation as a negative binomial distribution with mean proportional to the mean expression of the respective gene and the relative sequencing depth of the respective cell. The dispersion parameter of the negative binomial is fit to the variance of each gene. The equations for calculating these paramters are:
+
+$$\mu_{ij} = \frac{\sum\limits_{i} t_{ij} * \sum\limits_{j} t_{ij}}{\sum\limits_{ij} t_{ij}}$$
+
+
+$$\underset{r_i}{\operatorname{arg}\operatorname{min}}|\sum((t_{ij}-\mu_{ij})^2 - (\mu{ij}+r_i\mu_{ij}^2))|$$
+
+Where $\mu_{ij}$ is the observation specific mean for the negative binomial for the observed molecule counts, $t_{ij}$ of the $i$th gene in the $j$th of cell and $r_{i}$ is the dispersion parameter (the "size" paramter of R's nbinom functions) for gene $i$.
 
 Functions relating to the DANB model are tagged with the "NBumi" prefix. We will continue using the example data despite it not using UMIs for demonstration purposes.
 <<>>=
@@ -144,7 +151,8 @@ Next we check how well this model is fitting the data:
 \begin{center}
 <<fig=TRUE>>=
 # Smoothed gene-specific variances
-stats <- NBumiCheckFitFS(mount_mat, DANB_fit)
+par(mfrow=c(1,2))
+stats <- NBumiCheckFitFS(count_mat, DANB_fit)
 print(c(stats$gene_error,stats$cell_error))
 @
 \\
@@ -155,15 +163,33 @@ print(c(stats$gene_error,stats$cell_error))
 We can now perform feature selection on the basis of variance:
 <<>>=
 DispFS <- NBumiFeatureSelectionHighVar(DANB_fit)
-top_dispfeatures <- DispFS[1:1500]
+top_dispfeatures <- names(DispFS[1:1500])
 @
 or dropouts:
 <<>>=
 DropFS <- NBumiFeatureSelectionCombinedDrop(DANB_fit)
-top_dropfeatures <- DispFS[1:1500]
+top_dropfeatures <- names(DropFS[1:1500])
 @
 
 We can then compare the features identified with different methods:
+
+<<>>=
+# Dropout based features
+sum(top_dropfeatures %in% DE_genes$Gene)
+# Variance based features
+sum(top_dispfeatures %in% HVG$Gene)
+@
+
+They can also be used for all downstream analyses as before:
+
+\begin{center}
+<<fig=TRUE>>=
+heat_out <- M3DropExpressionHeatmap(top_dropfeatures, Normalized_data$data, 
+			cell_labels = Normalized_data$labels)
+@
+\\
+\textbf{Figure 7}: Heatmap of expression of DANB features.
+\end{center}
 
 \section*{References}
 
