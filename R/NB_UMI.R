@@ -284,7 +284,8 @@ NBumiFeatureSelectionCombinedDrop <- function(fit) {
 	Zed <- diff/combined_err
         pvalue <- pnorm(Zed, lower.tail = FALSE)
 	names(pvalue) <- names(vals$tjs)
-	return(sort(pvalue))
+	reorder <- order(pvalue, droprate_exp-droprate_obs) # deal with ties (e.g. lots of zero p-values)
+	return(pvalue[reorder])
 }
 
 PoissonUMIFeatureSelectionDropouts <- function(fit) {
