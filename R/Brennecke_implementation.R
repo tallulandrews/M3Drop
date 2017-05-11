@@ -1,5 +1,21 @@
-#from : http://www.nature.com/nmeth/journal/v10/n11/full/nmeth.2645.html#supplementary-information
-BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, fdr=0.1, minBiolDisp=0.5) {
+#Copyright (c) 2015, 2016 Genome Research Ltd .
+#Author : Tallulah Andrews <tallulandrews@gmail.com>
+#This file is part of M3Drop.
+
+#M3Drop is free software : you can redistribute it and/or modify it under
+#the terms of the GNU General Public License as published by the Free Software
+#Foundation; either version 2 of the License, or (at your option) any later
+#version.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT
+#ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License along with
+#this program . If not , see <http://www.gnu.org/licenses/>.
+
+#This contains code by Brennecke et al. published in http://www.nature.com/nmeth/journal/v10/n11/full/nmeth.2645.html#supplementary-information
+BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, fdr=0.1, minBiolDisp=0.5, fitMeanQuantile=0.8) {
         #require(statmod)
 
         rowVars <- function(x) { unlist(apply(x,1,var, na.rm=TRUE))}
@@ -29,7 +45,7 @@ BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, 
         varsGenes <- rowVars(countsGenes)
         cv2Genes <- varsGenes/meansGenes^2
         # Fit Model
-        minMeanForFit <- unname( quantile( meansSp[ which( cv2Sp > 0.3 ) ], 0.80))
+        minMeanForFit <- unname( quantile( meansSp[ which( cv2Sp > 0.3 ) ], fitMeanQuantile))
         useForFit <- meansSp >= minMeanForFit
         if (sum(useForFit, na.rm=TRUE) < 20) {
                 warning("Too few spike-ins exceed minMeanForFit, recomputing using all genes.")
@@ -42,6 +58,7 @@ BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, 
         fit <- glmgam.fit( cbind( a0 = 1, a1tilde = 1/meansSp[useForFit] ), cv2Sp[useForFit] )
         a0 <- unname( fit$coefficients["a0"] )
         a1 <- unname( fit$coefficients["a1tilde"])
+	res <- cv2Genes - (a0 + a1/meansGenes);
 
         # Test
         psia1theta <- a1
@@ -74,6 +91,7 @@ BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, 
                 # Add a curve showing the expectation for the chosen biological CV^2 thershold
                 lines( xg, psia1theta/xg + a0 + minBiolDisp, lty="dashed", col="#C0007090", lwd=3)
         }
-        return(names(meansGenes)[sig])
+	TABLE <- data.frame(Gene = names(meansGenes)[sig], effect.size=res[sig], p.value = p[sig], q.value= padj[sig])
+	TABLE <- TABLE[order(-TABLE[,2]),];
+        return(TABLE)
 }
-

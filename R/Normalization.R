@@ -1,3 +1,19 @@
+#Copyright (c) 2015, 2016 Genome Research Ltd .
+#Author : Tallulah Andrews <tallulandrews@gmail.com>
+#This file is part of M3Drop.
+
+#M3Drop is free software : you can redistribute it and/or modify it under
+#the terms of the GNU General Public License as published by the Free Software
+#Foundation; either version 2 of the License, or (at your option) any later
+#version.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT
+#ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License along with
+#this program . If not , see <http://www.gnu.org/licenses/>.
+
 # Normalization Functions
 hidden__UQ <- function(x){quantile(x[x>0],0.75)};
 
@@ -28,7 +44,7 @@ bg__filter_cells <- function(expr_mat,labels=NA, suppress.plot=FALSE, min_detect
 		if (length(labels)==length(expr_mat[1,])) {labels = labels[!low_quality]}
 		expr_mat <- expr_mat[,!low_quality];
 	}
-	return(list(expr_mat = expr_mat, labels = labels));
+	return(list(data = expr_mat, labels = labels));
 }
 
 hidden__normalize <- function(data) {
@@ -42,6 +58,7 @@ hidden__normalize <- function(data) {
 }
 
 M3DropCleanData <- function(expr_mat, labels = NA, is.counts=TRUE, suppress.plot=FALSE, pseudo_genes=NA, min_detected_genes=NA) {
+	expr_mat[is.na(expr_mat)] = 0;
 	if (length(pseudo_genes) > 1) {
 		is_pseudo <- rownames(expr_mat) %in% as.character(pseudo_genes);
 	        expr_mat <- expr_mat[!is_pseudo,];
@@ -51,6 +68,8 @@ M3DropCleanData <- function(expr_mat, labels = NA, is.counts=TRUE, suppress.plot
 	
         detected <- rowSums(data_list$expr_mat > 0) > 3;
         expr_mat <- data_list$expr_mat[detected,];
+        detected <- rowSums(data_list$data> 0) > 3;
+        expr_mat <- data_list$data[detected,];
 	labels   <- data_list$labels
 
 	spikes <- grep("ercc",rownames(expr_mat), ignore.case=TRUE)

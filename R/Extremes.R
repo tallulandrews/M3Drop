@@ -1,3 +1,19 @@
+#Copyright (c) 2015, 2016 Genome Research Ltd .
+#Author : Tallulah Andrews <tallulandrews@gmail.com>
+#This file is part of M3Drop.
+
+#M3Drop is free software : you can redistribute it and/or modify it under
+#the terms of the GNU General Public License as published by the Free Software
+#Foundation; either version 2 of the License, or (at your option) any later
+#version.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT
+#ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License along with
+#this program . If not , see <http://www.gnu.org/licenses/>.
+
 # DE Genes functions
 
 hidden__test_DE_K_equiv_raw <- function (expr_mat, fit=NA) {
@@ -20,15 +36,13 @@ hidden__test_DE_K_equiv_raw <- function (expr_mat, fit=NA) {
 	return(list(pval = pval, fold_change = effect_size))
 }
 
-bg__test_DE_K_equiv <- function(expr_mat, fit=NA) {
-	gene_info <- bg__calc_variables(expr_mat);
+bg__test_DE_K_equiv <- function(gene_info, fit=NA) {
 	if (is.na(fit)[1]) {
 		fit <- bg__fit_MM(gene_info$p, gene_info$s);
 	}
 	p_obs <- gene_info$p;
 	always_detected <- p_obs==0
 	p_obs[p_obs==0] <- min(p_obs[p_obs > 0])/2 # Here so that K_equiv for p_obs==0 will be 0 but K_equiv_err will not throw errors for such genes.
-	N <- length(expr_mat[1,]);
 	p_err <- gene_info$p_stderr;
 	S_mean <- gene_info$s
 	S_err <- gene_info$s_stderr
@@ -44,12 +58,14 @@ bg__test_DE_K_equiv <- function(expr_mat, fit=NA) {
 #	K_equiv_err_log = K_equiv_err/K_equiv # This does not hold when K_equiv_err =~ K_equiv which is particularly problematic for lowly expressed genes
 	K_equiv_err_log[K_equiv-K_equiv_err <= 0 ] <- 10^10
 	K_obs_log <- log(fit$K)
-	K_err_log <- sd(K_equiv_log-K_obs_log)/sqrt(length(K_equiv_log)) 
+	K_err_log <- sd(K_equiv_log-K_obs_log, na.rm=T)/sqrt(length(K_equiv_log)) 
 		
 	Z <- (K_equiv_log - K_obs_log)/sqrt(K_equiv_err_log^2+K_err_log^2); # high = shifted right, low = shifted left
 	pval <- pnorm(Z, lower.tail=FALSE)
 	pval[always_detected] <- 1;
+	pval[is.na(pval)] <- 1; # deal with never detected
 	effect_size <- K_equiv/fit$K;
+	effect_size[is.na(effect_size)] <- 1; # deal with never detected
 	return(list(pval = pval, fold_change = effect_size))
 }
 # Use the fact that errors of proportions are well define by converting S to proportion detected equivalents?
@@ -108,7 +124,7 @@ hidden__test_DE_S_equiv <- function (expr_mat, fit=NA, method="propagate") {
 	return(list(pval = pval, effect = effect_size))
 }
 
-bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95), percent = NA, fdr_threshold = 0.1, direction="right", suppress.plot = FALSE) {
+bg__get_extreme_residuals <- function (expr_mat, fit=NA, fdr_threshold = 0.1, percent = NA, v_threshold=c(0.05,0.95), direction="right", suppress.plot = FALSE) {
 	gene_info = bg__calc_variables(expr_mat);
 	if (is.na(fit)[1]) {
 		fit <- bg__fit_MM(gene_info$p, gene_info$s);
@@ -154,28 +170,28 @@ bg__get_extreme_residuals <- function (expr_mat, fit=NA, v_threshold=c(0.05,0.95
 	}
 }
 ##### Assembled Analysis Chunks ####
-M3DropDifferentialExpression <- function(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE) {
+M3DropFeatureSelection <- function(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
-	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
+	MM <- bg__fit_MM(BasePlot$gene_info$p, BasePlot$gene_info$s);
 	if (!suppress.plot) {
 		sizeloc <- bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
 	}
-	DEoutput <- bg__test_DE_K_equiv(expr_mat, fit=MM);
-
+	DEoutput <- bg__test_DE_K_equiv(BasePlot$gene_info, fit=MM);
 	sig <- which(p.adjust(DEoutput$pval, method=mt_method) < mt_threshold);
 	DEgenes <- rownames(expr_mat)[sig];
 	DEgenes <- DEgenes[!is.na(DEgenes)];
 	if (!suppress.plot) {
-		bg__highlight_genes(BasePlot, DEgenes);
+		bg__highlight_genes(BasePlot, expr_mat, DEgenes);
 	}
 	
-	TABLE <- data.frame(Gene = DEgenes, p.value = DEoutput$pval[sig], q.value= p.adjust(DEoutput$pval, method=mt_method)[sig])
+	TABLE <- data.frame(Gene = DEgenes, effect.size=DEoutput$fold_change[sig], p.value = DEoutput$pval[sig], q.value= p.adjust(DEoutput$pval, method=mt_method)[sig])
+	TABLE <- TABLE[order(-TABLE[,2]),];
 	return(TABLE)
 }
 
 M3DropGetExtremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_threshold=c(0.05,0.95), suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
-	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
+	MM <- bg__fit_MM(BasePlot$gene_info$p, BasePlot$gene_info$s);
 	if (!suppress.plot) {
 		sizeloc <- bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
 	}
@@ -189,22 +205,22 @@ M3DropGetExtremes <- function(expr_mat, fdr_threshold = 0.1, percent = NA, v_thr
 
 	}
 	if (!suppress.plot) {
-		bg__highlight_genes(BasePlot, shifted_right, colour="orange");
-		bg__highlight_genes(BasePlot, shifted_left, colour="purple");
+		bg__highlight_genes(BasePlot, expr_mat, shifted_right, col="orange");
+		bg__highlight_genes(BasePlot, expr_mat, shifted_left, col="purple");
 	}
 	return(list(left=shifted_left,right=shifted_right));
 }
 
 M3DropTestShift <- function(expr_mat, genes_to_test, name="", background=rownames(expr_mat), suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
-	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
+	MM <- bg__fit_MM(BasePlot$gene_info$p, BasePlot$gene_info$s);
 	if (!suppress.plot) {
 		sizeloc <- bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
-		bg__highlight_genes(BasePlot, genes_to_test, colour="purple");
+		bg__highlight_genes(BasePlot, expr_mat, genes_to_test);
 		title(main=name);
 	}
 
-	res <- bg__horizontal_residuals_MM_log10(MM$K, BasePlot$p, BasePlot$s)
+	res <- bg__horizontal_residuals_MM_log10(MM$K, BasePlot$gene_info$p, BasePlot$gene_info$s)
 	res[is.infinite(res)] <- NA;
 	mu <- median(res[rownames(expr_mat) %in% as.character(background)], na.rm=TRUE); #sigma = sd(res, na.rm=TRUE);
 	s_mu <- median(res[rownames(expr_mat) %in% as.character(genes_to_test)], na.rm=TRUE);

@@ -1,3 +1,19 @@
+#Copyright (c) 2015, 2016 Genome Research Ltd .
+#Author : Tallulah Andrews <tallulandrews@gmail.com>
+#This file is part of M3Drop.
+
+#M3Drop is free software : you can redistribute it and/or modify it under
+#the terms of the GNU General Public License as published by the Free Software
+#Foundation; either version 2 of the License, or (at your option) any later
+#version.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT
+#ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License along with
+#this program . If not , see <http://www.gnu.org/licenses/>.
+
 # Modularize this stuff more sensibly
 #  Plotting Functions
 bg__dropout_plot_base <- function (expr_mat, xlim = NA, suppress.plot=FALSE) {
@@ -24,7 +40,7 @@ bg__dropout_plot_base <- function (expr_mat, xlim = NA, suppress.plot=FALSE) {
 		title(ylab="Dropout Rate", line=2)
 		title(xlab="log10(expression)", line=2)
 	}
-	invisible(list(p=gene_info$p, s=gene_info$s, xes=xes, data=expr_mat, order=put_in_order));
+	invisible(list(gene_info = gene_info, xes=xes, order=put_in_order));
 }
 
 bg__add_model_to_plot <- function(fitted_model, base_plot, lty=1, lwd=1, col="black",legend_loc = "topright") {
@@ -39,16 +55,16 @@ bg__add_model_to_plot <- function(fitted_model, base_plot, lty=1, lwd=1, col="bl
 	invisible(this_loc)
 }
 
-bg__highlight_genes <- function (base_plot, genes, colour="purple", pch=16) {
+bg__highlight_genes <- function (base_plot, expr_mat, genes, col="purple", pch=16) {
 	if(!is.numeric(genes) && !is.logical(genes)) {
-		genes <- match(as.character(genes), rownames(base_plot$data));
+		genes <- match(as.character(genes), rownames(expr_mat));
 		nomatch <- sum(is.na(genes));
 		if (nomatch > 0) {warning(paste(nomatch, " genes could not be matched to data, they will not be highlighted."));}
 		if (nomatch == length(genes)) {invisible(cbind(c(NA,NA),c(NA,NA)))}
 		genes <- genes[!is.na(genes)];
 	}
-	points(base_plot$xes[genes],base_plot$p[genes],col=colour, pch=pch)
-	invisible(cbind(base_plot$s[genes],base_plot$p[genes]));
+	points(base_plot$xes[genes],base_plot$gene_info$p[genes],col=col, pch=pch)
+	invisible(cbind(base_plot$gene_info$s[genes],base_plot$gene_info$p[genes]));
 }
 
 bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels=NA, key_genes=genes, key_cells=NA) { 
@@ -172,8 +188,12 @@ M3DropExpressionHeatmap <- function(genes, expr_mat, cell_labels=NA, interesting
 	invisible(heatmap_output);
 }
 
-M3DropGetHeatmapCellClusters <- function (heatout, k) {
-        dendro<-heatout$colDendrogram
+M3DropGetHeatmapClusters <- function (heatout, k, type="cell") {
+	if (grepl("gene",type) | grepl("row",type)) {
+        	dendro<-heatout$rowDendrogram
+	} else if (grepl("cell",type) | grepl("col",type)) {
+        	dendro<-heatout$colDendrogram
+	}
         curr_k <- 1;
         dendro_list <- list(dendro)
         dendro_heights <- attr(dendro, "height")
@@ -200,4 +220,13 @@ M3DropGetHeatmapCellClusters <- function (heatout, k) {
         }
 	names(groups) <- names_orig_order;
         return(groups);
+}
+
+M3DropGetHeatmapNames <- function (heatout, type="cell") {
+	if (grepl("gene",type) | grepl("row",type)) {
+        	dendro<-heatout$rowDendrogram
+	} else if (grepl("cell",type) | grepl("col",type)) {
+        	dendro<-heatout$colDendrogram
+	}
+	return(labels(dendro))
 }

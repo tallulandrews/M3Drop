@@ -1,3 +1,19 @@
+#Copyright (c) 2015, 2016 Genome Research Ltd .
+#Author : Tallulah Andrews <tallulandrews@gmail.com>
+#This file is part of M3Drop.
+
+#M3Drop is free software : you can redistribute it and/or modify it under
+#the terms of the GNU General Public License as published by the Free Software
+#Foundation; either version 2 of the License, or (at your option) any later
+#version.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT
+#ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License along with
+#this program . If not , see <http://www.gnu.org/licenses/>.
+
 bg__fit_MM <- function (p,s) {
 	if (length(p) != length(s)) {
 		stop(print("Error: p and s not same length. Cannot fit Michaelis-Menten."))
@@ -98,9 +114,9 @@ bg__fit_ZIFA <- function(p,s) {
 
 M3DropDropoutModels <- function(expr_mat, xlim=NA, suppress.plot=FALSE) {
 	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = xlim, suppress.plot=suppress.plot);
-	MM <- bg__fit_MM(BasePlot$p, BasePlot$s);
-	SCDE <- bg__fit_logistic(BasePlot$p, BasePlot$s);
-	ZIFA <- bg__fit_ZIFA(BasePlot$p, BasePlot$s);
+	MM <- bg__fit_MM(BasePlot$gene_info$p, BasePlot$gene_info$s);
+	SCDE <- bg__fit_logistic(BasePlot$gene_info$p, BasePlot$gene_info$s);
+	ZIFA <- bg__fit_ZIFA(BasePlot$gene_info$p, BasePlot$gene_info$s);
 	if (!suppress.plot) {
 	  	sizeloc <- bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="black",legend_loc = "topright");
 		sizeloc <- bg__add_model_to_plot(SCDE, BasePlot, lty=2, lwd=2.5, col="magenta3",legend_loc = c(sizeloc$rect$left+sizeloc$rect$w,sizeloc$rect$top-sizeloc$rect$h-0.05));

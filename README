@@ -1,20 +1,15 @@
 M3Drop - Michaelis-Menten Modelling of Dropouts for scRNASeq
 
-This is an R package providing functions for fitting a modified Michaelis-Menten (MM) equation to the pattern of dropouts observed in a single-cell sequencing experiment.
+This is an R package providing functions for fitting a modified Michaelis-Menten (MM) equation to the pattern of dropouts observed in a single-cell sequencing experiment. As well as the Depth-Adjusted Negative Binomial (DANB) model which is tailored for datasets quantified using unique molecular identifiers (UMIs).
 
-In addition analyses based on the MM equation, such as identifying differentially expressed genes or biased quantification, are provided with automatically generated visualizations. 
+Functions are provided for fitting each model as well as performing dropout-based feature selection. These can be used to reduce technical noise in downstream analyses such as clustering or pseudotime analysis.
 
 For comparison, the algorithm presented in Brennecke et al (2015) for detection of significantly highly variable genes is included.
 
-Installation (currently under review at Bioconductor):
+Installation :
 
 >require("devtools")
 >install_github('tallulandrews/M3Drop')
-
-OR
-
->source("https://bioconductor.org/biocLite.R")
->biocLite("M3Drop")
 
 Example Data:
 
@@ -25,5 +20,6 @@ OR
 
 >source("https://bioconductor.org/biocLite.R")
 >biocLite("M3DExampleData")
+>biocLite("M3Drop")
 
 Read More: DOI: 10.1101/065094
