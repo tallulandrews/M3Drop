@@ -38,21 +38,14 @@ hidden_amplification1 <- function (x, rounds=12, efficiency=0.97) {
 	return(x);
 }
 
-hidden_rowVars <- function(x) {
-	unlist(apply(x, 1, var, na.rm = T))
-}
-hidden_colVars <- function(x) {
-	unlist(apply(x, 2, var, na.rm = T))
-}
-
-bg__mean2disp <- function(mu, coeffs=c(3.967816,-1.855054)){
+bg__default_mean2disp <- function(mu, coeffs=c(3.967816,-1.855054)){
 		cv2 <- exp(coeffs[1]+coeffs[2]*(log(mu)/log(10)))
 		variance <- cv2*(mu^2)
 		disp <- mu^2/(variance-mu)
 		return(1/disp)
 }
 
-M3DropMakeSimData <- function(dispersion_fun=bg__mean2disp, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3) {
+bg__MakeSimData <- function(dispersion_fun=bg__default_mean2disp, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3) {
 	# Make Simulated Matrix
         n_genes <- length(base_means);
         expr_mat <- sapply(1:n_genes, function(x){
@@ -70,7 +63,7 @@ M3DropMakeSimData <- function(dispersion_fun=bg__mean2disp, n_cells=300, dispers
 	return(expr_mat);
 }
 
-M3DropMakeSimDE <- function(dispersion_fun=bg__mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3){
+bg__MakeSimDE <- function(dispersion_fun=bg__default_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3){
         n_genes <- length(base_means);
         TP <- sample(1:n_genes, frac_change*n_genes)
         sub_pop <- round(sub_pop*n_cells)
@@ -91,7 +84,7 @@ M3DropMakeSimDE <- function(dispersion_fun=bg__mean2disp, fold_change=10, frac_c
 }
 
 
-M3DropMakeSimDVar <- function(dispersion_fun=bg__mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000, 1,1), K=10.3) {
+bg__MakeSimDVar <- function(dispersion_fun=bg__default_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000, 1,1), K=10.3) {
 	# Make Simulated Matrix
         n_genes <- length(base_means);
         TP <- sample(1:n_genes, frac_change*n_genes)
@@ -111,7 +104,7 @@ M3DropMakeSimDVar <- function(dispersion_fun=bg__mean2disp, fold_change=10, frac
 	return(list(data=base, cell_labels=Pop_lab, TP=TP));
 }
 
-M3DropMakeSimHVar <- function(dispersion_fun=bg__mean2disp, fold_change=10, frac_change=0.1, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000, 1,1), K=10.3) {
+bg__MakeSimHVar <- function(dispersion_fun=bg__default_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000, 1,1), K=10.3) {
         n_genes <- length(base_means);
         TP <- sample(1:n_genes, frac_change*n_genes)
         Pop_lab <- rep(1, times=n_cells)
@@ -130,10 +123,10 @@ M3DropMakeSimHVar <- function(dispersion_fun=bg__mean2disp, fold_change=10, frac
 }
 
 bg__get_stats <- function(sig, TP, ngenes) {
-	TPs<-sum(sig %in% TP)
-	FPs<-length(sig)-TPs
-	FNs<-length(TP)-TPs
-	TNs<-ngenes-length(TP)-FPs;
+	TPs=sum(sig %in% TP)
+	FPs=length(sig)-TPs
+	FNs=length(TP)-TPs
+	TNs=ngenes-length(TP)-FPs;
 	if ((TPs+FPs) == 0) {
 		FDR <- 0;
 	} else {
@@ -147,36 +140,209 @@ bg__get_stats <- function(sig, TP, ngenes) {
 	return(c(FDR,FNR));
 }
 
-bg__var_vs_drop <- function(pop_size, fixed_mean, K=10.3, mean2disp_fun=bg__mean2disp, suppress.plot=TRUE) {
-	# Relationship between Fold Change and Var/Dropouts for fixed mean
-        fc <- seq(from=1, to=100, by=1)
-        labels <- c(rep(1, times=pop_size),rep(2,times=pop_size))
+##### Update #####
+
+
+bg__calc_DE_stats <- function(expr_mat, TP, Observed_Means, mt_threshold=0.05, suppress.plot=TRUE) {
+	require("M3Drop")
+        # Test DE
+        mt_method="fdr"
+
+        expr_mat = expr_mat[rowSums(expr_mat) > 0,]
+        expr_mat = expr_mat[rowSums(expr_mat == 0) > 0,]
+        TP = TP[TP %in% rownames(expr_mat)]
+
+        DE = M3Drop_Differential_Expression(expr_mat, mt_method = mt_method, mt_threshold=2, suppress.plot=TRUE)
+        HVG = BrenneckeGetVariableGenes(expr_mat, fdr=2, suppress.plot=TRUE)
+
+        output = rbind(c(0,0,0),c(0,0,0));
+	colnames(output) = c("AUC","FDR","FNR")
+	rownames(output) = c("M3Drop","HVG")
+        tmp = list(DE, HVG)
+
+        # Plot Stuff - setup #
+        act_means = rowMeans(expr_mat)
+        thing = log(act_means)/log(10)
+        bins = 10^seq(from = floor(min(thing)), to = ceiling(max(thing)), by = 1)
+
+	for (bf in 1:9) { # Shift bins to make curve smoother
+                binned = as.numeric(cut(rowMeans(expr_mat), bins*bf))
+                names(binned) = rownames(expr_mat)
+                plot_output = bins[2:length(bins)]*bf
+
+	        for (i in 1:2) { # Do same thing for HVG & M3Drop
+	                Diff = tmp[[i]]
+	                sig = Diff[Diff$q.value < mt_threshold,]
+
+
+	                stats = bg__get_stats(sig[,1], TP, ngenes=length(expr_mat[,1]));
+
+	                require("ROCR")
+	                Diff$Truth = rep(0, times=length(Diff[,1]))
+	                Diff[Diff[,1] %in% TP,]$Truth = 1;
+	                pred <- ROCR::prediction(1-Diff$p.value, Diff$Truth)
+	                val <- unlist(ROCR::performance(pred,"auc")@y.values)
+	                output[i,]=c(val,stats);
+
+	                # Plot Stuff - data #
+	                get_bin_stats <- function(b){
+	                        this_bin = names(binned)[binned==b];
+	                        this_sig = this_bin[this_bin %in% sig[,1]];
+	                        this_TP = this_bin[this_bin %in% TP];
+	                        out = bg__get_stats(this_sig, this_TP, ngenes = length(expr_mat[,1]));
+	                        c(out, length(this_sig), length(this_TP))
+	                }
+	                bin_stats = sapply(1:(length(bins)-1), get_bin_stats)
+	                #colnames(bin_stats) = bins[2:length(bins)]
+	                rownames(bin_stats) = c("FDR","FNR","Ncalled","nTrue")
+	                plot_output = rbind(plot_output, bin_stats)
+	        }
+                if (bf==1) {
+                        final_plot_output <- plot_output;
+                } else {
+                        final_plot_output = cbind(final_plot_output, plot_output);
+                }
+        }
+
+	final_plot_output[1,] = final_plot_output[1,]/2
+	if (!suppress.plot) {
+#                par(mar=c(3.5,3.5,4,1))
+                background = density(log(Observed_Means)/log(10))
+                drawing=list()
+                drawing$ylim<-c(0,max(c(background$y)));
+#                drawing$xlim<-c(min(background$x),max(background$x));
+                drawing$xlim<-c(min(background$x),max(c(background$x,ceiling(log(final_plot_output[1,])/log(10)))));
+                plot(1, col="white", xlim=drawing$xlim, ylim=drawing$ylim, xaxt="n", yaxt="n", xlab="", ylab=""); polygon(background, col="grey75", border="grey75")
+
+
+                convert_yvals = function(y) { # convert 0-1 to appropriate scale for plot
+                        y*drawing$ylim[2]
+
+                }
+                final_plot_output <- final_plot_output[,order(final_plot_output[1,])]
+
+
+                xes = log(final_plot_output[1,])/log(10)
+
+                ticks = seq(from=1, to =length(xes), by=9)
+		ticks = final_plot_output[1,ticks]*2
+#                axis(1, at=xes[ticks], labels = final_plot_output[1,ticks])
+                axis(1, at=log(ticks)/log(10), labels = ticks)
+
+                axis(2, at=convert_yvals(seq(from=0, to=1, by=0.1)), labels = seq(from=0, to=1, by=0.1))
+                title(xlab="Gene Expression (CPM)", ylab="FDR/FNR", line=2)
+                abline(h=convert_yvals(mt_threshold), col="red", lty=2, xpd=F)
+                # FDR
+                lines(xes,convert_yvals(final_plot_output[2,]), col=M3Drop_col, lty=1, lwd=3)
+                lines(xes,convert_yvals(final_plot_output[6,]), col=HVG_col, lwd=3)
+
+                # FNR
+                lines(xes,convert_yvals(final_plot_output[3,]), col=M3Drop_col, lwd=3, lty=2)
+                lines(xes,convert_yvals(final_plot_output[7,]), col=HVG_col, lwd=3, lty=2)
+
+                par(xpd=T)
+                legend("top", inset=c(0,-0.22), c(expression(bold("Method :")), expression(bold("Measure :")), "M3Drop", "FDR","HVG", "FNR"), lty=c(1,1,1,1,1,2), col=c("white","white",M3Drop_col,"black",HVG_col,"black"), lwd=2.5, ncol=3, bty="n")
+		par(xpd=F);
+        }
+	return(list(summary=output, per_expr=final_plot_output))
+}
+
+bg__calc_DE_stats_simplified <- function(expr_mat, TP, Observed_Means, mt_threshold=0.05, suppress.plot=TRUE) {
+	# Just ge AUC, FDR, FNR
+	require("M3Drop")
+        # Test DE
+        mt_method="fdr"
+
+        expr_mat = expr_mat[rowSums(expr_mat) > 0,]
+        expr_mat = expr_mat[rowSums(expr_mat == 0) > 0,]
+        TP = TP[TP %in% rownames(expr_mat)]
+
+        DE = M3Drop_Differential_Expression(expr_mat, mt_method = mt_method, mt_threshold=2, suppress.plot=TRUE)
+        HVG = BrenneckeGetVariableGenes(expr_mat, fdr=2, suppress.plot=T)
+
+        output = rbind(c(0,0,0),c(0,0,0));
+	colnames(output) = c("AUC","FDR","FNR")
+	rownames(output) = c("M3Drop","HVG")
+        tmp = list(DE, HVG)
+
+        # Plot Stuff - setup #
+        act_means = rowMeans(expr_mat)
+        thing = log(act_means)/log(10)
+        bins = 10^seq(from = floor(min(thing)), to = ceiling(max(thing)), by = 1)
+
+        for (i in 1:2) { # Do same thing for HVG & M3Drop
+                Diff = tmp[[i]]
+                sig = Diff[Diff$q.value < mt_threshold,]
+
+
+                stats = bg__get_stats(sig[,1], TP, ngenes=length(expr_mat[,1]));
+
+		# Need to somehow downsample so distribution of gene expression =~ observed distribution of gene expression
+		# or do this when define means? - latter makes more sense b/c do it once for all sim
+                require("ROCR")
+                Diff$Truth = rep(0, times=length(Diff[,1]))
+                Diff[Diff[,1] %in% TP,]$Truth = 1;
+                pred <- ROCR::prediction(1-Diff$p.value, Diff$Truth)
+                val <- unlist(ROCR::performance(pred,"auc")@y.values)
+                output[i,]=c(val,stats);
+
+        }
+	return(list(summary=output, per_expr=NULL))
+}
+
+bg__calc_DE_stats_simplified_singular <- function(expr_mat, TP, DE) {
+	qvals <- DE$q.value
+	if (!is.numeric(qvals)) {
+		qvals <- as.numeric(qvals)
+	}
+	pvals <- DE$p.value
+	if (!is.numeric(pvals)) {
+		pvals <- as.numeric(pvals)
+	}
+
+        sig = DE[qvals < 0.05,]
+
+        stats = bg__get_stats(sig[,1], TP, ngenes=length(expr_mat[,1]));
+
+        require("ROCR")
+        DE$Truth = rep(0, times=length(DE[,1]))
+        DE[DE[,1] %in% TP,]$Truth = 1;
+        pred <- ROCR::prediction(1-pvals, DE$Truth)
+        val <- unlist(ROCR::performance(pred,"auc")@y.values)
+        output=c(val,stats);
+
+	return(list(summary=output, per_expr=NULL))
+}
+
+bg__var_vs_drop <- function(pop_size, fixed_mean, suppress.plot=TRUE) {
+        fc = seq(from=1, to=100, by=1)
+        labels = c(rep(1, times=pop_size),rep(2,times=pop_size))
         lowmean_fun <- function(fc) {2*fixed_mean/(1+fc)}
-        test <- sapply(fc, function(f) {
-                low_mean <- lowmean_fun(f)
-                high_mean <- low_mean*f
-                base <- rnbinom(pop_size, size=1/mean2disp_fun(low_mean), mu=low_mean);
-                subpop <- rnbinom(pop_size, size=1/mean2disp_fun(high_mean), mu=high_mean)
-                base <- hidden_add_dropouts(base,low_mean,K)
-                subpop <- hidden_add_dropouts(subpop,high_mean*f,K)
+        test = sapply(fc, function(f) {
+                low_mean = lowmean_fun(f)
+                high_mean = low_mean*f
+                base = rnbinom(pop_size, size=1/dispersion_from_mean(low_mean), mu=low_mean);
+                subpop = rnbinom(pop_size, size=1/dispersion_from_mean(high_mean), mu=high_mean)
+                base = hidden_add_dropouts(base,low_mean,K)
+                subpop = hidden_add_dropouts(subpop,high_mean*f,K)
                 return(c(base,subpop))
         })
         var_btw_fun <- function(x) {
-                a <- aov(x~labels)
-                sse_btw <-unlist(summary(a))[3]
-                var_btw <- sse_btw/(2*pop_size-1)
+                a = aov(x~labels)
+                sse_btw =unlist(summary(a))[3]
+                var_btw = sse_btw/(2*pop_size-1)
                 return(var_btw)
         }
         var_within_fun <- function(x) {
-                a <- aov(x~labels)
-                sse_within <-unlist(summary(a))[4]
-                var_within <- sse_within/(2*pop_size-1)
+                a = aov(x~labels)
+                sse_within =unlist(summary(a))[4]
+                var_within = sse_within/(2*pop_size-1)
                 return(var_within)
         }
-        Vbtw <- apply(test,2,var_btw_fun)
-        Vwithin <- apply(test,2,var_within_fun)
-        vars <- apply(test, 2, var)
-        drops <- apply(test, 2, function(x){sum(x==0)})/length(test[,1])
+        Vbtw = apply(test,2,var_btw_fun)
+        Vwithin = apply(test,2,var_within_fun)
+        vars = apply(test, 2, var)
+        drops = apply(test, 2, function(x){sum(x==0)})/length(test[,1])
         if (!suppress.plot) {
                 par(mar=c(3.5,3.5,4,1))
                 # Var plot
@@ -191,8 +357,118 @@ bg__var_vs_drop <- function(pop_size, fixed_mean, K=10.3, mean2disp_fun=bg__mean
                 title(xlab="Fold Change", ylab="Dropout Rate", line=2)
                 title(main=paste("mu = ",fixed_mean,", n = ",2*pop_size,sep=""))
         }
-        var_r <- cor(vars,fc)
-        drop_r <- cor(drops,fc)
+        var_r = cor(vars,fc)
+        drop_r = cor(drops,fc)
         return(list(var_r=var_r, drop_r=drop_r, vars=vars, drops=drops, fc=fc, Vbtw=Vbtw, Vwithin=Vwithin));
 }
 
+bg__calc_DE_stats_FPR<- function(expr_mat, TP, Observed_Means, mt_threshold=0.05, suppress.plot=TRUE) {
+	require("M3Drop")
+        # Test DE
+        mt_method="fdr"
+
+        expr_mat = expr_mat[rowSums(expr_mat) > 0,]
+        expr_mat = expr_mat[rowSums(expr_mat == 0) > 0,]
+        TP = TP[TP %in% rownames(expr_mat)]
+
+        DE = M3Drop_Differential_Expression(expr_mat, mt_method = mt_method, mt_threshold=2, suppress.plot=TRUE)
+        HVG = BrenneckeGetVariableGenes(expr_mat, fdr=2, suppress.plot=T)
+
+        output = c(0,0);
+        tmp = list(DE, HVG)
+
+        # Plot Stuff - setup #
+        act_means = rowMeans(expr_mat)
+        thing = log(act_means)/log(10)
+        bins = 10^seq(from = floor(min(thing)), to = ceiling(max(thing)), by = 1)
+
+        for (i in 1:2) { # Do same thing for HVG & M3Drop
+                Diff = tmp[[i]]
+                sig = Diff[Diff$q.value < mt_threshold,]
+		val <- 1-sum(sig[,1] %in% TP)/length(sig[,1])
+                output[i]=val;
+        }
+	return(list(summary=output, per_expr=NULL))
+}
+
+bg__fit_gamma <- function(x) {
+	s = var(x)/mean(x)
+	a = mean(x)/s
+	return(list(shape=a, scale=s))
+}
+bg__shift_size <- function(mu_all, size_all, mu_group, coeffs) {
+        b <- log(size_all)-coeffs[2]*log(mu_all)
+        size_group <- exp(coeffs[2]*log(mu_group)+b)
+        return(size_group)
+}
+
+NbumiSimulationTrifecta <- function(original_data) {
+	require("M3Drop")
+	fit <- NBumiFitModel(original_data);
+	Tis = fit$vals$tis
+	Tis_gamma = bg__fit_gamma(Tis)
+	Mjs = fit$vals$tjs/fit$vals$nc
+	Mjs_norm = c(mean(log(Mjs)/log(10)), sd(log(Mjs)/log(10)))
+	mean2disp_coeffs = NBumiFitDispVsMean(fit, suppress.plot=TRUE)
+	min_mean = 10^-5;
+
+
+	n_genes = 25000
+	n_cells = 250
+#	g_means = rgamma(n_genes, shape=Mjs_gamma$shape, scale=Mjs_gamma$scale)
+	g_means = rnorm(n_genes, mean=Mjs_norm[1], sd=Mjs_norm[2]);
+	g_means = 10^g_means
+	g_means[g_means < min_mean] = min_mean;
+	g_means = g_means*n_cells;
+#	g_means = round(g_means); g_means[g_means == 0] = 1;
+
+	c_depths = round(rgamma(n_cells, shape=Tis_gamma$shape, scale=Tis_gamma$scale));
+	l2fc <- rnorm(n_genes, sd=2)
+
+	mus <- (g_means %*% t(c_depths)/sum(c_depths))
+	disp_size <- exp(log(rowMeans(mus))*mean2disp_coeffs[2]+mean2disp_coeffs[1])
+
+	base <- sapply(1:n_genes, function(i) {sapply(mus[i,], function(m) {rnbinom(1, mu=m, size=disp_size[i])})})
+
+	shifted_size = bg__shift_size(rowMeans(mus), disp_size, rowMeans(mus)*2^l2fc, mean2disp_coeffs)
+	de <- sapply(1:n_genes, function(i) {sapply(mus[i,], function(m) {rnbinom(1, mu=m*2^l2fc[i], size=shifted_size[i])})})
+
+	dv <- sapply(1:n_genes, function(i) {sapply(mus[i,], function(m) {rnbinom(1, mu=m, size=disp_size[i]*2^l2fc[i])})})
+	hv <- sapply(1:n_genes, function(i) {sapply(mus[i,], function(m) {rnbinom(1, mu=m, size=disp_size[i]*2^l2fc[i])})})
+
+	return(list(truth=l2fc, groups=c(rep(1, times=n_cells), rep(2, times=n_cells)), de = cbind(t(base),t(de)), dv = cbind(t(base),t(dv)), hv = cbind(t(dv),t(hv))))
+
+}
+M3DropSimulationTrifecta <- function(original_data) {
+	require("M3Drop")
+	tis = colSums(original_data)
+	norm = t(t(original_data)/tis*median(tis))
+	Mjs = rowMeans(norm);
+	vals <- bg__calc_variables(norm)
+	fit = bg__fit_MM(vals$p, vals$s)
+	K = fit$K
+	Mjs_norm = c(mean(log(Mjs)/log(10)), sd(log(Mjs)/log(10)))
+	mean2disp <- bg__get_mean2disp(norm);
+	min_mean = 10^-5;
+	
+	n_genes = 25000
+	n_cells = 250
+#	g_means = rgamma(n_genes, shape=Mjs_gamma$shape, scale=Mjs_gamma$scale)
+	g_means = rnorm(n_genes, mean=Mjs_norm[1], sd=Mjs_norm[2])
+	g_means = 10^g_means
+	g_means[g_means < min_mean] = min_mean
+	l2fc <- rnorm(n_genes, sd=2)
+	
+	# Make datasets
+	base <- sapply(g_means, function(mu) {hidden_add_dropouts(rnbinom(n_cells, mu=mu, size=1/mean2disp(mu)), mu, K)})
+	de <- sapply(g_means*2^l2fc, function(mu) {hidden_add_dropouts(rnbinom(n_cells, mu=mu, size=1/mean2disp(mu)), mu, K)})
+	dv <- sapply(1:n_genes, function(i) {
+			mu = g_means[i];
+			hidden_add_dropouts(rnbinom(n_cells, mu=mu, size=1/(mean2disp(mu))*2^l2fc[i]), mu, K)
+			})
+	hv <-  sapply(1:n_genes, function(i) {
+                        mu = g_means[i];
+                        hidden_add_dropouts(rnbinom(n_cells, mu=mu, size=1/(mean2disp(mu))*2^l2fc[i]), mu, K)
+                        })
+	return(list(truth=l2fc, groups=c(rep(1, times=n_cells), rep(2, times=n_cells)), de = cbind(t(base),t(de)), dv = cbind(t(base),t(dv)), hv = cbind(t(dv),t(hv))))
+}

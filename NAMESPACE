@@ -13,3 +13,4 @@ importFrom("graphics", "abline", "axis", "box", "curve", "frame", "hist", "image
 importFrom("stats", "aggregate", "dist", "dnorm", "fitted", "glm", "hclust", "lm", "median", "p.adjust", "pchisq", "pnorm", "quantile", "rnorm", "sd", "uniroot", "var", "wilcox.test")
 importFrom("matrixStats", "rowSds")
 importFrom("matrixStats", "rowVars")
+importFrom("matrixStats", "colVars")
