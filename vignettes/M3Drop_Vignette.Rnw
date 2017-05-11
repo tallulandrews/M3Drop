@@ -57,7 +57,7 @@ Here we see that the sum of squared residuals favours the flatter logistic curve
 
 \section*{Feature Selection for Differentially Expressed (DE) Genes}
 
-Since the Michaelis-Menten equation is concave, averaging across a mixed population forces differentially expressed genes to be shifted to the right of the Michaelis-Menten curve. DE genes are identified by comparing the local $K$ calculated for a specific gene to the global $K$ fitted across all genes using a Z-test followed by multiple-testing correction. Here we find 1,248 DE genes at 1\% FDR.
+Since the Michaelis-Menten equation is convex, averaging across a mixed population forces differentially expressed genes to be shifted to the right of the Michaelis-Menten curve. DE genes are identified by comparing the local $K$ calculated for a specific gene to the global $K$ fitted across all genes using a Z-test followed by multiple-testing correction. Here we find 1,248 DE genes at 1\% FDR.
 
 \begin{center}
 <<fig=TRUE>>=
