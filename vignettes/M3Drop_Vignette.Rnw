@@ -57,7 +57,28 @@ Here we see that the sum of squared residuals favours the flatter logistic curve
 
 \section*{Feature Selection for Differentially Expressed (DE) Genes}
 
-Since the Michaelis-Menten equation is convex, averaging across a mixed population forces differentially expressed genes to be shifted to the right of the Michaelis-Menten curve. DE genes are identified by comparing the local $K$ calculated for a specific gene to the global $K$ fitted across all genes using a Z-test followed by multiple-testing correction. Here we find 1,248 DE genes at 1\% FDR.
+Since the Michaelis-Menten equation is convex, averaging across a mixed population forces differentially expressed genes to be shifted to the right of the Michaelis-Menten curve (Figure 2).
+
+\begin{center}
+<<fig=TRUE>>=
+K <- 49
+S_sim <- 10^seq(from=-3, to=4, by=0.05)
+MM <- 1-S_sim/(K+S_sim)
+plot(S_sim, MM, type="", lwd=3, xlab="Expression", ylab="Dropout Rate", 
+	xlim=c(1,1000))
+S1 <- 10; P1 <- 1-S1/(K+S1);
+S2 <- 750; P2 <- 1-S2/(K+S2);
+points(c(S1,S2), c(P1,P2), pch=16, col="grey85", cex=3)
+lines(c(S1, S2), c(P1,P2), lwd=2.5, lty=2, col="grey35")
+mix <- 0.5;
+points(S1*mix+S2*(1-mix), P1*mix+P2*(1-mix), pch=16, col="grey35", cex=3)
+@ 
+\\
+\textbf{Figure 2}: Michaelis-Menten is convex which leads to DE genes being outliers to the right/above the curve.
+\end{center}
+
+
+Feature selection for DE genes are identified by comparing the local $K$ calculated for a specific gene to the global $K$ fitted across all genes using a Z-test followed by multiple-testing correction. Here we find 1,248 DE genes at 1\% FDR.
 
 \begin{center}
 <<fig=TRUE>>=
@@ -65,7 +86,7 @@ DE_genes <- M3DropFeatureSelection(Normalized_data$data,
 			mt_method="fdr", mt_threshold=0.01)
 @
 \\
-\textbf{Figure 2}: Differentially expressed genes at 1\% FDR (purple).
+\textbf{Figure 3}: Differentially expressed genes at 1\% FDR (purple).
 \end{center}
 
 Note that this function runs directly from the expression matrix, hence one could skip straight to identifying DE genes without comparing models and any external normalisation method can be applied to the raw counts prior to DE analysis. 
@@ -80,10 +101,10 @@ heat_out <- M3DropExpressionHeatmap(DE_genes$Gene, Normalized_data$data,
 			cell_labels = Normalized_data$labels)
 @
 \\
-\textbf{Figure 3}: Heatmap of expression of DE genes.
+\textbf{Figure 4}: Heatmap of expression of DE genes.
 \end{center}
 
-The heatmap (Figure 3) shows that the identified DE genes are differentially expressed across timepoints. Furthermore, it shows that the blastocysts cluster into two different groups based on the expression of these genes. We can extract these groups and identify marker genes for them as follows:
+The heatmap (Figure 4) shows that the identified DE genes are differentially expressed across timepoints. Furthermore, it shows that the blastocysts cluster into two different groups based on the expression of these genes. We can extract these groups and identify marker genes for them as follows:
 
 <<>>=
 cell_populations <- M3DropGetHeatmapClusters(heat_out, k=4, type="cell")
@@ -111,12 +132,12 @@ For comparison purposes, I have also included a function which implements the me
 HVG <- BrenneckeGetVariableGenes(Normalized_data$data)
 @
 \\
-\textbf{Figure 4}: 1,236 Significantly highly variable genes (pink) using all genes as spike-ins (10\% FDR).
+\textbf{Figure 5}: 1,236 Significantly highly variable genes (pink) using all genes as spike-ins (10\% FDR).
 \end{center}
 
-This method is more sensitive to lowly expressed genes, and frequently picks up genes with fewer than 10 reads per million. In addition, the quadratic model it uses frequenly over estimates the expected variability of highly expressed genes thus only one gene with more than 1000 reads per million was detected as highly variable (Figure 4). This is in contrast with M3Drop (Figure 2) which recognizes the low information available for lowly expressed genes thus identifies few genes with expression < 10 reads per million as differentially expressed. 
+This method is more sensitive to lowly expressed genes, and frequently picks up genes with fewer than 10 reads per million. In addition, the quadratic model it uses frequenly over estimates the expected variability of highly expressed genes thus only one gene with more than 1000 reads per million was detected as highly variable (Figure 5). This is in contrast with M3Drop (Figure 3) which recognizes the low information available for lowly expressed genes thus identifies few genes with expression < 10 reads per million as differentially expressed. 
 
-This difference can also be seen by comparing the heatmaps for the respective genes (Figure 3,5). The highly variable genes contains many more genes exhibiting just noisy expression, whereas nearly all genes detected by M3Drop are clearly differentially expressed across the different cell populations. 
+This difference can also be seen by comparing the heatmaps for the respective genes (Figure 4,6). The highly variable genes contains many more genes exhibiting just noisy expression, whereas nearly all genes detected by M3Drop are clearly differentially expressed across the different cell populations. 
 
 \begin{center}
 <<fig=TRUE>>=
@@ -124,7 +145,7 @@ heat_out <- M3DropExpressionHeatmap(HVG, Normalized_data$data,
 		cell_labels = Normalized_data$labels)
 @
 \\
-\textbf{Figure 5}: Heatmap of expression of highly variable genes across cells.
+\textbf{Figure 6}: Heatmap of expression of highly variable genes across cells.
 \end{center}
 
 \section*{Depth Adjusted Negative Binomial}
@@ -158,7 +179,7 @@ stats <- NBumiCheckFitFS(count_mat, DANB_fit)
 print(c(stats$gene_error,stats$cell_error))
 @
 \\
-\textbf{Figure 6}: Fits of the depth-adjusted negative binomial.
+\textbf{Figure 7}: Fits of the depth-adjusted negative binomial.
 \end{center}
 
 

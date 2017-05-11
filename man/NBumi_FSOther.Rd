@@ -3,12 +3,11 @@
 \alias{bg__nbumiFeatureSelectionHighVarDist2Med}
 \title{Other Feature Selection Methods}
 \description{
-	Ineffective alternative feature selection methods based on the depth-adjusted negative binomial model.
+	Ineffective alternative feature selection methods based on the depth-adjusted negative binomial model. Functions tagged with "bg__" are not meant for direct usage and are not available in the Bioconductor release.
 }
 \usage{
 	bg__nbumiFeatureSelectionDropouts(fit)
 	bg__nbumiFeatureSelectionHighVarDist2Med(fit, window_size=1000)
-	
 }
 \arguments{
   \item{fit}{output from NBumiFitModel or NBumiFitBasicModel.}
@@ -27,12 +26,12 @@
 	Sorted vector of p-values/distances.
 }
 \examples{
-library(M3DExampleData)
-counts <- as.matrix(Mmus_example_list$data);
-counts <- counts[rowSums(counts) > 0,];
-fit <- NBumiFitModel(counts);
-Dropout_features <- names(bg__nbumiFeatureSelectionDropouts(fit)[1:2000]);
-dist2med_features <- names(bg__nbumiFeatureSelectionHighVarDist2Med(fit)[1:2000]);
+#library(M3DExampleData)
+#counts <- as.matrix(Mmus_example_list$data);
+#counts <- counts[rowSums(counts) > 0,];
+#fit <- NBumiFitModel(counts);
+#Dropout_features <- names(bg__nbumiFeatureSelectionDropouts(fit)[1:2000]);
+#dist2med_features <- names(bg__nbumiFeatureSelectionHighVarDist2Med(fit)[1:2000]);
 }
 \keyword{single cell}
 \keyword{feature selection}
