@@ -2,7 +2,7 @@
 \alias{bg__horizontal_residuals_MM_log10}
 \title{Calculate Horizontal Residuals}
 \description{
-	Calculates horizontal residuals from the Michaelis-Menten Function
+	Calculates horizontal residuals from the Michaelis-Menten Function. Functions tagged with "bg__" are not meant for direct usage and are not available in the Bioconductor release.
 }
 \usage{
 	bg__horizontal_residuals_MM_log10(K, p, s)

@@ -2,7 +2,7 @@
 \alias{bg__fit_size_to_var}
 \title{Fit gene-specific dispersion}
 \description{
-	Fits dispersion for a specific gene for the depth-adjusted negative binomial.
+	Fits dispersion for a specific gene for the depth-adjusted negative binomial. Functions tagged with "bg__" are not meant for direct usage and are not available in the Bioconductor release.
 }
 \usage{
 	bg__fit_size_to_var(obs, mu_vec, max_size, min_size=10^-10, convergence=0.001)

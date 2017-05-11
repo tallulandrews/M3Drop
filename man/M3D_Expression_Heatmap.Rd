@@ -3,7 +3,7 @@
 \alias{bg__expression_heatmap}
 \title{Plot Heatmap of Gene Expression}
 \description{
-	Plots a customized heatmap of scaled log expression values.
+	Plots a customized heatmap of scaled log expression values. Functions tagged with "bg__" are not meant for direct usage and are not available in the Bioconductor release.
 }
 \usage{
   M3DropExpressionHeatmap(genes, expr_mat, cell_labels=NA, interesting_genes=NA, key_genes=genes, key_cells=NA)
@@ -26,6 +26,6 @@
 \examples{
   library(M3DExampleData)
   M3DropExpressionHeatmap(head(rownames(Mmus_example_list$data),20),Mmus_example_list$data, cell_labels = Mmus_example_list$labels)
-  bg__expression_heatmap(head(rownames(Mmus_example_list$data),20),Mmus_example_list$data, cell_labels = Mmus_example_list$labels)
+#  bg__expression_heatmap(head(rownames(Mmus_example_list$data),20),Mmus_example_list$data, cell_labels = Mmus_example_list$labels)
 }
 \keyword{heatmap}

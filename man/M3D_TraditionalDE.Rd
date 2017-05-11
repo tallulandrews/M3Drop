@@ -5,7 +5,7 @@
 \alias{bg__get_mean2disp}
 \title{Perform Traditional Differential Expression}
 \description{
-	Performs traditional (i.e. compare defined groups) differential expression using a negative binomial model with MM zero-inflation.
+	Performs traditional (i.e. compare defined groups) differential expression using a negative binomial model with MM zero-inflation. Functions tagged with "bg__" are not meant for direct usage and are not available in the Bioconductor release.
 }
 \usage{
 	bg__m3dropTraditionalDE(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05)
@@ -51,11 +51,11 @@ dropouts (Michaelis-Menten) for genes are fit to the full dataset. Significance 
 }
 \examples{
 library(M3DExampleData)
-Normalized_data <- M3DropCleanData(Mmus_example_list$data,
-                  labels = Mmus_example_list$labels,
-                  is.counts=TRUE, min_detected_genes=2000)
-DE_output <- bg__m3dropTraditionalDE(Normalized_data$data[1:100,], Normalized_data$labels)
-DE_shifted_output <- bg__m3dropTraditionalDEShiftDisp(Normalized_data$data[1:100,], Normalized_data$labels)
-DE_output_batches <- bg__m3dropTraditionalDE(Normalized_data$data[1:100,], Normalized_data$labels, batches=Normalized_data$labels) # each biological condition was performed separately
+#Normalized_data <- M3DropCleanData(Mmus_example_list$data,
+#                  labels = Mmus_example_list$labels,
+#                  is.counts=TRUE, min_detected_genes=2000)
+#DE_output <- bg__m3dropTraditionalDE(Normalized_data$data[1:100,], Normalized_data$labels)
+#DE_shifted_output <- bg__m3dropTraditionalDEShiftDisp(Normalized_data$data[1:100,], Normalized_data$labels)
+#DE_output_batches <- bg__m3dropTraditionalDE(Normalized_data$data[1:100,], Normalized_data$labels, batches=Normalized_data$labels) # each biological condition was performed separately
 }
 \keyword{differential expression}

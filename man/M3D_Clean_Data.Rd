@@ -3,7 +3,7 @@
 \alias{bg__filter_cells}
 \title{Filter Expression Data}
 \description{
-	Filters and normalizes a given expression matrix. Removes low quality cells and undetected genes, and normalizes counts to counts per million. 
+	Filters and normalizes a given expression matrix. Removes low quality cells and undetected genes, and normalizes counts to counts per million. Functions tagged with "bg__" are not meant for direct usage and are not available in the Bioconductor release.
 }
 \usage{
   M3DropCleanData(expr_mat, labels = NA, is.counts = TRUE, suppress.plot = FALSE, pseudo_genes = NA, min_detected_genes = NA)

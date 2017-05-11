@@ -3,7 +3,7 @@
 \alias{bg__get_extreme_residuals}
 \title{Get outliers from MM curve.}
 \description{
-	Identifies outliers left and right of a fitted Michaelis-Menten curve.
+	Identifies outliers left and right of a fitted Michaelis-Menten curve. Functions tagged with "bg__" are not meant for direct usage and are not available in the Bioconductor release.
 }
 \usage{
   M3DropGetExtremes(expr_mat, fdr_threshold=0.1, percent=NA, v_threshold=c(0.05,0.95), suppress.plot=FALSE)
@@ -33,6 +33,6 @@ Only genes with dropout rates within v_threshold will be considered to avoid the
   library(M3DExampleData)
   extreme_gene_lists <- M3DropGetExtremes(Mmus_example_list$data, fdr_threshold=0.1)
   extreme_gene_lists <- M3DropGetExtremes(Mmus_example_list$data, percent=0.01)
-  Lextremes <- bg__get_extreme_residuals(Mmus_example_list$data, fdr_threshold=0.1, direction="left")
+#  Lextremes <- bg__get_extreme_residuals(Mmus_example_list$data, fdr_threshold=0.1, direction="left")
 }
 \keyword{extremes, outliers, residuals}

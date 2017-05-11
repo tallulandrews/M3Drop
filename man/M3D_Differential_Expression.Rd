@@ -3,7 +3,7 @@
 \alias{bg__test_DE_K_equiv}
 \title{Differentially Expressed Genes.}
 \description{
-	Use Michaelis-Menten curve to find differentially expressed (DE) genes.
+	Use Michaelis-Menten curve to find differentially expressed (DE) genes. Functions tagged with "bg__" are not meant for direct usage and are not available in the Bioconductor release.
 }
 \usage{
   M3DropFeatureSelection(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE)
@@ -31,7 +31,7 @@
                   is.counts=TRUE, min_detected_genes=2000)
   DE_genes <- M3DropFeatureSelection(Normalized_data$data, 
 		mt_method="fdr", mt_threshold=0.01)
-  gene_info <- bg__calc_variables(Normalized_data$data[1:1000,])
-  DE_output <- bg__test_DE_K_equiv(gene_info)
+#  gene_info <- bg__calc_variables(Normalized_data$data[1:1000,])
+#  DE_output <- bg__test_DE_K_equiv(gene_info)
 }
 \keyword{differential expression}

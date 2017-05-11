@@ -4,7 +4,7 @@
 \alias{bg__highlight_genes}
 \title{Make M3Drop Plots}
 \description{
-	Background functions used for making M3Drop plots.
+	Background functions used for making M3Drop plots. Functions tagged with "bg__" are not meant for direct usage and are not available in the Bioconductor release.
 }
 \usage{
 	bg__dropout_plot_base(expr_mat, xlim=NA, suppress.plot=FALSE)
