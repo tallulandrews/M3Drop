@@ -64,7 +64,7 @@ Since the Michaelis-Menten equation is convex, averaging across a mixed populati
 K <- 49
 S_sim <- 10^seq(from=-3, to=4, by=0.05)
 MM <- 1-S_sim/(K+S_sim)
-plot(S_sim, MM, type="", lwd=3, xlab="Expression", ylab="Dropout Rate", 
+plot(S_sim, MM, type="l", lwd=3, xlab="Expression", ylab="Dropout Rate", 
 	xlim=c(1,1000))
 S1 <- 10; P1 <- 1-S1/(K+S1);
 S2 <- 750; P2 <- 1-S2/(K+S2);
