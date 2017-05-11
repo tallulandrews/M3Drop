@@ -27,6 +27,6 @@
   # Removes cells with significantly few detected genes (FDR=5%)
   filtered_only <- M3DropCleanData(Mmus_example_list$data, Mmus_example_list$labels, 
 			is.counts=FALSE)
-  QCed <- bg__filter_cells(Mmus_example_list$data[,1:10], Mmus_example_list$labels[1:10], suppress.plot=TRUE)
+#  QCed <- bg__filter_cells(Mmus_example_list$data[,1:10], Mmus_example_list$labels[1:10], suppress.plot=TRUE)
 }
 \keyword{normalization, quality control}
