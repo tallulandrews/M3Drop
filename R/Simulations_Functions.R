@@ -402,8 +402,8 @@ bg__shift_size <- function(mu_all, size_all, mu_group, coeffs) {
         return(size_group)
 }
 
-NbumiSimulationTrifecta <- function(original_data) {
-	require("M3Drop")
+NBumiSimulationTrifecta <- function(original_data, n_genes=25000, n_cells=250) {
+#	require("M3Drop")
 	fit <- NBumiFitModel(original_data);
 	Tis = fit$vals$tis
 	Tis_gamma = bg__fit_gamma(Tis)
@@ -412,20 +412,16 @@ NbumiSimulationTrifecta <- function(original_data) {
 	mean2disp_coeffs = NBumiFitDispVsMean(fit, suppress.plot=TRUE)
 	min_mean = 10^-5;
 
-
-	n_genes = 25000
-	n_cells = 250
-#	g_means = rgamma(n_genes, shape=Mjs_gamma$shape, scale=Mjs_gamma$scale)
 	g_means = rnorm(n_genes, mean=Mjs_norm[1], sd=Mjs_norm[2]);
 	g_means = 10^g_means
 	g_means[g_means < min_mean] = min_mean;
+	g_means[g_means > max(Mjs)] = max(Mjs)
 	g_means = g_means*n_cells;
-#	g_means = round(g_means); g_means[g_means == 0] = 1;
 
 	c_depths = round(rgamma(n_cells, shape=Tis_gamma$shape, scale=Tis_gamma$scale));
 	l2fc <- rnorm(n_genes, sd=2)
 
-	mus <- (g_means %*% t(c_depths)/sum(c_depths))
+	mus <- ((g_means) %*% t(c_depths)/sum(c_depths)) # Fix 11 May 2017
 	disp_size <- exp(log(rowMeans(mus))*mean2disp_coeffs[2]+mean2disp_coeffs[1])
 
 	base <- sapply(1:n_genes, function(i) {sapply(mus[i,], function(m) {rnbinom(1, mu=m, size=disp_size[i])})})
@@ -439,8 +435,8 @@ NbumiSimulationTrifecta <- function(original_data) {
 	return(list(truth=l2fc, groups=c(rep(1, times=n_cells), rep(2, times=n_cells)), de = cbind(t(base),t(de)), dv = cbind(t(base),t(dv)), hv = cbind(t(dv),t(hv))))
 
 }
-M3DropSimulationTrifecta <- function(original_data) {
-	require("M3Drop")
+M3DropSimulationTrifecta <- function(original_data, n_genes=25000, n_cells=250) {
+#	require("M3Drop")
 	tis = colSums(original_data)
 	norm = t(t(original_data)/tis*median(tis))
 	Mjs = rowMeans(norm);
@@ -451,12 +447,11 @@ M3DropSimulationTrifecta <- function(original_data) {
 	mean2disp <- bg__get_mean2disp(norm);
 	min_mean = 10^-5;
 	
-	n_genes = 25000
-	n_cells = 250
 #	g_means = rgamma(n_genes, shape=Mjs_gamma$shape, scale=Mjs_gamma$scale)
 	g_means = rnorm(n_genes, mean=Mjs_norm[1], sd=Mjs_norm[2])
 	g_means = 10^g_means
 	g_means[g_means < min_mean] = min_mean
+	g_means[g_means > max(Mjs)] = max(Mjs)
 	l2fc <- rnorm(n_genes, sd=2)
 	
 	# Make datasets
