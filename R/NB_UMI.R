@@ -29,9 +29,15 @@ NBumiFitModel <- function(counts) {
 	convergence <- 0.001
 	max_size <- max(mus)^2;
 	min_size <- 10^-10;
-	size <- sapply(1:vals$ng,function(j) {
-		 bg__fit_size_to_var(var(counts[j,]-mus[j,]), mus[j,], max_size=max_size, min_size=10^-10, convergence=0.001)
-		})
+#	size <- sapply(1:vals$ng,function(j) {
+#		 bg__fit_size_to_var(var(counts[j,]-mus[j,]), mus[j,], max_size=max_size, min_size=10^-10, convergence=0.001)
+#		})
+
+	size = vals$tjs^2*(sum(vals$tis^2)/vals$total^2)/((vals$nc-1)*rowVars(counts-mus)-vals$tjs)
+	size[size < 0] = max_size;
+	size[size < min_size] = min_size;
+	size[size > max_size] = max_size;
+
 	return(list(mus=mus, sizes=size, vals=vals))
 }
 
