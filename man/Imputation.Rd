@@ -36,6 +36,6 @@ Normalized_data <- M3DropCleanData(Mmus_example_list$data,
                 labels = Mmus_example_list$labels,
                 is.counts=TRUE, min_detected_genes=2000)
 
-imputed <- M3DropImputZeros(Normalized_data$data);
+imputed <- M3DropImputeZeros(Normalized_data$data);
 }
 \keyword{imputation}

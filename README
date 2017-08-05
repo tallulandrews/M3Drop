@@ -20,4 +20,4 @@ Example Data:
 >require("devtools")
 >install_github('tallulandrews/M3DExampleData')
 
-Read More: DOI: 10.1101/065094
+Read More: https://doi.org/10.1101/065094

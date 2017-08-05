@@ -133,10 +133,13 @@ The Michaelis-Menten equation fits full-transcript single-cell RNASeq data well,
 
 To account for zeros resulting from insufficient sequencing depth, the M3Drop packaged includes the depth-adjusted negative binomial model (DANB). DANB models each observation as a negative binomial distribution with mean proportional to the mean expression of the respective gene and the relative sequencing depth of the respective cell. The dispersion parameter of the negative binomial is fit to the variance of each gene. The equations for calculating these paramters are:
 
+Observation specific means:
 $$\mu_{ij} = \frac{\sum\limits_{i} t_{ij} * \sum\limits_{j} t_{ij}}{\sum\limits_{ij} t_{ij}}$$
 
 
-$$\underset{r_i}{\operatorname{arg}\operatorname{min}}|\sum((t_{ij}-\mu_{ij})^2 - (\mu{ij}+r_i\mu_{ij}^2))|$$
+Gene specific dispersion (solved for $r_{i}$):
+%$$\underset{r_i}{\operatorname{arg}\operatorname{min}}|\sum((t_{ij}-\mu_{ij})^2 - (\mu{ij}+r_i\mu_{ij}^2))|$$
+$$\sum_{j}(t_{ij}-\mu_{ij})^2 = \sum_{j}(\mu_{ij}+r_{i}\mu_{ij}^2)$$
 
 Where $\mu_{ij}$ is the observation specific mean for the negative binomial for the observed molecule counts, $t_{ij}$ of the $i$th gene in the $j$th of cell and $r_{i}$ is the dispersion parameter (the "size" paramter of R's nbinom functions) for gene $i$.
 
