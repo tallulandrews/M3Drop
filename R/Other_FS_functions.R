@@ -14,11 +14,11 @@ irlba_pca_FS <- function(expr_mat, pcs=c(2,3)) {
 	require("Matrix")
 	norm <- expr_mat
 	nz_genes <- which(rowSums(norm) != 0)
-	norm[nz_genes] <- log(norm[nz_genes] + 1)/log(2)
+	norm[nz_genes,] <- log(norm[nz_genes,] + 1)/log(2)
 	# Create sparse Matrix
-	indices = which(norm > 0, arr.ind=TRUE)
+	indices <- which(norm > 0, arr.ind=TRUE)
 	vals <- norm[indices]
-	nc = ncol(norm)
+	nc <- ncol(norm)
 	gene_names <- rownames(norm);
 
 	norm <- Matrix::sparseMatrix(i = indices[,1], j=indices[,2], x=vals)
@@ -161,7 +161,7 @@ Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=length(count
 	DANB_var <- NBumiFeatureSelectionHighVar(fit)
 	# HVG
 	if (sum(is.spike == TRUE) > 10) {
-		HVG <- BrenneckeGetVariableGenes(norm, spikes=spikes, fdr=2)
+		HVG <- BrenneckeGetVariableGenes(norm, spikes=spikes, fdr=2, suppress.plot=TRUE)
 	} else {
 		warning("Warning: insufficient spike-ins using all genes for HVG");
 		HVG <- BrenneckeGetVariableGenes(norm, fdr=2)
@@ -189,5 +189,8 @@ Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=length(count
 		)
 	rownames(table) <- ref_order;
 	consensus_score = rowMeans(table, na.rm=TRUE);
-	return(table[order(consensus_score),])
+	table <- table[order(consensus_score),]
+#	table$Cons <- 1:nrow(table) # currently adding this in plotting scripts
+
+	return(table)
 }

@@ -402,7 +402,10 @@ bg__shift_size <- function(mu_all, size_all, mu_group, coeffs) {
         return(size_group)
 }
 
-NBumiSimulationTrifecta <- function(original_data, n_genes=25000, n_cells=250) {
+NBumiSimulationTrifecta <- function(original_data, n_genes=25000, n_cells=250, sub_pop_prop=0.5) {
+	# 31 Aug 2017
+	n_cells1 = round(n_cells*2*sub_pop_prop)
+	n_cells2 = round(n_cells*2*(1-sub_pop_prop))
 #	require("M3Drop")
 	fit <- NBumiFitModel(original_data);
 	Tis = fit$vals$tis
@@ -416,26 +419,31 @@ NBumiSimulationTrifecta <- function(original_data, n_genes=25000, n_cells=250) {
 	g_means = 10^g_means
 	g_means[g_means < min_mean] = min_mean;
 	g_means[g_means > max(Mjs)] = max(Mjs)
-	g_means = g_means*n_cells;
+	g_means1 = g_means*(n_cells1);
+	g_means2 = g_means*(n_cells2);
 
-	c_depths = round(rgamma(n_cells, shape=Tis_gamma$shape, scale=Tis_gamma$scale));
+	c_depths1 = round(rgamma(n_cells1, shape=Tis_gamma$shape, scale=Tis_gamma$scale));
+	c_depths2 = round(rgamma(n_cells2, shape=Tis_gamma$shape, scale=Tis_gamma$scale));
 	l2fc <- rnorm(n_genes, sd=2)
 
-	mus <- ((g_means) %*% t(c_depths)/sum(c_depths)) # Fix 11 May 2017
-	disp_size <- exp(log(rowMeans(mus))*mean2disp_coeffs[2]+mean2disp_coeffs[1])
+	mus1 <- ((g_means1) %*% t(c_depths1)/sum(c_depths1)) # Fix 11 May 2017
+	mus2 <- ((g_means2) %*% t(c_depths2)/sum(c_depths2)) # Fix 11 May 2017
+	disp_size <- exp(log(rowMeans(cbind(mus1,mus2)))*mean2disp_coeffs[2]+mean2disp_coeffs[1])
 
-	base <- sapply(1:n_genes, function(i) {sapply(mus[i,], function(m) {rnbinom(1, mu=m, size=disp_size[i])})})
+	base <- sapply(1:n_genes, function(i) {sapply(mus1[i,], function(m) {rnbinom(1, mu=m, size=disp_size[i])})})
 
-	shifted_size = bg__shift_size(rowMeans(mus), disp_size, rowMeans(mus)*2^l2fc, mean2disp_coeffs)
-	de <- sapply(1:n_genes, function(i) {sapply(mus[i,], function(m) {rnbinom(1, mu=m*2^l2fc[i], size=shifted_size[i])})})
+	shifted_size = bg__shift_size(rowMeans(mus2), disp_size, rowMeans(mus2)*2^l2fc, mean2disp_coeffs)
+	de <- sapply(1:n_genes, function(i) {sapply(mus2[i,], function(m) {rnbinom(1, mu=m*2^l2fc[i], size=shifted_size[i])})})
 
-	dv <- sapply(1:n_genes, function(i) {sapply(mus[i,], function(m) {rnbinom(1, mu=m, size=disp_size[i]*2^l2fc[i])})})
-	hv <- sapply(1:n_genes, function(i) {sapply(mus[i,], function(m) {rnbinom(1, mu=m, size=disp_size[i]*2^l2fc[i])})})
+	dv <- sapply(1:n_genes, function(i) {sapply(mus2[i,], function(m) {rnbinom(1, mu=m, size=disp_size[i]*2^l2fc[i])})})
+	hv <- sapply(1:n_genes, function(i) {sapply(mus2[i,], function(m) {rnbinom(1, mu=m, size=disp_size[i]*2^l2fc[i])})})
 
-	return(list(truth=l2fc, groups=c(rep(1, times=n_cells), rep(2, times=n_cells)), de = cbind(t(base),t(de)), dv = cbind(t(base),t(dv)), hv = cbind(t(dv),t(hv))))
+	return(list(truth=l2fc, groups=c(rep(1, times=n_cells1), rep(2, times=n_cells2)), de = cbind(t(base),t(de)), dv = cbind(t(base),t(dv)), hv = cbind(t(dv),t(hv))))
 
 }
-M3DropSimulationTrifecta <- function(original_data, n_genes=25000, n_cells=250) {
+M3DropSimulationTrifecta <- function(original_data, n_genes=25000, n_cells=250, sub_pop_prop=0.5) {
+	n_cells1 = round(n_cells*2*sub_pop_prop)
+	n_cells2 = round(n_cells*2*(1-sub_pop_prop))
 #	require("M3Drop")
 	tis = colSums(original_data)
 	norm = t(t(original_data)/tis*median(tis))
@@ -455,15 +463,37 @@ M3DropSimulationTrifecta <- function(original_data, n_genes=25000, n_cells=250) 
 	l2fc <- rnorm(n_genes, sd=2)
 	
 	# Make datasets
-	base <- sapply(g_means, function(mu) {hidden_add_dropouts(rnbinom(n_cells, mu=mu, size=1/mean2disp(mu)), mu, K)})
-	de <- sapply(g_means*2^l2fc, function(mu) {hidden_add_dropouts(rnbinom(n_cells, mu=mu, size=1/mean2disp(mu)), mu, K)})
+	base <- sapply(g_means, function(mu) {hidden_add_dropouts(rnbinom(n_cells1, mu=mu, size=1/mean2disp(mu)), mu, K)})
+	de <- sapply(g_means*2^l2fc, function(mu) {hidden_add_dropouts(rnbinom(n_cells2, mu=mu, size=1/mean2disp(mu)), mu, K)})
 	dv <- sapply(1:n_genes, function(i) {
 			mu = g_means[i];
-			hidden_add_dropouts(rnbinom(n_cells, mu=mu, size=1/(mean2disp(mu))*2^l2fc[i]), mu, K)
+			hidden_add_dropouts(rnbinom(n_cells2, mu=mu, size=1/(mean2disp(mu))*2^l2fc[i]), mu, K)
 			})
 	hv <-  sapply(1:n_genes, function(i) {
                         mu = g_means[i];
-                        hidden_add_dropouts(rnbinom(n_cells, mu=mu, size=1/(mean2disp(mu))*2^l2fc[i]), mu, K)
+                        hidden_add_dropouts(rnbinom(n_cells2, mu=mu, size=1/(mean2disp(mu))*2^l2fc[i]), mu, K)
                         })
-	return(list(truth=l2fc, groups=c(rep(1, times=n_cells), rep(2, times=n_cells)), de = cbind(t(base),t(de)), dv = cbind(t(base),t(dv)), hv = cbind(t(dv),t(hv))))
+	return(list(truth=l2fc, groups=c(rep(1, times=n_cells1), rep(2, times=n_cells2)), de = cbind(t(base),t(de)), dv = cbind(t(base),t(dv)), hv = cbind(t(dv),t(hv))))
+}
+
+Fit_Simulation_Params <- function(original_data) {
+
+}
+Make_Sim <- function(model_params, n_genes=25000, pop_params=data.frame(cells=c(125,125), size=c(1,1), hetero=c(0,0), distinct=c(0,0)), dV_params=list(mu=0, sd=1), dE_params=list(mu=0, sd=1)) {
+# model_params from above function include:
+#	slope & intercept of log-log relationship btw mean & variance
+#	mean & sd of distribution of mean expression per gene
+#	shape & scale of gamma distribution of total counts per cell (in 100,000s reads)
+#	K of MM dropouts
+# parameters for each cell population:
+#	number of cells
+#	relative size of the cells (affects total counts per cell)
+#	heterogeneity of the population (multiply FC in variance)a  - setting to 0 = no change in variance.
+#	distinctness of the population (multiply FC in mean expression); - setting to 0 = no change in mean expression.
+# the "reference" population is never seen, (unless hetero=0, distinct=0, size=1)
+# DE & DV are added to every population therefore actual distribution of FC is 
+# sum of distribution of FC between two populations, therefore sd=1 is actually sd=2
+
+# Does not support batch effects -> would require one population to have same dV/dE as another but with an additiona effect on top.
+
 }
