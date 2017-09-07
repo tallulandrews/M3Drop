@@ -104,7 +104,7 @@ Grun_FS <- function(expr_mat, spikes) {
 }
 
 # How does GiniClust do it?
-Gini_FS <- function(expr_mat) {
+Gini_FS_simple <- function(expr_mat) {
 	require("reldist")
 	ginis <- apply(expr_mat, 1, gini)
 	d <- rowMeans(expr_mat>0)
@@ -113,6 +113,33 @@ Gini_FS <- function(expr_mat) {
 	return(sort(-score));
 }
 
+Gini_FS <- function(expr_mat, suppress.plot=TRUE) {
+	# GiniClust
+	expr_mat <- expr_mat[rowSums(expr_mat) > 0,]
+	require("reldist")
+	ginis <- apply(expr_mat, 1, gini)
+	max_expr <- apply(expr_mat, 1, max)
+	max_expr <- log(max_expr+1)/log(2)
+	fit = loess(ginis~max_expr)
+	outliers = abs(fit$residuals)
+	outliers = outliers > quantile(outliers, probs=0.75)
+	fit2 = loess(ginis[!outliers]~max_expr[!outliers])
+	
+	norm_ginis = rep(NA, times=length(ginis));
+	norm_ginis[!outliers] = fit2$residuals;
+	to_impute = which(is.na(norm_ginis))
+	impute_loess <- function(i) {
+		d = abs(max_expr-max_expr[i])
+		closest = which(d[!outliers] == min(d[!outliers]))
+		imputed = fit2$fitted[closest[1]]
+		return(imputed)
+	}
+	fit_ginis = sapply(to_impute, impute_loess)
+	norm_ginis[outliers] = ginis[outliers]-fit_ginis
+	p = pnorm(norm_ginis, mean=mean(norm_ginis), sd=sd(norm_ginis))
+	names(p) = rownames(expr_mat)
+	return(sort(p));
+}
 Cor_FS <- function(expr_mat) {
 	# High memory
 	cor_mat = cor(t(expr_mat))
@@ -164,7 +191,7 @@ Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=length(count
 		HVG <- BrenneckeGetVariableGenes(norm, spikes=spikes, fdr=2, suppress.plot=TRUE)
 	} else {
 		warning("Warning: insufficient spike-ins using all genes for HVG");
-		HVG <- BrenneckeGetVariableGenes(norm, fdr=2)
+		HVG <- BrenneckeGetVariableGenes(norm, fdr=2, suppress.plot=TRUE)
 	}
 	# M3Drop
 	m3drop <- M3DropFeatureSelection(norm, mt_method="fdr", mt_threshold=2, suppress.plot=TRUE)
