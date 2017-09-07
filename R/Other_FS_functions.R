@@ -136,7 +136,7 @@ Gini_FS <- function(expr_mat, suppress.plot=TRUE) {
 	}
 	fit_ginis = sapply(to_impute, impute_loess)
 	norm_ginis[outliers] = ginis[outliers]-fit_ginis
-	p = pnorm(norm_ginis, mean=mean(norm_ginis), sd=sd(norm_ginis))
+	p = pnorm(norm_ginis, mean=mean(norm_ginis), sd=sd(norm_ginis), lower.tail=FALSE)
 	names(p) = rownames(expr_mat)
 	return(sort(p));
 }
