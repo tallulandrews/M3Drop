@@ -33,7 +33,7 @@ NBumiFitModel <- function(counts) {
 #		 bg__fit_size_to_var(var(counts[j,]-mus[j,]), mus[j,], max_size=max_size, min_size=10^-10, convergence=0.001)
 #		})
 
-	size = vals$tjs^2*(sum(vals$tis^2)/vals$total^2)/((vals$nc-1)*rowVars(counts-mus)-vals$tjs)
+	size = vals$tjs^2*(sum(vals$tis^2)/vals$total^2)/((vals$nc-1)*rowVars(counts-mus)-vals$tjs) # for this to work with sparse matrices might need to implement in C
 	size[size < 0] = max_size;
 	size[size < min_size] = min_size;
 	size[size > max_size] = max_size;
