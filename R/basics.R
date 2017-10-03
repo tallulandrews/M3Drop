@@ -14,39 +14,46 @@
 #You should have received a copy of the GNU General Public License along with
 #this program . If not , see <http://www.gnu.org/licenses/>.
 
-bg__calc_variables <- function(expr_mat) {
-    if (!is.matrix(expr_mat)) {
+bg__calc_variables <- function(expr_mat, is.log=FALSE) {
+    if (class(mat) != "matrix" | class(mat) != "dgCMatrix") {
+	warning("Warning: not a recognized matrix class, coercing to 'matrix'.")
 	expr_mat <- as.matrix(expr_mat)
     }
     # Calc variables
-    sum_neg <- sum(expr_mat < 0)
-    sum_zero <- sum(expr_mat == 0)
-    sum_pos <- sum(expr_mat >= 0)
-    if (sum_neg > 0) {stop("Expression matrix contains negative values! M3Drop requires an expression matrix that is not log-transformed.")}
+#    sum_neg <- sum(expr_mat < 0)
+     sum_zero <- sum(expr_mat == 0)
+#    sum_pos <- sum(expr_mat >= 0)
+    if (is.log) {
+	expr_mat <- is.log^expr_mat-1;
+    }
+
+    lowest <- min(expr_mat)
+    if (lowest < 0) {stop("Error: Expression matrix cannot contains negative values! Has the matrix been log-transformed?")}
     
     # Deal with strangely normalized data
-    if (sum_zero == 0) {
+    if (lowest > 0) {
         warning("Warning: No zero values (dropouts) detected will use minimum expression value instead.")
         # If no zeros in expression matrix convert minimum value into zero
-        expr_mat <- round(expr_mat, digits=2) # Round to accomodate errors
-        min_val <- min(expr_mat)
+        #expr_mat <- round(expr_mat, digits=2) # Round to accomodate errors
+        min_val <- lowest+0.05 # Instead of rounding to accomodate errors
         expr_mat[expr_mat == min_val] <- 0;
     }
-    if (sum_zero < 0.1*sum_pos) {
+    if (sum_zero < 0.1*prod(dim(expr_mat))) {
         # Less than 10% zeros
         warning("Warning: Expression matrix contains few zero values (dropouts) this may lead to poor performance.")
     }
     
     p <- rowSums(expr_mat == 0)/ncol(expr_mat)
     if (sum(p == 1) > 0) {
-	warning(paste("Warning: Removing", sum(p==1),"invariant genes."))
+	warning(paste("Warning: Removing", sum(p==1),"undetected genes."))
 	expr_mat <- expr_mat[p < 1,]
         p <- rowSums(expr_mat == 0)/ncol(expr_mat)
     }
 
     p_stderr <- sqrt(p*(1-p)/ncol(expr_mat))
     s <- rowMeans(expr_mat)
-    s_stderr <- rowSds(expr_mat)/sqrt(ncol(expr_mat))
+    s_stderr <- sqrt( (rowMeans(expr_mat^2) - s^2)/ncol(expr_mat) ) #sparse matrix friendly
+#    s_stderr <- rowSds(expr_mat)/sqrt(ncol(expr_mat))
     names(s_stderr) <- rownames(expr_mat)
     return(list(s = s, p = p, s_stderr = s_stderr, p_stderr = p_stderr))
 }
@@ -55,7 +62,12 @@ hidden__invert_MM <- function (K, p) {K*(1-p)/(p)}
 bg__horizontal_residuals_MM_log10 <- function (K, p, s) {log(s)/log(10) - log(hidden__invert_MM(K,p))/log(10)}
 
 hidden_getAUC <- function(gene, labels) {
+	labels <- unlist(labels);
         ranked <- rank(gene);
+	#MAT <- as.matrix(ranked)
+        #x <- split(seq(ncol(MAT)), labels)
+        #ms <- sapply(x, function(a) rowMeans(MAT[,a]))
+
         ms <- aggregate(ranked~unlist(labels),FUN=mean); #Get average score for each cluster
         posgroup <- as.character(unlist(ms[which(ms[,2]==max(ms[,2])),1])); #Get cluster with highest average score
         if (length(posgroup) > 1) {return (c(-1,-1,-1))} # Return negatives if there is a tie for cluster with highest average score (by definition this is not cluster specific)
@@ -72,11 +84,36 @@ hidden_getAUC <- function(gene, labels) {
         return(c(val,posgroup,pval))
 }
 
+hidden_fast_AUC_m3drop <- function(expression_vec, labels) {
+	R = rank(expression_vec);
+	labels <- unlist(labels);
+	ms <- aggregate(ranked~unlist(labels),FUN=mean); #Get average score for each cluster
+	posgroup <- as.character(unlist(ms[which(ms[,2]==max(ms[,2])),1])); #Get cluster with highest average score
+	if (length(posgroup) > 1) {return (c(-1,-1,-1))} # Return negatives if there is a tie for cluster with highest average score (by definition this is not cluster specific)
+	truth <- labels == posgroup
+
+	out <- wilcox.test(expression_vec[truth], expression_vec[!truth], alternative="two.sided")
+	
+        N1 = sum(truth)
+        N2 = sum(!truth);
+        #U1 = sum(R[truth])-N1*(N1+1)/2
+        U2 = sum(R[!truth])-N2*(N2+1)/2
+        if (N1 == 0) {return(c(0,0,0))}
+        if (N2 == 0) {return(c(1,1,1))}
+        AUC = 1-U2/(N1*N2);  # smaller valued ranks (i.e. lower expression values for !true).
+        # assumes large sample size
+        #  https://ncss-wpengine.netdna-ssl.com/wp-content/themes/ncss/pdf/Procedures/PASS/Confidence_Intervals_for_the_Area_Under_an_ROC_Curve.pdf
+        # originally (Hanley and McNeil 1982)
+	
+	
+        return(c(AUC, posgroup, out$p.value));
+}
+
 M3DropGetMarkers <- function(expr_mat, labels) {
 	if (length(labels) != length(expr_mat[1,])) {
 		stop("Length of labels does not match number of cells.")
 	}
-        aucs <- apply(expr_mat,1,hidden_getAUC,labels=labels)
+        aucs <- apply(expr_mat,1,hidden_fast_AUC_m3drop,labels=labels)
         auc_df <- data.frame(matrix(unlist(aucs), ncol=3, byrow=TRUE))
         rownames(auc_df) <- rownames(expr_mat)
         colnames(auc_df) <- c("AUC","Group", "pval")
