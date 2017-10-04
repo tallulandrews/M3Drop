@@ -15,7 +15,7 @@
 #this program . If not , see <http://www.gnu.org/licenses/>.
 
 bg__calc_variables <- function(expr_mat, is.log=FALSE) {
-    if (class(mat) != "matrix" | class(mat) != "dgCMatrix") {
+    if (class(expr_mat) != "matrix" | class(expr_mat) != "dgCMatrix") {
 	warning("Warning: not a recognized matrix class, coercing to 'matrix'.")
 	expr_mat <- as.matrix(expr_mat)
     }
@@ -87,7 +87,7 @@ hidden_getAUC <- function(gene, labels) {
 hidden_fast_AUC_m3drop <- function(expression_vec, labels) {
 	R = rank(expression_vec);
 	labels <- unlist(labels);
-	ms <- aggregate(ranked~unlist(labels),FUN=mean); #Get average score for each cluster
+	ms <- aggregate(R~unlist(labels),FUN=mean); #Get average score for each cluster
 	posgroup <- as.character(unlist(ms[which(ms[,2]==max(ms[,2])),1])); #Get cluster with highest average score
 	if (length(posgroup) > 1) {return (c(-1,-1,-1))} # Return negatives if there is a tie for cluster with highest average score (by definition this is not cluster specific)
 	truth <- labels == posgroup
@@ -104,7 +104,6 @@ hidden_fast_AUC_m3drop <- function(expression_vec, labels) {
         # assumes large sample size
         #  https://ncss-wpengine.netdna-ssl.com/wp-content/themes/ncss/pdf/Procedures/PASS/Confidence_Intervals_for_the_Area_Under_an_ROC_Curve.pdf
         # originally (Hanley and McNeil 1982)
-	
 	
         return(c(AUC, posgroup, out$p.value));
 }

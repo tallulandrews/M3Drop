@@ -272,9 +272,9 @@ bg__nbumiFeatureSelectionDropouts <- function(fit) {
 	vals <- fit$vals;
 	size_mat <- matrix(rep(fit$sizes, times=vals$nc), ncol=vals$nc, byrow=F)
 
-	droprate_exp <- vector(length=nrow(counts))
-	droprate_exp_err <- vector(length=nrow(counts))
-	for (i in 1:nrow(counts)) {
+	droprate_exp <- vector(length=vals$ng)
+	droprate_exp_err <- vector(length=vals$ng)
+	for (i in 1:vals$ng) {
 		mu_is <- vals$tjs[i]*vals$tis/vals$total
 		p_is <- (1+mu_is/vals$size[i])^(-vals$size[i]);
 		p_var_is <- p_is*(1-p_is);
@@ -308,9 +308,10 @@ NBumiFeatureSelectionCombinedDrop <- function(fit) {
 	#size_mat <- matrix(rep(exp_size, times=vals$nc), ncol=vals$nc, byrow=F)
 	#Exp_p <- (1+fit$mus/size_mat)^(-size_mat)
 	#Exp_p_var <- Exp_p*(1-Exp_p)
-	droprate_exp <- vector(length=nrow(counts))
-	droprate_exp_err <- vector(length=nrow(counts))
-	for (i in 1:nrow(counts)) {
+
+	droprate_exp <- vector(length=vals$ng)
+	droprate_exp_err <- vector(length=vals$ng)
+	for (i in 1:vals$ng) {
 		mu_is <- vals$tjs[i]*vals$tis/vals$total
 		p_is <- (1+mu_is/exp_size[i])^(-exp_size[i]);
 		p_var_is <- p_is*(1-p_is);
@@ -338,9 +339,9 @@ PoissonUMIFeatureSelectionDropouts <- function(fit) {
 	vals <- fit$vals
 	#Exp_p <- exp(-fit$mus)
 	#Exp_p_var <- Exp_p*(1-Exp_p)
-	droprate_exp <- vector(length=nrow(counts))
-	droprate_exp_err <- vector(length=nrow(counts))
-	for (i in 1:nrow(counts)) {
+	droprate_exp <- vector(length=vals$ng)
+	droprate_exp_err <- vector(length=vals$ng)
+	for (i in 1:vals$ng) {
 		mu_is <- vals$tjs[i]*vals$tis/vals$total
 		p_is <- exp(-mu_is);
 		p_var_is <- p_is*(1-p_is);
