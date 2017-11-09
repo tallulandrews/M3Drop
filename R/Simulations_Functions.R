@@ -69,14 +69,14 @@ bg__MakeSimDE <- function(dispersion_fun=bg__default_mean2disp, fold_change=10, 
         sub_pop <- round(sub_pop*n_cells)
         Pop_lab <- c(rep(1, times=n_cells-sub_pop),rep(2,times=sub_pop))
 	# Base Population
-	base <- M3DropMakeSimData(dispersion_fun=dispersion_fun, 
+	base <- bg__MakeSimData(dispersion_fun=dispersion_fun, 
 			n_cells=sum(Pop_lab==1), 
 			dispersion_factor=dispersion_factor, 
 			base_means=base_means, K=K)
 	changed_means <- base_means;
 	changed_means[TP] <- base_means[TP]*fold_change;
 	# Changed Subpopulation
-	sub_pop <- M3DropMakeSimData(dispersion_fun=dispersion_fun, 
+	sub_pop <- bg__MakeSimData(dispersion_fun=dispersion_fun, 
 			n_cells=sum(Pop_lab==2), 
 			dispersion_factor=dispersion_factor, 
 			base_means=changed_means, K=K)
@@ -91,12 +91,12 @@ bg__MakeSimDVar <- function(dispersion_fun=bg__default_mean2disp, fold_change=10
         sub_pop <- round(sub_pop*n_cells)
         Pop_lab <- c(rep(1, times=n_cells-sub_pop),rep(2,times=sub_pop))
 	# Whole Population
-	base <- M3DropMakeSimData(dispersion_fun=dispersion_fun, 
+	base <- bg__MakeSimData(dispersion_fun=dispersion_fun, 
 			n_cells=n_cells, 
 			dispersion_factor=dispersion_factor, 
 			base_means=base_means, K=K)
 	# Changed Vals
-	subpop <- M3DropMakeSimData(dispersion_fun=dispersion_fun, 
+	subpop <- bg__MakeSimData(dispersion_fun=dispersion_fun, 
 			n_cells=sum(Pop_lab==2), 
 			dispersion_factor=fold_change*dispersion_factor, 
 			base_means=base_means[TP], K=K)
@@ -109,12 +109,12 @@ bg__MakeSimHVar <- function(dispersion_fun=bg__default_mean2disp, fold_change=10
         TP <- sample(1:n_genes, frac_change*n_genes)
         Pop_lab <- rep(1, times=n_cells)
 	# Whole Population
-	base <- M3DropMakeSimData(dispersion_fun=dispersion_fun, 
+	base <- bg__MakeSimData(dispersion_fun=dispersion_fun, 
 			n_cells=n_cells, 
 			dispersion_factor=dispersion_factor, 
 			base_means=base_means, K=K)
 	# Changed Vals
-	subpop <- M3DropMakeSimData(dispersion_fun=dispersion_fun, 
+	subpop <- bg__MakeSimData(dispersion_fun=dispersion_fun, 
 			n_cells=n_cells, 
 			dispersion_factor=fold_change*dispersion_factor, 
 			base_means=base_means[TP], K=K)
