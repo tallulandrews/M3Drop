@@ -21,7 +21,7 @@ bg__calc_variables <- function(expr_mat, is.log=FALSE) {
     }
     # Calc variables
 #    sum_neg <- sum(expr_mat < 0)
-     sum_zero <- sum(expr_mat == 0)
+     sum_zero <- prod(dim(expr_mat)) - sum(expr_mat > 0)
 #    sum_pos <- sum(expr_mat >= 0)
     if (is.log) {
 	expr_mat <- is.log^expr_mat-1;
@@ -43,11 +43,11 @@ bg__calc_variables <- function(expr_mat, is.log=FALSE) {
         warning("Warning: Expression matrix contains few zero values (dropouts) this may lead to poor performance.")
     }
     
-    p <- rowSums(expr_mat == 0)/ncol(expr_mat)
+    p <- 1 - rowSums(expr_mat > 0)/ncol(expr_mat)
     if (sum(p == 1) > 0) {
 	warning(paste("Warning: Removing", sum(p==1),"undetected genes."))
 	expr_mat <- expr_mat[p < 1,]
-        p <- rowSums(expr_mat == 0)/ncol(expr_mat)
+        p <- 1-rowSums(expr_mat > 0)/ncol(expr_mat)
     }
 
     p_stderr <- sqrt(p*(1-p)/ncol(expr_mat))
