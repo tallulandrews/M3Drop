@@ -1,11 +1,11 @@
-\name{bg__mean2disp}
-\alias{bg__mean2disp}
+\name{bg__default_mean2disp}
+\alias{bg__default_mean2disp}
 \title{Mean to Dispersion}
 \description{
 	Default function to calculate the negative binomial dispersion parameter given the mean expression of the gene.
 }
 \usage{
-	bg__mean2disp(mu, coeffs=c(3.967816,-1.855054))
+	bg__default_mean2disp(mu, coeffs=c(3.967816,-1.855054))
 }
 \arguments{
   \item{mu}{mean expression of the gene(s)}
@@ -19,10 +19,10 @@ Default coefficients were fit to the Buettner at al.[1] single cell mESC data.
 \value{the dispersion parameter (1/size) for the (mu,size) paramterization of the \code{rnbinom} function.
 }
 \examples{
-# mu <- 100
-# r <- bg__mean2disp(mu)
-# n_cells <- 50
-# sim <- rnbinom(n_cells, size=1/r, mu=mu)
+ mu <- 100
+ r <- bg__default_mean2disp(mu)
+ n_cells <- 50
+ sim <- rnbinom(n_cells, size=1/r, mu=mu)
 }
 \keyword{simulations}
 \references{
