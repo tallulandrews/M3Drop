@@ -7,8 +7,8 @@ hidden_calc_vals <- function(counts) {
 	if (sum(tjs <= 0) > 0) {stop("Error: all genes must have at least one detected molecule.")}
         tis <- colSums(counts, na.rm=T) # Total molecules/cell
 	if (sum(tis <= 0) > 0) {stop("Error: all cells must have at least one detected molecule.")}
-        djs <- nrow(counts)-rowSums(counts > 0, na.rm=T) # Observed Dropouts per gene
-        dis <- ncol(counts)-colSums(counts > 0, na.rm=T) # Observed Dropouts per cell
+        djs <- ncol(counts)-rowSums(counts > 0, na.rm=T) # Observed Dropouts per gene
+        dis <- nrow(counts)-colSums(counts > 0, na.rm=T) # Observed Dropouts per cell
         nc <- length(counts[1,]) # Number of cells
         ng <- length(counts[,1]) # Number of genes
         total <- sum(tis, na.rm=T) # Total molecules sampled
@@ -16,7 +16,7 @@ hidden_calc_vals <- function(counts) {
 }
 
 NBumiConvertToInteger <- function(mat) {
-        mat <- round(as.matrix(mat))
+        mat <- ceiling(as.matrix(mat))
         storage.mode(mat) <- "integer"
         mat <- mat[rowSums(mat) > 0,]
         return(mat)
@@ -235,7 +235,7 @@ hidden_shift_size <- function(mu_all, size_all, mu_group, coeffs) {
 	return(size_group)
 }
 
-bg__nbumiFeatureSelectionHighVarDist2Med <- function(fit, window_size=1000) {
+obsolete__nbumiFeatureSelectionHighVarDist2Med <- function(fit, window_size=1000) {
 	vals <- fit$vals;
 	mean_order <- order(vals$tjs);
 	obs_mean <- vals$tjs[mean_order]/vals$nc
@@ -267,7 +267,7 @@ NBumiFeatureSelectionHighVar <- function(fit) {
 	return(sort(res))
 }
 
-bg__nbumiFeatureSelectionDropouts <- function(fit) {
+obsolete__nbumiFeatureSelectionDropouts <- function(fit) {
 	# Gene-specific variance, mean
 	vals <- fit$vals;
 	size_mat <- matrix(rep(fit$sizes, times=vals$nc), ncol=vals$nc, byrow=F)
@@ -298,7 +298,7 @@ bg__nbumiFeatureSelectionDropouts <- function(fit) {
 	return(sort(pvalue))
 }
 
-NBumiFeatureSelectionCombinedDrop <- function(fit) {
+NBumiFeatureSelectionCombinedDrop <- function(fit, ntop=NULL, fdr=2, suppress.plot=TRUE) {
 	# Global mean-variance, gene-specific mean
 	vals <- fit$vals;
 
@@ -326,12 +326,33 @@ NBumiFeatureSelectionCombinedDrop <- function(fit) {
 	droprate_obs_err <- sqrt(droprate_obs*(1-droprate_obs)/vals$nc)
 
 	diff <- droprate_obs-droprate_exp
-	combined_err <- droprate_exp_err
+	combined_err <- sqrt(droprate_exp_err^2+droprate_obs_err^2)
+	#alt_err <- sd(diff)/sqrt(vals$nc);
 	Zed <- diff/combined_err
         pvalue <- pnorm(Zed, lower.tail = FALSE)
 	names(pvalue) <- names(vals$tjs)
 	reorder <- order(pvalue, droprate_exp-droprate_obs) # deal with ties (e.g. lots of zero p-values)
-	return(pvalue[reorder])
+
+	out <- pvalue[reorder]
+	qval <- p.adjust(out, method="fdr")
+
+	if (!suppress.plot) {
+		xes <- vals$tjs/vals$nc;
+		plot(xes, droprate_obs, col="black", pch=16, log="x")
+		points(xes, droprate_exp, col="goldenrod1", pch=16, cex=0.5)
+		if (is.null(ntop)) {
+			toplot = names(out)[qval < fdr]
+		} else {
+			toplot = names(out)[1:ntop]
+		}
+		toplot = names(vals$tjs) %in% toplot
+		points(xes[toplot], droprate_obs[toplot], col="purple", pch=16)
+	}
+	if (is.null(ntop)) {
+		return(out[qval < fdr])
+	} else {
+		return(out[1:ntop])
+	}
 }
 
 PoissonUMIFeatureSelectionDropouts <- function(fit) {
@@ -468,7 +489,7 @@ broken__nbumiCGroupDE <- function(counts, fit, groups) {
 	return(output);
 }
 
-NBumiImputeZeros <- function(counts, fit) {
+hidden_nbumiImputeZeros <- function(counts, fit) {
 	vals <- fit$vals
 	for (i in 1:nrow(counts)) {
 		mu_is <- vals$tjs[i]*vals$tis/vals$total
@@ -478,23 +499,22 @@ NBumiImputeZeros <- function(counts, fit) {
 	return(counts);
 }
 
-NBumiImputeNorm <- function(counts, fit, total_counts_per_cell=NULL) {
+NBumiImputeNorm <- function(counts, fit, total_counts_per_cell=median(fit$vals$tis)) {
 	# find p-value for current fit NB Umi
 	# adjust parameters of the NB
 	# determine value of equivalent p-value under new NB
+	coeffs <- NBumiFitDispVsMean(fit, suppress.plot=TRUE);
 	vals <- fit$vals;
 	norm <- counts;
-	if (is.null(total_counts_per_cell)) {
-		normed_ti <- total_counts_per_cell;
-	} else {
-		normed_ti <- median(vals$tis);
-	}
+	normed_ti <- total_counts_per_cell;
 	normed_mus <- vals$tjs/vals$total;
-	normed_size <- fit$size;
+	# TODO modify so adjusts size to new mean expression level
+	#normed_size <- fit$size;
 	for (i in 1:nrow(counts)) {
 		mu_is <- vals$tjs[i]*vals$tis/vals$total;
 		p_orig <- pnbinom(counts[i,], mu=mu_is, size=fit$sizes[i]);
-		normed <- qnbinom(p_orig, mu=normed_mus[i]*normed_ti, size=normed_size[i]);
+		new_size <- hidden_shift_size(mean(mu_is), fit$sizes[i], normed_mus[i]*normed_ti, coeffs)
+		normed <- qnbinom(p_orig, mu=normed_mus[i]*normed_ti, size=new_size);
 		norm[i,] <- normed;
 	}
 	return(norm);

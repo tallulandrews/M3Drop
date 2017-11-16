@@ -14,7 +14,7 @@
 #You should have received a copy of the GNU General Public License along with
 #this program . If not , see <http://www.gnu.org/licenses/>.
 
-bg__calc_variables <- function(expr_mat, is.log=FALSE) {
+bg__calc_variables <- function(expr_mat) {
     if (class(expr_mat) != "matrix" | class(expr_mat) != "dgCMatrix") {
 	warning("Warning: not a recognized matrix class, coercing to 'matrix'.")
 	expr_mat <- as.matrix(expr_mat)
@@ -23,9 +23,9 @@ bg__calc_variables <- function(expr_mat, is.log=FALSE) {
 #    sum_neg <- sum(expr_mat < 0)
      sum_zero <- prod(dim(expr_mat)) - sum(expr_mat > 0)
 #    sum_pos <- sum(expr_mat >= 0)
-    if (is.log) {
-	expr_mat <- is.log^expr_mat-1;
-    }
+#    if (is.log) {
+#	expr_mat <- is.log^expr_mat-1;
+#    }
 
     lowest <- min(expr_mat)
     if (lowest < 0) {stop("Error: Expression matrix cannot contains negative values! Has the matrix been log-transformed?")}

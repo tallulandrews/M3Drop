@@ -1,4 +1,4 @@
-pca_FS <- function(expr_mat, pcs = c(1,2)) {
+hidden__pca_fs <- function(expr_mat, pcs = c(1,2)) {
 	pca <- prcomp(log(expr_mat+1)/log(2));
 	if (length(pcs) > 1) {
 		score <- rowSums(abs(pca$x[,pcs]))
@@ -9,9 +9,9 @@ pca_FS <- function(expr_mat, pcs = c(1,2)) {
 	return(sort(-score))
 }
 
-irlba_pca_FS <- function(expr_mat, pcs=c(2,3)) {
-	require("irlba")
-	require("Matrix")
+irlbaPcaFS <- function(expr_mat, pcs=c(2,3)) {
+	#require("irlba")
+	#require("Matrix")
 	norm <- expr_mat
 	nz_genes <- which(rowSums(norm) != 0)
 	norm[nz_genes,] <- log(norm[nz_genes,] + 1)/log(2)
@@ -45,7 +45,7 @@ irlba_pca_FS <- function(expr_mat, pcs=c(2,3)) {
 }
 
 
-Grun_FS <- function(expr_mat, spikes) {
+hidden__Grun_fs <- function(expr_mat, spikes) {
 #	if (!is.factor(batches)) { batches <- factor(batches) }
 #	batch_spikes <- sapply(levels(batches), function(b) {rowMeans(expr_mat[spikes,batches==b])})
 	spike_T <- rowMeans(expr_mat[spikes,])
@@ -104,26 +104,27 @@ Grun_FS <- function(expr_mat, spikes) {
 }
 
 # How does GiniClust do it?
-Gini_FS_simple <- function(expr_mat) {
-	require("reldist")
-	ginis <- apply(expr_mat, 1, gini)
+hidden__ginifs_simple <- function(expr_mat) {
+	#require("reldist")
+	ginis <- apply(expr_mat, 1, reldist::gini)
 	d <- rowMeans(expr_mat>0)
 	reg <- lm(ginis~d) # almost perfect linear relation in UMI data
 	score <- reg$res
 	return(sort(-score));
 }
 
-Gini_FS <- function(expr_mat, suppress.plot=TRUE) {
+giniFS <- function(expr_mat, suppress.plot=TRUE) {
 	# GiniClust
 	expr_mat <- expr_mat[rowSums(expr_mat) > 0,]
-	require("reldist")
-	ginis <- apply(expr_mat, 1, gini)
+	#require("reldist")
+	ginis <- apply(expr_mat, 1, reldist::gini)
 	max_expr <- apply(expr_mat, 1, max)
 	max_expr <- log(max_expr+1)/log(2)
 	fit = loess(ginis~max_expr)
 	outliers = abs(fit$residuals)
 	outliers = outliers > quantile(outliers, probs=0.75)
 	fit2 = loess(ginis[!outliers]~max_expr[!outliers])
+
 	
 	norm_ginis = rep(NA, times=length(ginis));
 	norm_ginis[!outliers] = fit2$residuals;
@@ -138,26 +139,37 @@ Gini_FS <- function(expr_mat, suppress.plot=TRUE) {
 	norm_ginis[outliers] = ginis[outliers]-fit_ginis
 	p = pnorm(norm_ginis, mean=mean(norm_ginis), sd=sd(norm_ginis), lower.tail=FALSE)
 	names(p) = rownames(expr_mat)
+
+	if (!suppress.plot) {
+		my_cols <- colorRampPalette(c("grey75","black"))(20);
+		plot(max_expr, ginis, pch=16, col=rev(my_cols)[cut(log(p), breaks=20)], xlab="Max Expression", ylab="Gini");
+		legend("bottomleft", bty="n", c("Color indicates estimated p-value"), col="white", pch=16, cex=0.75)
+		tmp <- order(max_expr);
+		yes <-  rep(NA, times=length(ginis)); yes[!outliers]= fit2$fitted; yes[outliers] = fit_ginis
+		lines(max_expr[tmp], yes[tmp], col="red", lwd=3)
+	}
+
 	return(sort(p));
 }
-Cor_FS <- function(expr_mat) {
+corFS <- function(expr_mat, dir=c("both", "pos", "neg")) {
 	# High memory
 	cor_mat = cor(t(expr_mat))
-	score = apply(cor_mat, 1, function(x) {sum(abs(min(x)), abs(max(x)))})
+	if (dir[1] == "both") {
+		score = apply(cor_mat, 1, function(x) {sum(abs(min(x)), abs(max(x)))})
+	} else if (dir[1] == "pos") {
+		score = apply(cor_mat, 1, max)
+	} else if (dir[1] == "neg") {
+		score = abs(apply(cor_mat, 1, min))
+	} else {
+		stop("Unrecognized direction")
+	}
+
 	rm(cor_mat)
 	names(score) = rownames(expr_mat)
 	return(sort(-score))
 }
-Cor_FS_neg <- function(expr_mat) {
-	# High memory
-	cor_mat = cor(t(expr_mat))
-	score = apply(cor_mat, 1, min)
-	rm(cor_mat)
-	names(score) = rownames(expr_mat)
-	return(sort(score))
-}
 
-Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=length(counts[,1])), pcs=c(2,3)) {
+Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=nrow(counts)), pcs=c(2,3)) {
 	# Check input
 	if (!is.matrix(counts)) {
 		counts <- as.matrix(counts);
@@ -188,6 +200,7 @@ Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=length(count
 	DANB_var <- NBumiFeatureSelectionHighVar(fit)
 	# HVG
 	if (sum(is.spike == TRUE) > 10) {
+		spikes <- rownames(norm)[is.spike]
 		HVG <- BrenneckeGetVariableGenes(norm, spikes=spikes, fdr=2, suppress.plot=TRUE)
 	} else {
 		warning("Warning: insufficient spike-ins using all genes for HVG");
@@ -196,11 +209,11 @@ Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=length(count
 	# M3Drop
 	m3drop <- M3DropFeatureSelection(norm, mt_method="fdr", mt_threshold=2, suppress.plot=TRUE)
 	# Gini
-	gini <- Gini_FS(norm)
+	gini <- giniFS(norm)
 	# pca
-	pca_fs <- irlba_pca_FS(norm) 
+	pca_fs <- irlbaPcaFS(norm, pcs=pcs) 
 	# cor
-	cor_fs <- Cor_FS(norm)
+	cor_fs <- corFS(norm)
 
 	# sort by mean_rank of each gene.
 	ranks <- 1:nrow(norm);
@@ -217,7 +230,7 @@ Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=length(count
 	rownames(table) <- ref_order;
 	consensus_score = rowMeans(table, na.rm=TRUE);
 	table <- table[order(consensus_score),]
-#	table$Cons <- 1:nrow(table) # currently adding this in plotting scripts
+	table$Cons <- 1:nrow(table) # currently adding this in plotting scripts
 
 	return(table)
 }

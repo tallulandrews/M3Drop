@@ -5,13 +5,13 @@
 	Fixes the mean expression level and simulates a single gene with different fold changes across two equally sized subpopulations. 
 }
 \usage{
-	bg__var_vs_drop(pop_size, fixed_mean, K=10.3, mean2disp_fun=bg__mean2disp, suppress.plot=TRUE)
+	bg__var_vs_drop(pop_size, fixed_mean, K=10.3, dispersion_from_mean=bg__default_mean2disp, suppress.plot=TRUE)
 }
 \arguments{
   \item{pop_size}{size of each subpopulation, i.e. 1/2 the total number of cells.}
   \item{fixed_mean}{expected mean expression across all cells.}
   \item{K}{K of the Michaelis-Menten function.}
-  \item{mean2disp_fun}{function which calculates the dispersion parameter of the negative binomial distribution given the mean expression of the gene.}
+  \item{dispersion_from_mean}{function which calculates the dispersion parameter of the negative binomial distribution given the mean expression of the gene.}
   \item{suppress.plot}{Whether to plot variance vs fold change and dropout rate vs fold change plots.}
 }
 \details{

@@ -8,10 +8,10 @@
 	Makes simulated data based on a negative binomial distribution inflated with zeros based on the Michaelis-Menten equation.
 }
 \usage{
-	bg__MakeSimData(dispersion_fun=bg__mean2disp, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000, 1, 1), K=10.3)
-	bg__MakeSimDE(dispersion_fun=bg__mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3)
-	bg__MakeSimDVar(dispersion_fun=bg__mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3)
-	bg__MakeSimHVar(dispersion_fun=bg__mean2disp, fold_change=10, frac_change=0.1, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3)
+	bg__MakeSimData(dispersion_fun=bg__default_mean2disp, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000, 1, 1), K=10.3)
+	bg__MakeSimDE(dispersion_fun=bg__default_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3)
+	bg__MakeSimDVar(dispersion_fun=bg__default_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, sub_pop=0.5, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3)
+	bg__MakeSimHVar(dispersion_fun=bg__default_mean2disp, fold_change=10, frac_change=0.1, n_cells=300, dispersion_factor=1, base_means=10^rnorm(25000,1,1), K=10.3)
 }
 \arguments{
   \item{dispersion_fun}{a function which takes mean experssion and returns the dispersion parameter of the negative binomial distribution.}

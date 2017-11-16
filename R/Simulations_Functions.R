@@ -143,16 +143,18 @@ bg__get_stats <- function(sig, TP, ngenes) {
 ##### Update #####
 
 
-bg__calc_DE_stats <- function(expr_mat, TP, Observed_Means, mt_threshold=0.05, suppress.plot=TRUE) {
-	require("M3Drop")
+obsolete__calc_DE_stats <- function(expr_mat, TP, Observed_Means, mt_threshold=0.05, suppress.plot=TRUE) {
+	#require("M3Drop")
         # Test DE
         mt_method="fdr"
+	M3Drop_col="black"
+	HVG_col="forestgreen"
 
         expr_mat = expr_mat[rowSums(expr_mat) > 0,]
         expr_mat = expr_mat[rowSums(expr_mat == 0) > 0,]
         TP = TP[TP %in% rownames(expr_mat)]
 
-        DE = M3Drop_Differential_Expression(expr_mat, mt_method = mt_method, mt_threshold=2, suppress.plot=TRUE)
+        DE = M3DropFeatureSelection(expr_mat, mt_method = mt_method, mt_threshold=2, suppress.plot=TRUE)
         HVG = BrenneckeGetVariableGenes(expr_mat, fdr=2, suppress.plot=TRUE)
 
         output = rbind(c(0,0,0),c(0,0,0));
@@ -177,7 +179,7 @@ bg__calc_DE_stats <- function(expr_mat, TP, Observed_Means, mt_threshold=0.05, s
 
 	                stats = bg__get_stats(sig[,1], TP, ngenes=length(expr_mat[,1]));
 
-	                require("ROCR")
+	                #require("ROCR")
 	                Diff$Truth = rep(0, times=length(Diff[,1]))
 	                Diff[Diff[,1] %in% TP,]$Truth = 1;
 	                pred <- ROCR::prediction(1-Diff$p.value, Diff$Truth)
@@ -247,9 +249,9 @@ bg__calc_DE_stats <- function(expr_mat, TP, Observed_Means, mt_threshold=0.05, s
 	return(list(summary=output, per_expr=final_plot_output))
 }
 
-bg__calc_DE_stats_simplified <- function(expr_mat, TP, Observed_Means, mt_threshold=0.05, suppress.plot=TRUE) {
+hidden__calc_DE_stats_simplified <- function(expr_mat, TP, Observed_Means, mt_threshold=0.05, suppress.plot=TRUE) {
 	# Just ge AUC, FDR, FNR
-	require("M3Drop")
+	#require("M3Drop")
         # Test DE
         mt_method="fdr"
 
@@ -257,7 +259,7 @@ bg__calc_DE_stats_simplified <- function(expr_mat, TP, Observed_Means, mt_thresh
         expr_mat = expr_mat[rowSums(expr_mat == 0) > 0,]
         TP = TP[TP %in% rownames(expr_mat)]
 
-        DE = M3Drop_Differential_Expression(expr_mat, mt_method = mt_method, mt_threshold=2, suppress.plot=TRUE)
+        DE = M3DropFeatureSelection(expr_mat, mt_method = mt_method, mt_threshold=2, suppress.plot=TRUE)
         HVG = BrenneckeGetVariableGenes(expr_mat, fdr=2, suppress.plot=T)
 
         output = rbind(c(0,0,0),c(0,0,0));
@@ -279,7 +281,7 @@ bg__calc_DE_stats_simplified <- function(expr_mat, TP, Observed_Means, mt_thresh
 
 		# Need to somehow downsample so distribution of gene expression =~ observed distribution of gene expression
 		# or do this when define means? - latter makes more sense b/c do it once for all sim
-                require("ROCR")
+                #require("ROCR")
                 Diff$Truth = rep(0, times=length(Diff[,1]))
                 Diff[Diff[,1] %in% TP,]$Truth = 1;
                 pred <- ROCR::prediction(1-Diff$p.value, Diff$Truth)
@@ -290,7 +292,7 @@ bg__calc_DE_stats_simplified <- function(expr_mat, TP, Observed_Means, mt_thresh
 	return(list(summary=output, per_expr=NULL))
 }
 
-bg__calc_DE_stats_simplified_singular <- function(expr_mat, TP, DE) {
+hidden__calc_DE_stats_simplified_singular <- function(expr_mat, TP, DE) {
 	qvals <- DE$q.value
 	if (!is.numeric(qvals)) {
 		qvals <- as.numeric(qvals)
@@ -304,7 +306,7 @@ bg__calc_DE_stats_simplified_singular <- function(expr_mat, TP, DE) {
 
         stats = bg__get_stats(sig[,1], TP, ngenes=length(expr_mat[,1]));
 
-        require("ROCR")
+        #require("ROCR")
         DE$Truth = rep(0, times=length(DE[,1]))
         DE[DE[,1] %in% TP,]$Truth = 1;
         pred <- ROCR::prediction(1-pvals, DE$Truth)
@@ -314,7 +316,7 @@ bg__calc_DE_stats_simplified_singular <- function(expr_mat, TP, DE) {
 	return(list(summary=output, per_expr=NULL))
 }
 
-bg__var_vs_drop <- function(pop_size, fixed_mean, suppress.plot=TRUE) {
+bg__var_vs_drop <- function(pop_size, fixed_mean, K=10.3, dispersion_from_mean=bg__default_mean2disp, suppress.plot=TRUE) {
         fc = seq(from=1, to=100, by=1)
         labels = c(rep(1, times=pop_size),rep(2,times=pop_size))
         lowmean_fun <- function(fc) {2*fixed_mean/(1+fc)}
@@ -362,8 +364,8 @@ bg__var_vs_drop <- function(pop_size, fixed_mean, suppress.plot=TRUE) {
         return(list(var_r=var_r, drop_r=drop_r, vars=vars, drops=drops, fc=fc, Vbtw=Vbtw, Vwithin=Vwithin));
 }
 
-bg__calc_DE_stats_FPR<- function(expr_mat, TP, Observed_Means, mt_threshold=0.05, suppress.plot=TRUE) {
-	require("M3Drop")
+hidden__calc_DE_stats_fpr<- function(expr_mat, TP, Observed_Means, mt_threshold=0.05, suppress.plot=TRUE) {
+	#require("M3Drop")
         # Test DE
         mt_method="fdr"
 
@@ -371,7 +373,7 @@ bg__calc_DE_stats_FPR<- function(expr_mat, TP, Observed_Means, mt_threshold=0.05
         expr_mat = expr_mat[rowSums(expr_mat == 0) > 0,]
         TP = TP[TP %in% rownames(expr_mat)]
 
-        DE = M3Drop_Differential_Expression(expr_mat, mt_method = mt_method, mt_threshold=2, suppress.plot=TRUE)
+        DE = M3DropFeatureSelection(expr_mat, mt_method = mt_method, mt_threshold=2, suppress.plot=TRUE)
         HVG = BrenneckeGetVariableGenes(expr_mat, fdr=2, suppress.plot=T)
 
         output = c(0,0);
@@ -476,9 +478,9 @@ M3DropSimulationTrifecta <- function(original_data, n_genes=25000, n_cells=250, 
 	return(list(truth=l2fc, groups=c(rep(1, times=n_cells1), rep(2, times=n_cells2)), de = cbind(t(base),t(de)), dv = cbind(t(base),t(dv)), hv = cbind(t(dv),t(hv))))
 }
 
-Fit_Simulation_Params <- function(original_data) {
-
-}
+#Fit_Simulation_Params <- function(original_data) {
+#
+#}
 Make_Sim <- function(model_params, n_genes=25000, pop_params=data.frame(cells=c(125,125), size=c(1,1), hetero=c(0,0), distinct=c(0,0)), dV_params=list(mu=0, sd=1), dE_params=list(mu=0, sd=1)) {
 # model_params from above function include:
 #	slope & intercept of log-log relationship btw mean & variance

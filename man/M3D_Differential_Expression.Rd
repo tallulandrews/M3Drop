@@ -13,7 +13,7 @@
   \item{expr_mat}{a numeric matrix of normalized (not log-transformed) expression values, columns = samples, rows = genes.}
   \item{mt_method}{the multiple testing method used in p.adjust}
   \item{mt_threshold}{the threshold for identifying significantly DE genes.}
-  \item{suppress.plot}{logical, whether to plot the fitted curve and highlight DE genes.}
+  \item{suppress.plot}{logical, whether to plot the fitted curve and highlight selected features.}
   \item{fit}{Output from fitting the Michaelis-Menten equation (see: \code{bg__fit_MM}}
   \item{gene_info}{List of calculated gene-specific values output by \code{bg__calc_variables}}
 }

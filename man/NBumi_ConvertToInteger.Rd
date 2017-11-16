@@ -11,7 +11,7 @@
   \item{mat}{a numeric matrix of expression values (ideally raw UMI counts), columns = samples, rows = genes.}
 }
 \details{
-	Coerces the provided data to a matrix then rounds all values to integers and removes all rows where all values are zero.	
+	Coerces the provided data to a matrix then rounds all values up (ceiling) to integers and removes all rows where all values are zero.	
 }
 \value{
 	Rounded, integer matrix of the original data.

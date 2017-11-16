@@ -1,13 +1,13 @@
 \name{NBumiFeatureSelectionOther}
-\alias{bg__nbumiFeatureSelectionDropouts}
-\alias{bg__nbumiFeatureSelectionHighVarDist2Med}
+\alias{obsolete__nbumiFeatureSelectionDropouts}
+\alias{obsolete__nbumiFeatureSelectionHighVarDist2Med}
 \title{Other Feature Selection Methods}
 \description{
 	Ineffective alternative feature selection methods based on the depth-adjusted negative binomial model.
 }
 \usage{
-	bg__nbumiFeatureSelectionDropouts(fit)
-	bg__nbumiFeatureSelectionHighVarDist2Med(fit, window_size=1000)
+	obsolete__nbumiFeatureSelectionDropouts(fit)
+	obsolete__nbumiFeatureSelectionHighVarDist2Med(fit, window_size=1000)
 	
 }
 \arguments{
@@ -20,8 +20,8 @@
 	from a fitted power-law relationship between mean and dispersion. Total dropouts per gene are modelled using the normal 
 	approximation of the sum of bernoulli variables. And significance is evaluated using a Z-test.
 
-	\code{bg__nbumiFeatureSelectionDropouts} Ranks genes by significance of increase in dropouts compared to expectation allowing for gene-specific dispersions.
-	\code{bg__nbumiFeatureSelectionHighVarDist2Med} Ranks genes by the distance to median of log-transformed estimated dispersions.
+	\code{obsolete__nbumiFeatureSelectionDropouts} Ranks genes by significance of increase in dropouts compared to expectation allowing for gene-specific dispersions.
+	\code{obsolete__nbumiFeatureSelectionHighVarDist2Med} Ranks genes by the distance to median of log-transformed estimated dispersions.
 }
 \value{
 	Sorted vector of p-values/distances.
@@ -31,8 +31,8 @@ library(M3DExampleData)
 counts <- as.matrix(Mmus_example_list$data);
 counts <- counts[rowSums(counts) > 0,];
 fit <- NBumiFitModel(counts);
-Dropout_features <- names(bg__nbumiFeatureSelectionDropouts(fit)[1:2000]);
-dist2med_features <- names(bg__nbumiFeatureSelectionHighVarDist2Med(fit)[1:2000]);
+Dropout_features <- names(obsolete__nbumiFeatureSelectionDropouts(fit)[1:2000]);
+dist2med_features <- names(obsolete__nbumiFeatureSelectionHighVarDist2Med(fit)[1:2000]);
 }
 \keyword{single cell}
 \keyword{feature selection}
