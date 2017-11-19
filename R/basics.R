@@ -15,7 +15,7 @@
 #this program . If not , see <http://www.gnu.org/licenses/>.
 
 bg__calc_variables <- function(expr_mat) {
-    if (class(expr_mat) != "matrix" | class(expr_mat) != "dgCMatrix") {
+    if (class(expr_mat) != "matrix" & class(expr_mat) != "dgCMatrix" & class(expr_mat) != "Matrix") {
 	warning("Warning: not a recognized matrix class, coercing to 'matrix'.")
 	expr_mat <- as.matrix(expr_mat)
     }
