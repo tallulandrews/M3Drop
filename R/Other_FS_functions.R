@@ -153,6 +153,7 @@ giniFS <- function(expr_mat, suppress.plot=TRUE) {
 }
 corFS <- function(expr_mat, dir=c("both", "pos", "neg")) {
 	# High memory
+	expr_mat <- as.matrix(expr_mat);
 	cor_mat = cor(t(expr_mat))
 	if (dir[1] == "both") {
 		score = apply(cor_mat, 1, function(x) {sum(abs(min(x)), abs(max(x)))})
