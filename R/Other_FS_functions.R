@@ -171,9 +171,9 @@ corFS <- function(expr_mat, dir=c("both", "pos", "neg")) {
 
 Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=nrow(counts)), pcs=c(2,3)) {
 	# Check input
-	if (!is.matrix(counts)) {
-		counts <- as.matrix(counts);
-	}
+	#if (!is.matrix(counts)) {
+	#	counts <- as.matrix(counts);
+	#}
 
 
 	if (sum(dim(counts) != dim(norm)) > 0) {
