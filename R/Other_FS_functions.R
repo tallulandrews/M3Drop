@@ -189,8 +189,12 @@ Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=nrow(counts)
 			stop("Error: counts and norm matrices must be of the same dimension");
 		}
 	}
-
-	invariant <- rowVars(counts) == 0;
+	if (ncol(counts) < 1000) {
+		row_vars <- (rowMeans(counts^2)-rowMeans(counts)^2);
+	} else {
+		row_vars <- rowSums(counts);
+	}
+	invariant <- row_vars == 0;
 	counts <- counts[!invariant,]
 	norm <- norm[!invariant,]
 	# apply FS methods
