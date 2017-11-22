@@ -142,7 +142,7 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
         xargs <- list(at = xv, labels = lv)
 	xargs$side <- 1
 	do.call(axis, xargs)
-	mtext(side = 1, "Expression Z-Score", line = par("mgp")[1], padj = 0.5, 
+	mtext(side = 1, "Z-Score", line = par("mgp")[1], padj = 0.5, 
                 cex <- par("cex") * par("cex.lab"))
 
 	# Legend
