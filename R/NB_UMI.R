@@ -33,11 +33,15 @@ NBumiFitModel <- function(counts) {
 #	size <- sapply(1:vals$ng,function(j) {
 #		 bg__fit_size_to_var(var(counts[j,]-mus[j,]), mus[j,], max_size=max_size, min_size=10^-10, convergence=0.001)
 #		})
-	my_rowvar <- vector(length=nrow(counts));
-	for (i in 1:nrow(counts)) {
-		mu_is <- vals$tjs[i]*vals$tis/vals$total
-		my_rowvar[i] <- var(counts[i,]-mu_is)
-	}
+	my_rowvar <- sapply(1:nrow(counts), function(i){
+				mu_is <- vals$tjs[i]*vals$tis/vals$total
+				var(as.vector(unlist(counts[i,]))-mu_is)
+			})
+#	my_rowvar <- vector(length=nrow(counts));
+#	for (i in 1:nrow(counts)) {
+#		mu_is <- vals$tjs[i]*vals$tis/vals$total
+#		my_rowvar[i] <- var(as.vector(unlist(counts[i,]))-mu_is)
+#	}
 		
 	size <- vals$tjs^2*(sum(vals$tis^2)/vals$total^2)/((vals$nc-1)*my_rowvar-vals$tjs) # for this to work with sparse matrices might need to implement in C
 	max_size <- 10*max(size);
