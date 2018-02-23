@@ -19,6 +19,9 @@ bg__calc_variables <- function(expr_mat) {
 	warning("Warning: not a recognized matrix class, coercing to 'matrix'.")
 	expr_mat <- as.matrix(expr_mat)
     }
+    if (sum(is.na(expr_mat)) > 0) {
+	stop("Error: Expression matrix contain NA values.");
+    }
     # Calc variables
 #    sum_neg <- sum(expr_mat < 0)
      sum_zero <- prod(dim(expr_mat)) - sum(expr_mat > 0)

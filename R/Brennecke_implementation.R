@@ -60,7 +60,6 @@ BrenneckeGetVariableGenes <- function(expr_mat, spikes=NA, suppress.plot=FALSE, 
         a1 <- unname( fit$coefficients["a1tilde"])
 	res <- cv2Genes - (a0 + a1/meansGenes);
 
-
         # Test
         psia1theta <- a1
         minBiolDisp <- minBiolDisp^2
