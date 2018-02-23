@@ -23,12 +23,14 @@ bg__dropout_plot_base <- function (expr_mat, xlim = NA, suppress.plot=FALSE) {
 
         xes <- log(gene_info$s)/log(10);
         put_in_order <- order(xes);
-        fancy <- densCols(xes, gene_info$p, colramp=colorRampPalette(c("black","white")))
-        dens <- col2rgb(fancy)[1,]+1L
+#        fancy <- densCols(xes, gene_info$p, colramp=colorRampPalette(c("black","white")))
+#        dens <- col2rgb(fancy)[1,]+1L
 #        colours <-  colorRampPalette(c("#000099", "#00FEFF", "#45FE4F",
 #                                    "#FCFF00", "#FF9400", "#FF3100"))(256) #rainbow
-        colours <-  colorRampPalette(c("#000099", "#00FEFF", "#FCFF00"))(256) #blue->yellow
-        dens.col <- colours[dens]
+#        colours <-  colorRampPalette(c("#000099", "#00FEFF", "#FCFF00"))(256) #blue->yellow
+#        dens.col <- colours[dens]
+
+        dens.col <- densCols(xes, gene_info$p, colramp=colorRampPalette(c("grey75","black")))
 
 	if (!suppress.plot) {
         	par(fg="black")
@@ -43,19 +45,19 @@ bg__dropout_plot_base <- function (expr_mat, xlim = NA, suppress.plot=FALSE) {
 	invisible(list(gene_info = gene_info, xes=xes, order=put_in_order));
 }
 
-bg__add_model_to_plot <- function(fitted_model, base_plot, lty=1, lwd=1, col="black",legend_loc = "topright") {
+bg__add_model_to_plot <- function(fitted_model, base_plot, lty=1, lwd=1, col="dodgerblue",legend_loc = "topright") {
 	lines(base_plot$xes[base_plot$order],fitted_model$predictions[base_plot$order],lty=lty,lwd=lwd,col=col);
-	par(fg=col)
+	#par(fg=col)
 	if (length(legend_loc) == 2) {
-        	this_loc <- legend(legend_loc[1], legend_loc[2], fitted_model$model, box.lty=lty, box.lwd=lwd, xjust=1)
+        	this_loc <- legend(legend_loc[1], legend_loc[2], fitted_model$model, xjust=1, bty="n", lty=lty, lwd=lwd, col=col)
 	} else {
-		this_loc <- legend(legend_loc[1], fitted_model$model, box.lty=lty, box.lwd=lwd, xjust=1)
+		this_loc <- legend(legend_loc[1], fitted_model$model, xjust=1, bty="n", lty=lty, lwd=lwd, col=col)
 	}
-	par(fg="black")
+	#par(fg="black")
 	invisible(this_loc)
 }
 
-bg__highlight_genes <- function (base_plot, expr_mat, genes, col="purple", pch=16) {
+bg__highlight_genes <- function (base_plot, expr_mat, genes, col="darkorange", pch=16) {
 	if(!is.numeric(genes) && !is.logical(genes)) {
 		genes <- match(as.character(genes), rownames(expr_mat));
 		nomatch <- sum(is.na(genes));

@@ -33,7 +33,7 @@ irlbaPcaFS <- function(expr_mat, pcs=c(2,3)) {
 	expression_vars <- expression_vars[genes_to_keep]
 	# Here✬s how to take the top PCA loading genes, but using
 	# sparseMatrix operations the whole time, using irlba.
-	irlba_pca_res <- irlba::irlba(t(norm), nu=0, center=expression_means, scale=sqrt(expression_vars), right_only=TRUE)$v
+	irlba_pca_res <- irlba::irlba(Matrix::t(norm), nu=0, center=expression_means, scale=sqrt(expression_vars), right_only=TRUE)$v
 	row.names(irlba_pca_res) <- row.names(norm)
 	if (length(pcs) > 1) {
 		score <- rowSums(abs(irlba_pca_res[, pcs]))
