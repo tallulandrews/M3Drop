@@ -151,10 +151,13 @@ giniFS <- function(expr_mat, suppress.plot=TRUE) {
 
 	return(sort(p));
 }
-corFS <- function(expr_mat, dir=c("both", "pos", "neg")) {
+corFS <- function(expr_mat, dir=c("both", "pos", "neg"), fdr=NULL) {
 	# High memory
 	expr_mat <- as.matrix(expr_mat);
-	cor_mat = cor(t(expr_mat))
+	cor_mat = Hmisc::rcorr(t(expr_mat), type="spearman")
+	p_mat <- cor_mat$P
+	cor_mat <- cor_mat$r
+	diag(cor_mat) <- 0
 	if (dir[1] == "both") {
 		score = apply(cor_mat, 1, function(x) {sum(abs(min(x)), abs(max(x)))})
 	} else if (dir[1] == "pos") {
@@ -164,7 +167,10 @@ corFS <- function(expr_mat, dir=c("both", "pos", "neg")) {
 	} else {
 		stop("Unrecognized direction")
 	}
-
+	if (!is.null(fdr)) {
+		sig <- matrix(p.adjust(p_mat, method="fdr"), ncol=ncol(p_mat))
+		score <- score[apply(sig, 1, min, na.rm=T) < fdr]
+	}
 	rm(cor_mat)
 	names(score) = rownames(expr_mat)
 	return(sort(-score))
