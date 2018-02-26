@@ -49,9 +49,9 @@ bg__add_model_to_plot <- function(fitted_model, base_plot, lty=1, lwd=1, col="do
 	lines(base_plot$xes[base_plot$order],fitted_model$predictions[base_plot$order],lty=lty,lwd=lwd,col=col);
 	#par(fg=col)
 	if (length(legend_loc) == 2) {
-        	this_loc <- legend(legend_loc[1], legend_loc[2], fitted_model$model, xjust=1, bty="n", lty=lty, lwd=lwd, col=col)
+        	this_loc <- legend(legend_loc[1], legend_loc[2], fitted_model$model, xjust=1, bty="n", lty=lty, lwd=lwd, col=c(col, "white"))
 	} else {
-		this_loc <- legend(legend_loc[1], fitted_model$model, xjust=1, bty="n", lty=lty, lwd=lwd, col=col)
+		this_loc <- legend(legend_loc[1], fitted_model$model, xjust=1, bty="n", lty=lty, lwd=lwd, col=c(col, "white"))
 	}
 	#par(fg="black")
 	invisible(this_loc)

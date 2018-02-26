@@ -66,8 +66,8 @@ M3DropCleanData <- function(expr_mat, labels = NA, is.counts=TRUE, suppress.plot
 
 	data_list <- bg__filter_cells(expr_mat, labels, suppress.plot = suppress.plot, min_detected_genes=min_detected_genes);
 	
-        detected <- rowSums(data_list$expr_mat > 0) > 3;
-        expr_mat <- data_list$expr_mat[detected,];
+        detected <- rowSums(data_list$data > 0) > 3;
+        expr_mat <- data_list$data[detected,];
         detected <- rowSums(data_list$data> 0) > 3;
         expr_mat <- data_list$data[detected,];
 	labels   <- data_list$labels
