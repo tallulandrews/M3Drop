@@ -342,9 +342,9 @@ NBumiFeatureSelectionCombinedDrop <- function(fit, ntop=NULL, fdr=2, suppress.pl
 	qval <- p.adjust(out, method="fdr")
 
 	if (!suppress.plot) {
-		xes <- vals$tjs/vals$nc;
+		xes <- log10(vals$tjs/vals$nc);
         	dens.col <- densCols(xes, droprate_obs, colramp=colorRampPalette(c("grey75","black")))
-		plot(xes, droprate_obs, col=dens.col, pch=16, log="x")
+		plot(xes, droprate_obs, col=dens.col, pch=16, log="x", xlab="log10(expression)", ylab="Dropout Rate")
 		points(xes, droprate_exp, col="dodgerblue", pch=16, cex=0.5)
 		if (is.null(ntop)) {
 			toplot = names(out)[qval < fdr]

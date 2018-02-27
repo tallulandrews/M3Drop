@@ -170,11 +170,11 @@ bg__get_extreme_residuals <- function (expr_mat, fit=NA, fdr_threshold = 0.1, pe
 	}
 }
 ##### Assembled Analysis Chunks ####
-M3DropFeatureSelection <- function(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE) {
-	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = NA, suppress.plot=suppress.plot);
+M3DropFeatureSelection <- function(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE, xlim=NA) {
+	BasePlot <- bg__dropout_plot_base(expr_mat, xlim = xlim, suppress.plot=suppress.plot);
 	MM <- bg__fit_MM(BasePlot$gene_info$p, BasePlot$gene_info$s);
 	if (!suppress.plot) {
-		sizeloc <- bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="dodgerblue", legend_loc = "topright");
+		sizeloc <- bg__add_model_to_plot(MM, BasePlot, lty=1, lwd=2.5, col="dodgerblue", legend_loc = NULL);
 	}
 	DEoutput <- bg__test_DE_K_equiv(BasePlot$gene_info, fit=MM);
 	sig <- which(p.adjust(DEoutput$pval, method=mt_method) < mt_threshold);
