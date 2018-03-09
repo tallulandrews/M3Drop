@@ -14,6 +14,74 @@
 #You should have received a copy of the GNU General Public License along with
 #this program . If not , see <http://www.gnu.org/licenses/>.
 
+M3DropConvertData <- function(input, is.log=FALSE, is.counts=FALSE) {
+	type <- class(input)[1]
+	lognorm <- NULL
+	counts <- NULL
+	if (type == "SCESet") {
+		# Old scater
+		lognorm <- exprs(input)
+		counts <- counts(input)
+
+	} else if (type == "SingleCellExperiment") {
+		# New scater
+		c <- which(names(input@assays) == "counts")
+		ln <- which(names(input@assays) == "logcounts")
+		if (length(ln) > 0) {
+			lognorm <- input@assays[[ln]]
+		} else if (length(c) > 0) {
+			counts <- input@assays[[c]]
+		} else {
+			stop("Error: Recognized SingleCellExperiment object but cannot find either counts or lognorm expression.")
+		}
+	} else if (type == "CellDataSet" | type == "ExpressionSet") {
+		# monocle
+		if (is.log) {
+			lognorm <- exprs(input)
+		} else {
+			counts <- exprs(input)
+		}
+	} else if (type == "seurat") {
+		# Seurat
+		counts <- input@raw.data
+	} else if (type == "matrix" | 
+		   type == "data.frame" | 
+		   type == "dgCMatrix" | 
+		   type == "data.table" |
+		   type == "DataTable" |
+		   type == "DataFrame" |
+		   type == "AnnotatedDataFrame") {
+		if (type != "dgCMatrix") {
+			input <- as.matrix(input)
+		}
+
+		if (is.log) {
+			lognorm <- input;
+		} else if (is.counts) {
+			counts <- input
+		} else {
+			return(input);
+		}
+	} else {
+		stop(paste("Error: Unrecognized input format :", type))
+	}
+
+	# Prefer log-norm to raw counts
+	if (!is.null(dim(lognorm))) {
+		return(2^lognorm-1)
+	} 
+
+	# CPM transform raw counts
+	if (!is.null(dim(counts))) {
+		if (class(counts)[1] == "dgCMatrix"){
+			sf <- Matrix::colSums(counts)
+		} else {
+			sf <- colSums(counts)
+		}
+		return( t( t(counts)/sf * median(sf) ) )
+	}
+}
+
 bg__calc_variables <- function(expr_mat) {
     if (class(expr_mat) != "matrix" & class(expr_mat) != "dgCMatrix" & class(expr_mat) != "Matrix") {
 	warning("Warning: not a recognized matrix class, coercing to 'matrix'.")

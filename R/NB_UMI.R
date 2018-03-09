@@ -5,7 +5,12 @@ hidden_calc_vals <- function(counts) {
 #        if (sum(!is.integer(counts)) >0) {stop("Expression matrix is not integers! Please provide a matrix (not data.frame) raw UMI counts!")}
 
         tjs <- rowSums(counts, na.rm=T) # Total molecules/gene
-	if (sum(tjs <= 0) > 0) {stop("Error: all genes must have at least one detected molecule.")}
+	no_detect <- tjs <= 0
+	if (sum(no_detect) > 0) {
+		warn(paste("Warning: removing",sum(no_detect), "undetected genes."))
+		counts <- counts[!no_detect,]
+        	tjs <- rowSums(counts, na.rm=T) # Total molecules/gene
+	}
         tis <- colSums(counts, na.rm=T) # Total molecules/cell
 	if (sum(tis <= 0) > 0) {stop("Error: all cells must have at least one detected molecule.")}
         djs <- ncol(counts)-rowSums(counts > 0, na.rm=T) # Observed Dropouts per gene
@@ -340,25 +345,24 @@ NBumiFeatureSelectionCombinedDrop <- function(fit, ntop=NULL, fdr=2, suppress.pl
 
 	out <- pvalue[reorder]
 	qval <- p.adjust(out, method="fdr")
+	if (is.null(ntop)) {
+		out <- out[qval < fdr]
+	} else {
+		out <- out[1:ntop]
+	}
 
 	if (!suppress.plot) {
 		xes <- log10(vals$tjs/vals$nc);
         	dens.col <- densCols(xes, droprate_obs, colramp=colorRampPalette(c("grey75","black")))
-		plot(xes, droprate_obs, col=dens.col, pch=16, log="x", xlab="log10(expression)", ylab="Dropout Rate")
-		points(xes, droprate_exp, col="dodgerblue", pch=16, cex=0.5)
-		if (is.null(ntop)) {
-			toplot = names(out)[qval < fdr]
-		} else {
-			toplot = names(out)[1:ntop]
-		}
+		plot(xes, droprate_obs, col=dens.col, pch=16, xlab="", ylab="")
+		title(ylab="Dropout Rate", line=2)
+		title(xlab="log10(expression)", line=2)
+		toplot = names(out)
 		toplot = names(vals$tjs) %in% toplot
 		points(xes[toplot], droprate_obs[toplot], col="darkorange", pch=16)
+		points(xes, droprate_exp, col="dodgerblue", pch=16, cex=1)
 	}
-	if (is.null(ntop)) {
-		return(out[qval < fdr])
-	} else {
-		return(out[1:ntop])
-	}
+	return(out)
 }
 
 PoissonUMIFeatureSelectionDropouts <- function(fit) {

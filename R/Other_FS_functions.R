@@ -16,12 +16,15 @@ irlbaPcaFS <- function(expr_mat, pcs=c(2,3)) {
 	nz_genes <- which(rowSums(norm) != 0)
 	norm[nz_genes,] <- log(norm[nz_genes,] + 1)/log(2)
 	# Create sparse Matrix
-	indices <- which(norm > 0, arr.ind=TRUE)
-	vals <- norm[indices]
-	nc <- ncol(norm)
-	gene_names <- rownames(norm);
 
-	norm <- Matrix::sparseMatrix(i = indices[,1], j=indices[,2], x=vals)
+	gene_names <- rownames(norm);
+	norm <- as(norm, "sparseMatrix")
+	rownames(norm) <- gene_names
+	#indices <- which(norm > 0, arr.ind=TRUE)
+	#vals <- norm[indices]
+	nc <- ncol(norm)
+
+	#norm <- Matrix::sparseMatrix(i = indices[,1], j=indices[,2], x=vals)
 	# Calculate the variance across genes without converting to a dense
 	# matrix:
 	expression_means <- Matrix::rowMeans(norm)
