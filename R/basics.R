@@ -14,7 +14,7 @@
 #You should have received a copy of the GNU General Public License along with
 #this program . If not , see <http://www.gnu.org/licenses/>.
 
-M3DropConvertData <- function(input, is.log=FALSE, is.counts=FALSE) {
+M3DropConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=1) {
 	type <- class(input)[1]
 	lognorm <- NULL
 	counts <- NULL

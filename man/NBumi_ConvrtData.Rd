@@ -1,13 +1,13 @@
-\name{M3DropConvertData}
-\alias{M3DropConvertData}
-\title{Convert Data to be suitable for M3Drop}
+\name{NBumiConvertData}
+\alias{NBumiConvertData}
+\title{Convert Data to be suitable for NBumi}
 \description{
 	Recognizes a variety of R objects/classes and extracts expression 
-	matrices from them then converts that to a normalized but 
-	not-log transformed matrix appropriate for input into M3Drop functions.
+	matrices from them then converts that to a count matrix for input 
+	into NBumi functions.
 }
 \usage{
-  M3DropConvertData(input, is.log=FALSE, is.counts=FALSE, pseudocount=1)
+  NBumiConvertData(input, is.log=FALSE, is.counts=FALSE, pseudocount=1)
 }
 \arguments{
   \item{input}{a matrix, data.frame or object }
@@ -19,8 +19,8 @@
 	You must have loaded the respective packages (in parentheses) into your namespace before running this function on the respective objects. Note that to maintain scalability sparse matrices will remain as such.
 
 	Supported classes/objects:
-		SCESet (scater <= 1.4.0) : uses "exprs" or if unavailable then "counts" 
-		SingleCellExperiment (scater >= 1.6.0) : uses "logcounts", which is assumed to be log-normalized, or if unavailable then "counts" 
+		SCESet (scater <= 1.4.0) : uses "counts" or if unavailable then "exprs" 
+		SingleCellExperiment (scater >= 1.6.0) : uses "counts", if unavailable then "logcounts", which is assumed to be log-normalized.
 		CellDataSet (monocle) : uses "exprs", specify log/counts using arguments
 		ExpressionSet (Biobase) : uses "exprs", specify log/counts using arguments
 		seurat (Seurat) : uses "raw.data" as counts.
@@ -34,32 +34,38 @@
 		matrix (base-r) : specify log/counts using arguments
 		data.frame (base-r) : specify log/counts using arguments
 
+	Counts are rounded up to integers if necessary, if counts are 
+	unavailable then this will attempt to convert log2 normalized expression
+	to counts by de-logging, subtracting the pseudocount, and then 
+	un-normalizing by rescaling cells based on their relative number of 
+	detected genes, finally expression is rounded up to integers for use 
+	as counts. 
 
 }
-\value{A normalized but not log-transformed matrix appropriate for input into M3Drop functions.}
+\value{A count matrix appropriate for input into NBumi functions.}
 \examples{
 	# Simulated raw count matrix:
 	set.seed(42)
 	counts <- matrix(rpois(200, lambda=3), ncol=10)
-	expr_mat <- M3DropConvertData(counts, is.counts=TRUE)
+	input_counts <- NBumiConvertData(counts, is.counts=TRUE)
 
 	# log normalized data frame
 	lognorm <-log2( t(t(counts)/colSums(counts)*100)+1 )
 	lognorm <- as.data.frame(lognorm)
-	expr_mat <- M3DropConvertData(lognorm)
+	input_counts <- NBumiConvertData(lognorm)
 
 	# Sparse matrix
 	counts <- Matrix(counts, sparse=TRUE)
-	expr_mat <- M3DropConvertData(counts, is.counts=TRUE)
+	input_counts <- NBumiConvertData(counts, is.counts=TRUE)
 
 	# SingleCellExperiment Object
 	require("SingleCellExperiment")
 	SCE <- SingleCellExperiment(assays=list(counts=counts))
-	expr_mat <- M3DropConvertData(SCE)
+	input_counts <- NBumiConvertData(SCE)
 
 	# monocle Object
 	require("monocle")
 	obj <- suppressWarnings(newCellDataSet(lognorm))
-	expr_mat <- M3DropConvertData(obj, is.log=TRUE)
+	input_counts <- NBumiConvertData(obj, is.log=TRUE)
 }
 \keyword{normalization}

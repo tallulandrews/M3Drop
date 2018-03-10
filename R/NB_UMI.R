@@ -532,3 +532,91 @@ NBumiImputeNorm <- function(counts, fit, total_counts_per_cell=median(fit$vals$t
 
 ## Cell-type DANB ##
 # fit variances with contribution from global mean~var relationship for small clusters. 
+#Copyright (c) 2015, 2016 Genome Research Ltd .
+#Author : Tallulah Andrews <tallulandrews@gmail.com>
+#This file is part of M3Drop.
+
+#M3Drop is free software : you can redistribute it and/or modify it under
+#the terms of the GNU General Public License as published by the Free Software
+#Foundation; either version 2 of the License, or (at your option) any later
+#version.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT
+#ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License along with
+#this program . If not , see <http://www.gnu.org/licenses/>.
+
+NBumiConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=1) {
+	type <- class(input)[1]
+	lognorm <- NULL
+	counts <- NULL
+	if (type == "SCESet") {
+		# Old scater
+		lognorm <- exprs(input)
+		counts <- counts(input)
+
+	} else if (type == "SingleCellExperiment") {
+		# New scater
+		c <- which(names(input@assays) == "counts")
+		ln <- which(names(input@assays) == "logcounts")
+		if (length(ln) > 0) {
+			lognorm <- input@assays[[ln]]
+		} else if (length(c) > 0) {
+			counts <- input@assays[[c]]
+		} else {
+			stop("Error: Recognized SingleCellExperiment object but cannot find either counts or lognorm expression.")
+		}
+	} else if (type == "CellDataSet" | type == "ExpressionSet") {
+		# monocle
+		if (is.log) {
+			lognorm <- exprs(input)
+		} else {
+			counts <- exprs(input)
+		}
+	} else if (type == "seurat") {
+		# Seurat
+		counts <- input@raw.data
+	} else if (type == "matrix" | 
+		   type == "data.frame" | 
+		   type == "dgCMatrix" | 
+		   type == "data.table" |
+		   type == "DataTable" |
+		   type == "DataFrame" |
+		   type == "AnnotatedDataFrame") {
+		if (type != "dgCMatrix") {
+			input <- as.matrix(input)
+		}
+
+		if (is.log) {
+			lognorm <- input;
+		} else if (is.counts) {
+			counts <- input
+		} else {
+			return(input);
+		}
+	} else {
+		stop(paste("Error: Unrecognized input format :", type))
+	}
+
+	# Prefer raw counts to lognorm
+
+	# CPM transform raw counts
+	if (!is.null(dim(counts))) {
+		counts <- ceiling(counts)
+		return( counts )
+	}
+	# If normalized rescale by number of detected genes
+	if (!is.null(dim(lognorm))) {
+		norm <- 2^lognorm-pseudocount
+		sf <- colSums(norm)
+		detected <- colSums(norm > 0);
+		detected <- detected/median(detected);
+		libsize <- detected*median(sf)
+		counts <- t( t(norm/sf*libsize) )
+		counts <- ceiling(counts)
+		return(counts)
+	} 
+}
+
