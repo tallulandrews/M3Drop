@@ -34,11 +34,10 @@ Mean expression for each simulated gene is drawn from a log-normal distribution 
 		
 }
 \examples{
-  library(M3DExampleData)
-  Normalized_data <- M3DropCleanData(Mmus_example_list$data,
-                  labels = Mmus_example_list$labels,
-                  is.counts=TRUE, min_detected_genes=2000)
-  ZINB_sim <- M3DropSimulationTrifecta(Normalized_data$data)
-  DANB_sim <- NBumiSimulationTrifecta(Mmus_example_list$data)
+	library(M3DExampleData)
+	counts <- NBumiConvertData(Mmus_example_list$data)
+	norm <- M3DropConvertData(Mmus_example_list$data, is.log=FALSE, is.counts=TRUE)
+	ZINB_sim <- M3DropSimulationTrifecta(norm)
+	DANB_sim <- NBumiSimulationTrifecta(counts)
 }
 \keyword{simulations, differential expression, differential variance}

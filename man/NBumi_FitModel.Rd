@@ -33,9 +33,8 @@
 			ng = number of genes
 }
 \examples{
-library(M3DExampleData)
-counts <- as.matrix(Mmus_example_list$data);
-counts <- counts[rowSums(counts) > 0,];
-fit <- NBumiFitModel(counts);
+	library(M3DExampleData)
+	counts <- NBumiConvertData(Mmus_example_list$data)
+	fit <- NBumiFitModel(counts);
 }
 \keyword{single cell}

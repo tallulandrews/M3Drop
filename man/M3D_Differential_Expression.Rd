@@ -6,7 +6,7 @@
 	Use Michaelis-Menten curve to find differentially expressed (DE) genes. Functions tagged with "bg__" are not meant for direct usage and are not available in the Bioconductor release.
 }
 \usage{
-  M3DropFeatureSelection(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE)
+  M3DropFeatureSelection(expr_mat, mt_method="bon", mt_threshold=0.05, suppress.plot=FALSE, xlim=NA)
   bg__test_DE_K_equiv(gene_info, fit=NA)
 }
 \arguments{
@@ -14,6 +14,7 @@
   \item{mt_method}{the multiple testing method used in p.adjust}
   \item{mt_threshold}{the threshold for identifying significantly DE genes.}
   \item{suppress.plot}{logical, whether to plot the fitted curve and highlight selected features.}
+  \item{xlim}{specify the limits of the x-axis of the plot.}
   \item{fit}{Output from fitting the Michaelis-Menten equation (see: \code{bg__fit_MM}}
   \item{gene_info}{List of calculated gene-specific values output by \code{bg__calc_variables}}
 }
@@ -25,11 +26,9 @@
 	fold_change : ratio of gene-specific K to globally fit K
 }
 \examples{
-  library(M3DExampleData)
-  Normalized_data <- M3DropCleanData(Mmus_example_list$data,
-                  labels = Mmus_example_list$labels,
-                  is.counts=TRUE, min_detected_genes=2000)
-  DE_genes <- M3DropFeatureSelection(Normalized_data$data, 
+	library(M3DExampleData)
+	norm <- M3DropConvertData(Mmus_example_list$data, is.counts=TRUE)
+	DE_genes <- M3DropFeatureSelection(norm, 
 		mt_method="fdr", mt_threshold=0.01)
 #  gene_info <- bg__calc_variables(Normalized_data$data[1:1000,])
 #  DE_output <- bg__test_DE_K_equiv(gene_info)

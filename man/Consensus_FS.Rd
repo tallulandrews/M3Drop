@@ -35,10 +35,13 @@
 
 \examples{
 library(M3DExampleData)
-norm <- Mmus_example_list$data[1:1000,];
+norm <- as.matrix(Mmus_example_list$data[1:500,]);
 norm <- norm[rowSums(norm) > 0,];
 counts <- NBumiConvertToInteger(norm);
-Features_consensus<- Consensus_FS(counts, norm);
+spikes <- sample(1:nrow(counts), 50);
+spikes <- rownames(norm)[spikes];
+spikes <- rownames(norm) %in% spikes;
+Features_consensus <- Consensus_FS(counts, norm, is.spike=spikes);
 }
 \keyword{single cell}
 \keyword{feature selection}

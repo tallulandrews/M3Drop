@@ -27,8 +27,7 @@
 }
 \examples{
 	library(M3DExampleData)
-	counts <- as.matrix(Mmus_example_list$data);
-	counts <- counts[rowSums(counts) > 0,];
+	counts <- NBumiConvertData(Mmus_example_list$data)
 	fit <- NBumiFitModel(counts);
 	fit_quality <- NBumiCheckFitFS(counts, fit);
 }

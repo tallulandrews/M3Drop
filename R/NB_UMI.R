@@ -5,11 +5,9 @@ hidden_calc_vals <- function(counts) {
 #        if (sum(!is.integer(counts)) >0) {stop("Expression matrix is not integers! Please provide a matrix (not data.frame) raw UMI counts!")}
 
         tjs <- rowSums(counts, na.rm=T) # Total molecules/gene
-	no_detect <- tjs <= 0
-	if (sum(no_detect) > 0) {
-		warn(paste("Warning: removing",sum(no_detect), "undetected genes."))
-		counts <- counts[!no_detect,]
-        	tjs <- rowSums(counts, na.rm=T) # Total molecules/gene
+	no_detect <- sum(tjs <= 0)
+	if (no_detect > 0) {
+		stop(paste("Error: contains",no_detect, "undetected genes."))
 	}
         tis <- colSums(counts, na.rm=T) # Total molecules/cell
 	if (sum(tis <= 0) > 0) {stop("Error: all cells must have at least one detected molecule.")}
@@ -32,12 +30,8 @@ NBumiFitModel <- function(counts) {
 	vals <- hidden_calc_vals(counts);
 #	mus <- (vals$tjs) %*% t(vals$tis/vals$total)
 	
-	convergence <- 0.001
 #	max_size <- max(mus)^2;
 	min_size <- 10^-10;
-#	size <- sapply(1:vals$ng,function(j) {
-#		 bg__fit_size_to_var(var(counts[j,]-mus[j,]), mus[j,], max_size=max_size, min_size=10^-10, convergence=0.001)
-#		})
 	my_rowvar <- sapply(1:nrow(counts), function(i){
 				mu_is <- vals$tjs[i]*vals$tis/vals$total
 				var(as.vector(unlist(counts[i,]))-mu_is)
@@ -347,9 +341,14 @@ NBumiFeatureSelectionCombinedDrop <- function(fit, ntop=NULL, fdr=2, suppress.pl
 	qval <- p.adjust(out, method="fdr")
 	if (is.null(ntop)) {
 		out <- out[qval < fdr]
+		diff <- diff[qval < fdr]
+		qval <- qval[qval < fdr]
 	} else {
 		out <- out[1:ntop]
+		diff <- diff[1:ntop]
+		qval <- qval[1:ntop]
 	}
+	outTABLE <- data.frame(Gene=names(out), effect_size=diff, p.value=out, q.value=qval)
 
 	if (!suppress.plot) {
 		xes <- log10(vals$tjs/vals$nc);
@@ -362,7 +361,7 @@ NBumiFeatureSelectionCombinedDrop <- function(fit, ntop=NULL, fdr=2, suppress.pl
 		points(xes[toplot], droprate_obs[toplot], col="darkorange", pch=16)
 		points(xes, droprate_exp, col="dodgerblue", pch=16, cex=1)
 	}
-	return(out)
+	return(outTABLE)
 }
 
 PoissonUMIFeatureSelectionDropouts <- function(fit) {
@@ -554,7 +553,7 @@ NBumiConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=1
 	counts <- NULL
 	if (type == "SCESet") {
 		# Old scater
-		lognorm <- exprs(input)
+		lognorm <- scater::exprs(input)
 		counts <- counts(input)
 
 	} else if (type == "SingleCellExperiment") {
@@ -571,9 +570,9 @@ NBumiConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=1
 	} else if (type == "CellDataSet" | type == "ExpressionSet") {
 		# monocle
 		if (is.log) {
-			lognorm <- exprs(input)
+			lognorm <- Biobase::exprs(input)
 		} else {
-			counts <- exprs(input)
+			counts <- Biobase::exprs(input)
 		}
 	} else if (type == "seurat") {
 		# Seurat
@@ -594,28 +593,36 @@ NBumiConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=1
 		} else if (is.counts) {
 			counts <- input
 		} else {
-			return(input);
+			norm <- input;
 		}
 	} else {
 		stop(paste("Error: Unrecognized input format :", type))
 	}
 
 	# Prefer raw counts to lognorm
-
+	remove_undetected_genes <- function(mat) {
+		no_detect <- rowSums(mat > 0, na.rm=T) == 0;
+		print(paste("Removing ",sum(no_detect), "undetected genes."))
+		return(mat[!no_detect,])
+	}
 	# CPM transform raw counts
 	if (!is.null(dim(counts))) {
 		counts <- ceiling(counts)
+		counts <- remove_undetected_genes(counts);
 		return( counts )
 	}
 	# If normalized rescale by number of detected genes
 	if (!is.null(dim(lognorm))) {
 		norm <- 2^lognorm-pseudocount
+	}
+	if (!is.null(dim(norm))) {
 		sf <- colSums(norm)
 		detected <- colSums(norm > 0);
 		detected <- detected/median(detected);
 		libsize <- detected*median(sf)
 		counts <- t( t(norm/sf*libsize) )
 		counts <- ceiling(counts)
+		counts <- remove_undetected_genes(counts);
 		return(counts)
 	} 
 }

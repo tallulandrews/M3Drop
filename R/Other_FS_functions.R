@@ -233,7 +233,7 @@ Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=nrow(counts)
 	ranks <- 1:nrow(norm);
 	ref_order <- rownames(counts); 
 	table <- data.frame(
-		DANB_drop = ranks[match(ref_order, names(DANB))],
+		DANB_drop = ranks[match(ref_order, DANB$Gene)],
 		DANB_var = ranks[match(ref_order, names(DANB_var))],
 		M3Drop = ranks[match(ref_order, m3drop$Gene)],
 		HVG = ranks[match(ref_order, HVG$Gene)],

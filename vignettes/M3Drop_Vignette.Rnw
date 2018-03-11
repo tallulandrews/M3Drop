@@ -1,20 +1,50 @@
 \documentclass[a4paper]{article}
 \begin{document}
 
-\title{Introduction to M3Drop: Michaelis-Menten modelling of dropouts in scRNASeq}
+\title{Dropout-based Feature Selection with M3Drop and NBumi}
 \author{Tallulah Andrews}
 %\VignetteIndexEntry{Introduction to M3Drop}
 
 \maketitle
 
 \section*{Introduction}
-Single-cell RNA sequencing is able to quantify the whole transcriptome from the small amount of RNA present in individual cells. However, a consequence of reverse-transcribing and amplifying small quantities of RNA is a large number of dropouts, genes with zero expression in particular cells. The frequency of dropout events is strongly non-linearly related to the measured expression levels of the respective genes. M3Drop posits that these dropouts are due to failures of reverse transcription, a simple enzyme reaction, thus should be modelled using the Michaelis-Menten equation as follows:
+
+Feature selection is a key step in the analysis of single-cell RNASeq data. 
+Feature selection aims to identify and remove genes whose expression is 
+dominated by technical noise, thus reducing the effect of batch-effects and 
+other technical counfounders while also reducing the curse of dimensionality. 
+
+A common way to select features is to identify genes that follow a different 
+expression distribution than a set of control genes. These control genes may 
+be spike-ins but more commonly one assumes that the majority of genes don't
+differ from control genes and use all genes to approximate the expression 
+pattern of expression of controls.
+
+Often the variance relative to the mean expression is used to characterize the
+expression distribution of a gene, and feature selection proceeds by identifying
+highly variable genes. In contrast, this package provides two methods which 
+characterize the expression distribution of a gene using the dropout-rate and 
+mean expression. This takes advantage of the fact than at least 50\% of entries
+in a single-cell RNASeq expression matrix are dropouts, and that dropout rate
+is less sensitive to sampling errors than variance.
+
+\section*{M3Drop}
+
+Single-cell RNA sequencing is able to quantify the whole transcriptome from the
+small amount of RNA present in individual cells. However, a consequence of 
+reverse-transcribing and amplifying small quantities of RNA is a large number 
+of dropouts, genes with zero expression in particular cells. The frequency of 
+dropout events is strongly non-linearly related to the measured expression 
+levels of the respective genes. M3Drop posits that these dropouts are due to 
+failures of reverse transcription, a simple enzyme reaction, thus should be 
+modelled using the Michaelis-Menten equation as follows:
 
 $$P_{i} = 1 - \frac{S_{i}}{S_{i}+K}$$
 
-Where $P_{i}$ is the proportion of cells where gene $i$ dropouts out, $S_{i}$ is the mean expression of gene $i$ and $K$ is the Michaelis constant.
-
-\section*{Example Workflow}
+Where $P_{i}$ is the proportion of cells where gene $i$ dropouts out, 
+$S_{i}$ is the mean expression of gene $i$ and $K$ is the Michaelis constant. 
+This model fits observed single-cell RNASeq data which have been sequenced to 
+near saturation (i.e. >100,000 reads per cell). 
 
 We'll be using a portion of the Deng et al. (2014) dataset in this example. You can download the R-package containing this data (M3DExampleData) from Bioconductor using biocLite().
 <<results=hide>>=
@@ -22,42 +52,39 @@ library(M3Drop)
 library(M3DExampleData)
 @
 
-\section*{QC and Normalization}
-The first step is to clean the data by remove cells with too few detected genes, genes that with very low expression, and to normalize the data. This can be done using any method but M3Drop includes a simple function that will clean the expression matrix and convert raw counts to counts per million (CPM). If alternative normalization methods are used the input expression matrix must not be log-transformed, nor contain negative values. If normalization adjusts zero values then M3Drop will use the minimal expression value in the entire matrix as the value for dropouts. 
+\subsection*{Prepare Data}
+The first step is to perform quality control on cells. Any existing tools can
+be used for this. Here we will simply remove cells with fewer than 2000 detected
+genes.
+<<>>=
+counts <- Mmus_example_list$data
+labels <- Mmus_example_list$labels
+total_features <- colSums(counts >= 0)
+counts <- counts[,total_features >= 2000]
+labels <- labels[total_features >= 2000]
+@
+
+The second is to extract and correctly format data for M3Drop. To support 
+quality control tools in various other single-cell R packages, we have 
+provided a function to extract appropriate data from objects used by scater, 
+monocle, and Seurat. This function also removes undetected genes, and if necessary applies a counts-per-million normalization to raw count data. 
 
 <<>>=
-Normalized_data <- M3DropCleanData(Mmus_example_list$data, 
-		  labels = Mmus_example_list$labels, 
-		  is.counts=TRUE, min_detected_genes=2000)
-dim(Normalized_data$data)
-length(Normalized_data$labels)
+norm <- M3DropConvertData(counts, is.counts=TRUE)
 @
 
-\section*{Fitting the Michaelis-Menten}
-Next, we can compare the fits of different possible functions relating the proportion of dropouts to the average expression for each gene.
+M3Drop requires a normalized but not log-transformed expression matrix, thus the above function can optionally de-log a log2-normalized expression matrix from any normalization method.
 
-\begin{center}
-<<fig=TRUE>>=
-fits <- M3DropDropoutModels(Normalized_data$data)
-@
-\\
-\textbf{Figure 1}: Fits of three different dropout models.
-\end{center}
-
-Visual inspection of the resulting plot (Figure 1) shows that the Michaelis-Menten equation is the best fit to the data. However, we can also examine some statistics to confirm this:
 <<>>=
-# Sum absolute residuals
-data.frame(MM=fits$MMFit$SAr, Logistic=fits$LogiFit$SAr,
-	   DoubleExpo=fits$ExpoFit$SAr) 
-# Sum squared residuals
-data.frame(MM=fits$MMFit$SSr, Logistic=fits$LogiFit$SSr,
-	   DoubleExpo=fits$ExpoFit$SSr)
+norm <- M3DropConvertData(log2(norm+1), is.log=TRUE, pseudocount=1)
 @
-Here we see that the sum of squared residuals favours the flatter logistic curve due to the noise in the data, where as sum of absolute residuals shows the Michaelis-Menten is the best fit to the data.
 
-\section*{Feature Selection for Differentially Expressed (DE) Genes}
+Any normalization method which preserves dropouts (i.e zeros) is compatible 
+with M3Drop.
 
-Since the Michaelis-Menten equation is convex, averaging across a mixed population forces differentially expressed genes to be shifted to the right of the Michaelis-Menten curve (Figure 2).
+\subsection*{Feature Selection}
+
+Since the Michaelis-Menten equation is convex, averaging across a mixed population forces differentially expressed genes to be shifted to the right of the Michaelis-Menten curve (Figure 1).
 
 \begin{center}
 <<fig=TRUE>>=
@@ -74,22 +101,106 @@ mix <- 0.5;
 points(S1*mix+S2*(1-mix), P1*mix+P2*(1-mix), pch=16, col="grey35", cex=3)
 @ 
 \\
-\textbf{Figure 2}: Michaelis-Menten is convex which leads to DE genes being outliers to the right/above the curve.
+\textbf{Figure 1}: Michaelis-Menten is convex which leads to DE genes being outliers to the right/above the curve.
 \end{center}
 
-
-Feature selection for DE genes are identified by comparing the local $K$ calculated for a specific gene to the global $K$ fitted across all genes using a Z-test followed by multiple-testing correction. Here we find 1,248 DE genes at 1\% FDR.
+Feature selection for DE genes are identified by comparing the local $K$ 
+calculated for a specific gene to the global $K$ fitted across all genes using 
+a Z-test followed by multiple-testing correction. Here we find 1,248 DE genes 
+at 1\% FDR.
 
 \begin{center}
 <<fig=TRUE>>=
-DE_genes <- M3DropFeatureSelection(Normalized_data$data, 
-			mt_method="fdr", mt_threshold=0.01)
+M3Drop_genes <- M3DropFeatureSelection(norm, mt_method="fdr", mt_threshold=0.01)
 @
 \\
-\textbf{Figure 3}: Differentially expressed genes at 1\% FDR (purple).
+\textbf{Figure 2}: Differentially expressed genes at 1\% FDR (purple).
 \end{center}
 
-Note that this function runs directly from the expression matrix, hence one could skip straight to identifying DE genes without comparing models and any external normalisation method can be applied to the raw counts prior to DE analysis. 
+\section*{NBumi}
+
+The Michaelis-Menten equation fits full-transcript single-cell RNASeq data 
+well, but often struggles to fit data tagged with unique molecular identifiers 
+(UMIs). This is a result of UMI datasets typically not being sequenced to 
+saturation, thus many dropouts are a result of low sequencing coverage rather 
+than a failure of reverse transcription. 
+
+To account for zeros resulting from insufficient sequencing depth, the M3Drop 
+packaged includes a depth-adjusted negative binomial model (DANB). DANB models 
+each observation as a negative binomial distribution with mean proportional to
+the mean expression of the respective gene and the relative sequencing depth 
+of the respective cell. The dispersion parameter of the negative binomial is 
+fit to the variance of each gene. The equations for calculating these 
+parameters are:
+
+Observation specific means:
+$$\mu_{ij} = \frac{\sum\limits_{i} t_{ij} * \sum\limits_{j} t_{ij}}{\sum\limits_{ij} t_{ij}}$$
+
+
+Gene specific dispersion (solved for $r_{i}$):
+$$\sum_{j}(t_{ij}-\mu_{ij})^2 = \sum_{j}(\mu_{ij}+r_{i}\mu_{ij}^2)$$
+
+Where $\mu_{ij}$ is the observation specific mean for the negative binomial for the observed molecule counts, $t_{ij}$ of the $i$th gene in the $j$th of cell and $r_{i}$ is the dispersion parameter (the "size" paramter of R's nbinom functions) for gene $i$.
+
+Functions relating to the DANB model are tagged with the "NBumi" prefix. We will continue using the example data despite it not using UMIs for demonstration purposes. Similar to M3Drop we have provided a function to extract the relevant 
+expression matrix from objects used by popular single-cell RNASeq analysis 
+packages : scater, monocle, and Seurat. This is a separate function because
+DANB requires raw counts as opposed to the normalized expression matrix used
+by M3Drop. 
+
+<<>>=
+count_mat <- NBumiConvertData(Mmus_example_list$data, is.counts=TRUE)
+@
+
+This function can also de-log and de-normalize a provided expression matrix, 
+but raw counts are preferable if they are available.
+
+Next we fit the DANB model to this count matrix, and check it fits the data:
+
+\begin{center}
+<<fig=TRUE>>=
+DANB_fit <- NBumiFitModel(count_mat)
+
+# Smoothed gene-specific variances
+par(mfrow=c(1,2))
+stats <- NBumiCheckFitFS(count_mat, DANB_fit)
+print(c(stats$gene_error,stats$cell_error))
+@
+\\
+\textbf{Figure 3}: Fits of the depth-adjusted negative binomial.
+\end{center}
+
+We use a binomial test to evaluable the significance of features under the DANB
+model:
+
+\begin{center}
+<<fig=TRUE>>=
+NBDropFS <- NBumiFeatureSelectionCombinedDrop(DANB_fit, fdr=0.01, suppress.plot=FALSE)
+@
+\textbf{Figure 4}: Dropout-based feature selection using DANB
+\end{center}
+
+
+\section*{Other Feature Selection Methods}
+
+For comparison purposes we have provided functions for other feature selection
+methods, including: 
+BrenneckeGetVariableGenes from Brennecke et al. (2013) modified to optionally use all genes to fit the function between CV2 and mean expression.
+giniFS based on GiniClust (REF)
+pcaFS based on monocle (REF) using irlba and sparse-matricies.
+corFS which uses gene-gene correlations.
+and ConsensusFS which uses all the available feature selection methods and takes the average rank of genes across all methods.
+
+Only the Brennecke highly variable gene method also provides a significance 
+test and runs in linear time, thus is the only one we will demostrate here.
+
+
+\begin{center}
+<<fig=TRUE>>=
+HVG <- BrenneckeGetVariableGenes(norm)
+@
+\textbf{Figure 5}: Brennecke highly variable genes.
+\end{center}
 
 \section*{Examining Features and Identifying Subpopulations of Cells}
 
@@ -97,122 +208,76 @@ To check that the identified genes are truly differentially expressed we can plo
 
 \begin{center}
 <<fig=TRUE>>=
-heat_out <- M3DropExpressionHeatmap(DE_genes$Gene, Normalized_data$data, 
-			cell_labels = Normalized_data$labels)
+heat_out <- M3DropExpressionHeatmap(M3Drop_genes$Gene, norm, 
+		cell_labels = labels)
 @
 \\
-\textbf{Figure 4}: Heatmap of expression of DE genes.
+\textbf{Figure 6}: Heatmap of expression of M3Drop features.
 \end{center}
 
-The heatmap (Figure 4) shows that the identified DE genes are differentially expressed across timepoints. Furthermore, it shows that the blastocysts cluster into two different groups based on the expression of these genes. We can extract these groups and identify marker genes for them as follows:
+The heatmap (Figure 6) shows that the genes identified by M3Drop are 
+differentially expressed across timepoints. Furthermore, it shows that the 
+blastocysts cluster into two different groups based on the expression of 
+these genes. We can extract these groups and identify marker genes for them 
+as follows:
 
 <<>>=
 cell_populations <- M3DropGetHeatmapClusters(heat_out, k=4, type="cell")
 library("ROCR") 
-marker_genes <- M3DropGetMarkers(Normalized_data$data, cell_populations)
+marker_genes <- M3DropGetMarkers(norm, cell_populations)
 @
 
-The first function cuts the dendrogram from the heatmap to produce k clusters of cells. These labels are stored in cell\_populations. The second function tests all genes as marker genes for the provided clusters.
+The first function cuts the dendrogram from the heatmap to produce k clusters 
+of cells. These labels are stored in cell\_populations. The second function 
+tests all genes as marker genes for the provided clusters.
 
-Marker genes are ranked by the area-under the ROC curve (AUC) for predicting the population with the highest expression of the gene from the other groups. Significance is calculated using a Wilcox-rank-sum test. Now we can examine the marker genes of the two clusters of blastocyst cells more closely.
+Marker genes are ranked by the area-under the ROC curve (AUC) for predicting 
+the population with the highest expression of the gene from the other groups. 
+Significance is calculated using a Wilcox-rank-sum test. Now we can examine 
+the marker genes of the two clusters of blastocyst cells more closely.
 
 <<>>=
 head(marker_genes[marker_genes$Group==4,],20) 
 marker_genes[rownames(marker_genes)=="Cdx2",] 
 @
 
-This shows that the inner cell mass (ICM) marker Sox2 is one of the top 20 markers for group 4 and that the trophectoderm (TE) marker Cdx2 is a marker for group 3, suggesting these two clusters coorespond to ICM and TE cells within each blastocyst.
+This shows that the inner cell mass (ICM) marker Sox2 is one of the top 20 
+markers for group 4 and that the trophectoderm (TE) marker Cdx2 is a marker 
+for group 3, suggesting these two clusters coorespond to ICM and TE cells 
+within each blastocyst.
 
 \section*{Comparing to Other Methods}
 
-For comparison purposes, I have also included a function which implements the method to identify highly variable genes presented in Brennecke et al. (2013) with the added option to run it without providing spike-ins, in which case all genes are used to fit the function between CV2 and mean expression.
+The DANB features look similar to M3Drop though identifies more genes due to 
+the simplified noise model it uses, which is appropriate for UMI-tagged data 
+but too permissive for data with high amplifcation noise.
 
 \begin{center}
 <<fig=TRUE>>=
-HVG <- BrenneckeGetVariableGenes(Normalized_data$data)
-@
-\\
-\textbf{Figure 5}: 1,236 Significantly highly variable genes (pink) using all genes as spike-ins (10\% FDR).
-\end{center}
-
-This method is more sensitive to lowly expressed genes, and frequently picks up genes with fewer than 10 reads per million. In addition, the quadratic model it uses frequenly over estimates the expected variability of highly expressed genes thus only one gene with more than 1000 reads per million was detected as highly variable (Figure 5). This is in contrast with M3Drop (Figure 3) which recognizes the low information available for lowly expressed genes thus identifies few genes with expression < 10 reads per million as differentially expressed. 
-
-This difference can also be seen by comparing the heatmaps for the respective genes (Figure 4,6). The highly variable genes contains many more genes exhibiting just noisy expression, whereas nearly all genes detected by M3Drop are clearly differentially expressed across the different cell populations. 
-
-\begin{center}
-<<fig=TRUE>>=
-heat_out <- M3DropExpressionHeatmap(HVG, Normalized_data$data, 
-		cell_labels = Normalized_data$labels)
-@
-\\
-\textbf{Figure 6}: Heatmap of expression of highly variable genes across cells.
-\end{center}
-
-\section*{Depth Adjusted Negative Binomial}
-
-The Michaelis-Menten equation fits full-transcript single-cell RNASeq data well, but often struggles to fit data tagged with unique molecular identifiers (UMIs). This is a result of UMI datasets typically not being sequenced to saturation, thus many dropouts are a result of low sequencing coverage rather than a failure of reverse transcription. 
-
-To account for zeros resulting from insufficient sequencing depth, the M3Drop packaged includes the depth-adjusted negative binomial model (DANB). DANB models each observation as a negative binomial distribution with mean proportional to the mean expression of the respective gene and the relative sequencing depth of the respective cell. The dispersion parameter of the negative binomial is fit to the variance of each gene. The equations for calculating these parameters are:
-
-Observation specific means:
-$$\mu_{ij} = \frac{\sum\limits_{i} t_{ij} * \sum\limits_{j} t_{ij}}{\sum\limits_{ij} t_{ij}}$$
-
-
-Gene specific dispersion (solved for $r_{i}$):
-%$$\underset{r_i}{\operatorname{arg}\operatorname{min}}|\sum((t_{ij}-\mu_{ij})^2 - (\mu{ij}+r_i\mu_{ij}^2))|$$
-$$\sum_{j}(t_{ij}-\mu_{ij})^2 = \sum_{j}(\mu_{ij}+r_{i}\mu_{ij}^2)$$
-
-Where $\mu_{ij}$ is the observation specific mean for the negative binomial for the observed molecule counts, $t_{ij}$ of the $i$th gene in the $j$th of cell and $r_{i}$ is the dispersion parameter (the "size" paramter of R's nbinom functions) for gene $i$.
-
-Functions relating to the DANB model are tagged with the "NBumi" prefix. We will continue using the example data despite it not using UMIs for demonstration purposes.
-<<>>=
-count_mat <- NBumiConvertToInteger(Mmus_example_list$data)
-DANB_fit <- NBumiFitModel(count_mat)
-@
-
-Next we check how well this model is fitting the data:
-
-\begin{center}
-<<fig=TRUE>>=
-# Smoothed gene-specific variances
-par(mfrow=c(1,2))
-stats <- NBumiCheckFitFS(count_mat, DANB_fit)
-print(c(stats$gene_error,stats$cell_error))
-@
-\\
-\textbf{Figure 7}: Fits of the depth-adjusted negative binomial.
-\end{center}
-
-
-We can now perform feature selection on the basis of variance:
-<<>>=
-DispFS <- NBumiFeatureSelectionHighVar(DANB_fit)
-top_dispfeatures <- names(DispFS[1:1500])
-@
-or dropouts:
-<<>>=
-DropFS <- NBumiFeatureSelectionCombinedDrop(DANB_fit)
-top_dropfeatures <- names(DropFS[1:1500])
-@
-
-We can then compare the features identified with different methods:
-
-<<>>=
-# Dropout based features
-sum(top_dropfeatures %in% DE_genes$Gene)
-# Variance based features
-sum(top_dispfeatures %in% HVG$Gene)
-@
-
-They can also be used for all downstream analyses as before:
-
-\begin{center}
-<<fig=TRUE>>=
-heat_out <- M3DropExpressionHeatmap(top_dropfeatures, Normalized_data$data, 
-			cell_labels = Normalized_data$labels)
+heat_out <- M3DropExpressionHeatmap(NBDropFS$Gene, norm, 
+		cell_labels = labels)
 @
 \\
 \textbf{Figure 7}: Heatmap of expression of DANB features.
+\end{center}
+
+The HVG method is more sensitive to lowly expressed genes. In addition, the 
+quadratic model it uses frequenly over estimates the expected variability of 
+highly expressed genes. This is in contrast with M3Drop which recognizes the 
+low information available for lowly expressed genes. 
+
+This difference can be seen by comparing the heatmaps for the respective genes.
+The highly variable genes contains many more genes exhibiting just noisy 
+expression, whereas nearly all genes detected by M3Drop are clearly 
+differentially expressed across the different cell populations. 
+
+\begin{center}
+<<fig=TRUE>>=
+heat_out <- M3DropExpressionHeatmap(HVG, norm, 
+		cell_labels = labels)
+@
+\\
+\textbf{Figure 8}: Heatmap of expression of highly variable genes across cells.
 \end{center}
 
 \section*{References}
@@ -222,3 +287,4 @@ Tallulah Andrews, Martin Hemberg. Modelling dropouts allows for unbiased identif
 Philip Brennecke, Simon Anders, Jong Kyoung Kim, Aleksandra A Kolodziejczyk, Xiuwei Zhang, Valentina Proserpio, Bianka Baying, Vladimir Benes, Sarah A Teichmann, John C Marioni and Marcus G Heisler. Accounting for technical noise in single-cell RNA-seq experiments. \textit{Nature Methods}, 10:1093-1095, 2013. doi:10.1038/nmeth.2645, PMID: 24056876
 
 \end{document}
+

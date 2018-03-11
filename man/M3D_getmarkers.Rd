@@ -18,6 +18,7 @@
 }
 \examples{
   library(M3DExampleData)
-  marker_gene_table <- M3DropGetMarkers(Mmus_example_list$data, Mmus_example_list$labels)
+  norm <- M3DropConvertData(Mmus_example_list$data, is.counts=TRUE)
+  marker_gene_table <- M3DropGetMarkers(norm, Mmus_example_list$labels)
 }
 \keyword{markers}

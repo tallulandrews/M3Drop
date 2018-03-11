@@ -18,11 +18,10 @@
 	Sorted vector of residuals.
 }
 \examples{
-library(M3DExampleData)
-counts <- as.matrix(Mmus_example_list$data);
-counts <- counts[rowSums(counts) > 0,];
-fit <- NBumiFitModel(counts);
-HVGs <- names(NBumiFeatureSelectionHighVar(fit)[1:2000]);
+	library(M3DExampleData)
+	counts <- NBumiConvertData(Mmus_example_list$data)
+	fit <- NBumiFitModel(counts);
+	HVGs <- names(NBumiFeatureSelectionHighVar(fit)[1:2000]);
 }
 \keyword{single cell}
 \keyword{feature selection}

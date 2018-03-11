@@ -22,13 +22,17 @@
 	If provided, ntop will overrule the significance threshold.
 }
 \value{
-	Sorted vector of p-values
+	dataframe with columns: 
+		Gene 
+		effect_size (difference between observed and expected dropout rate)
+		p.value
+		q.value (fdr corrected)
 }
 \examples{
-library(M3DExampleData)
-counts <- NBumiConvertToInteger(Mmus_example_list$data);
-fit <- NBumiFitModel(counts);
-Dropout_features <- names(NBumiFeatureSelectionCombinedDrop(fit, fdr=0.05));
+	library(M3DExampleData)
+	counts <- NBumiConvertData(Mmus_example_list$data)
+	fit <- NBumiFitModel(counts);
+	Drop_features <- names(NBumiFeatureSelectionCombinedDrop(fit, fdr=0.05));
 }
 \keyword{single cell}
 \keyword{feature selection}

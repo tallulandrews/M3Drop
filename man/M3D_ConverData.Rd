@@ -49,6 +49,7 @@
 	expr_mat <- M3DropConvertData(lognorm)
 
 	# Sparse matrix
+	require("Matrix")
 	counts <- Matrix(counts, sparse=TRUE)
 	expr_mat <- M3DropConvertData(counts, is.counts=TRUE)
 
@@ -59,7 +60,7 @@
 
 	# monocle Object
 	require("monocle")
-	obj <- suppressWarnings(newCellDataSet(lognorm))
+	obj <- suppressWarnings(newCellDataSet(as.matrix(lognorm)))
 	expr_mat <- M3DropConvertData(obj, is.log=TRUE)
 }
 \keyword{normalization}

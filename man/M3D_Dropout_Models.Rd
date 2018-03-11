@@ -18,7 +18,8 @@
 \value{Invisibly, a list of output from each fit (MMfit, LogiFit, ExpoFit).}
 \examples{
   library(M3DExampleData)
-  M3DropDropoutModels(Mmus_example_list$data)
+  norm <- M3DropConvertData(Mmus_example_list$data, is.counts=TRUE)
+  M3DropDropoutModels(norm)
 } 
 
 \references{

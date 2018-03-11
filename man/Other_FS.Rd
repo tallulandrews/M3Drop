@@ -9,13 +9,14 @@
 \usage{
 	irlbaPcaFS(expr_mat, pcs=c(2,3))
 	giniFS(expr_mat, suppress.plot=TRUE)
-	corFS(expr_mat, dir=c("both", "pos", "neg"))
+	corFS(expr_mat, dir=c("both", "pos", "neg"), fdr=NULL)
 }
 \arguments{
-  \item{expr_mat}{normalized but not log-transformed gene expression matrix, rows=genes, cols=cells}
-  \item{pcs}{which principle components to use to score genes}
+  \item{expr_mat}{normalized but not log-transformed gene expression matrix, rows=genes, cols=cells.}
+  \item{pcs}{which principle components to use to score genes.}
   \item{suppress.plot}{whether to plot the gene expression vs Gini score.}
-  \item{dir}{direction of correlation to consider}
+  \item{dir}{direction of correlation to consider.}
+  \item{fdr}{apply an fdr threshold for significant features.}
 }
 \details{
 
@@ -28,7 +29,7 @@
 }
 \examples{
 library(M3DExampleData)
-norm <- Mmus_example_list$data[1:1000,];
+norm <- M3DropConvertData(Mmus_example_list$data[1:500,]);
 Features_gini <- giniFS(norm, suppress.plot=FALSE);
 Features_cor <- corFS(norm);
 Features_pca <- irlbaPcaFS(norm);

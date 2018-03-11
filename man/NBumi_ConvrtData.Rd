@@ -55,6 +55,7 @@
 	input_counts <- NBumiConvertData(lognorm)
 
 	# Sparse matrix
+	require("Matrix")
 	counts <- Matrix(counts, sparse=TRUE)
 	input_counts <- NBumiConvertData(counts, is.counts=TRUE)
 
@@ -65,7 +66,7 @@
 
 	# monocle Object
 	require("monocle")
-	obj <- suppressWarnings(newCellDataSet(lognorm))
+	obj <- suppressWarnings(newCellDataSet(as.matrix(lognorm)))
 	input_counts <- NBumiConvertData(obj, is.log=TRUE)
 }
 \keyword{normalization}

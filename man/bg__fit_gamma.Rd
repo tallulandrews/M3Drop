@@ -16,7 +16,7 @@
 }
 \value{list with two entries: shape and size.}
 \examples{
- dat <- rgamma(100)
+ dat <- rgamma(100, 0.1, 1)
  params <- bg__fit_gamma(dat)
 }
 \keyword{simulations}

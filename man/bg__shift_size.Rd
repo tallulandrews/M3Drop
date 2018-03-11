@@ -18,10 +18,10 @@
 }
 \value{vector of new size parameters}
 \examples{
-counts <- as.matrix(Mmus_example_list$data);
-counts <- counts[rowSums(counts) > 0,];
-fit <- NBumiFitModel(counts);
-ceoffs <- NBumiFitDispVsMean(fit, suppress.plot=TRUE)
-new_size <- bg__shift_size(rowMeans(counts), fit$size, rowMeans(counts)*2, coeffs)
+#require("M3DExampleData")
+#counts <- NBumiConvertData(Mmus_example_list$data, is.counts=TRUE);
+#fit <- NBumiFitModel(counts);
+#ceoffs <- NBumiFitDispVsMean(fit, suppress.plot=TRUE)
+#new_size <- bg__shift_size(rowMeans(counts), fit$size, rowMeans(counts)*2, coeffs)
 }
 \keyword{simulations}

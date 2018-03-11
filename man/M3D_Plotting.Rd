@@ -8,8 +8,8 @@
 }
 \usage{
 	bg__dropout_plot_base(expr_mat, xlim=NA, suppress.plot=FALSE)
-	bg__add_model_to_plot(fitted_model, base_plot, lty=1, lwd=1, col="black", legend_loc="topright")
-	bg__highlight_genes(base_plot, expr_mat, genes, col="purple", pch=16)
+	bg__add_model_to_plot(fitted_model, base_plot, lty=1, lwd=1, col="dodgerblue", legend_loc="topright")
+	bg__highlight_genes(base_plot, expr_mat, genes, col="darkorange", pch=16)
 }
 \arguments{
   \item{expr_mat}{a numeric matrix of normalized (not log-transformed) expression values, columns = samples, rows = genes.}
@@ -22,7 +22,7 @@
   \item{col,lty,lwd,pch}{Graphical parameters passed to plotted points & lines respectively.}
 }
 \details{ 
-\code{bg__dropout_plot_base} plots rainbow-coloured distribution of dropout-rate vs log10(mean expression) for each each. Colour indicates density of points blue = low, red = high.
+\code{bg__dropout_plot_base} plots grey-scale distribution of dropout-rate vs log10(mean expression) for each each. Colour indicates density of points light-grey = low, black = high.
 
 \code{bg__add_model_to_plot} adds a line based on the predicted dropout rate for each gene from a particular model.
 

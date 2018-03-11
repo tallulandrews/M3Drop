@@ -15,12 +15,17 @@
 #this program . If not , see <http://www.gnu.org/licenses/>.
 
 M3DropConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=1) {
+	remove_undetected_genes <- function(mat) {
+		no_detect <- rowSums(mat > 0, na.rm=T) == 0;
+		print(paste("Removing ",sum(no_detect), "undetected genes."))
+		return(mat[!no_detect,])
+	}
 	type <- class(input)[1]
 	lognorm <- NULL
 	counts <- NULL
 	if (type == "SCESet") {
 		# Old scater
-		lognorm <- exprs(input)
+		lognorm <- scater::exprs(input)
 		counts <- counts(input)
 
 	} else if (type == "SingleCellExperiment") {
@@ -37,9 +42,9 @@ M3DropConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=
 	} else if (type == "CellDataSet" | type == "ExpressionSet") {
 		# monocle
 		if (is.log) {
-			lognorm <- exprs(input)
+			lognorm <- Biobase::exprs(input)
 		} else {
-			counts <- exprs(input)
+			counts <- Biobase::exprs(input)
 		}
 	} else if (type == "seurat") {
 		# Seurat
@@ -60,7 +65,7 @@ M3DropConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=
 		} else if (is.counts) {
 			counts <- input
 		} else {
-			return(input);
+			return(remove_undetected_genes(input));
 		}
 	} else {
 		stop(paste("Error: Unrecognized input format :", type))
@@ -68,7 +73,9 @@ M3DropConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=
 
 	# Prefer log-norm to raw counts
 	if (!is.null(dim(lognorm))) {
-		return(2^lognorm-1)
+		norm <- 2^lognorm-pseudocount
+		norm <- remove_undetected_genes(norm);
+		return(norm)
 	} 
 
 	# CPM transform raw counts
@@ -78,7 +85,9 @@ M3DropConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=
 		} else {
 			sf <- colSums(counts)
 		}
-		return( t( t(counts)/sf * median(sf) ) )
+		norm <- t( t(counts)/sf * median(sf) )
+		norm <- remove_undetected_genes(norm)
+		return( norm )
 	}
 }
 
