@@ -44,12 +44,12 @@ Default values of base_means, K, and dispersion_fun were fit to the Buettner et 
 		TP : a vector of row IDs of those genes that change (true positives).
 }
 \examples{
-  means = c(1,2,5,10,20,50,100,200,500,1000,2000,5000)
-  population1 <- bg__MakeSimData(n_cells=10, base_means=means)
-  population2 <- bg__MakeSimData(n_cells=10, base_means=means*2, dispersion_factor=0.5)
-  sim_DE <- bg__MakeSimDE(n_cells=100, base_means=means)
-  sim_DVar <- bg__MakeSimDVar(n_cells=100, sub_pop=0.25, base_means=means)
-  sim_HVar <- bg__MakeSimHVar(base_means=means, fold_change=3)
+#  means = c(1,2,5,10,20,50,100,200,500,1000,2000,5000)
+#  population1 <- bg__MakeSimData(n_cells=10, base_means=means)
+#  population2 <- bg__MakeSimData(n_cells=10, base_means=means*2, dispersion_factor=0.5)
+#  sim_DE <- bg__MakeSimDE(n_cells=100, base_means=means)
+#  sim_DVar <- bg__MakeSimDVar(n_cells=100, sub_pop=0.25, base_means=means)
+#  sim_HVar <- bg__MakeSimHVar(base_means=means, fold_change=3)
 }
 \keyword{simulations, differential expression, differential variance}
 \references{

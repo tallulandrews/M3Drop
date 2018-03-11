@@ -19,10 +19,10 @@ Default coefficients were fit to the Buettner at al.[1] single cell mESC data.
 \value{the dispersion parameter (1/size) for the (mu,size) paramterization of the \code{rnbinom} function.
 }
 \examples{
- mu <- 100
- r <- bg__default_mean2disp(mu)
- n_cells <- 50
- sim <- rnbinom(n_cells, size=1/r, mu=mu)
+# mu <- 100
+# r <- bg__default_mean2disp(mu)
+# n_cells <- 50
+# sim <- rnbinom(n_cells, size=1/r, mu=mu)
 }
 \keyword{simulations}
 \references{
