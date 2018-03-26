@@ -18,7 +18,7 @@ irlbaPcaFS <- function(expr_mat, pcs=c(2,3)) {
 	# Create sparse Matrix
 
 	gene_names <- rownames(norm);
-	norm <- as(norm, "sparseMatrix")
+	norm <- Matrix::Matrix(norm, sparse=TRUE)
 	rownames(norm) <- gene_names
 	#indices <- which(norm > 0, arr.ind=TRUE)
 	#vals <- norm[indices]
@@ -157,9 +157,13 @@ giniFS <- function(expr_mat, suppress.plot=TRUE) {
 corFS <- function(expr_mat, dir=c("both", "pos", "neg"), fdr=NULL) {
 	# High memory
 	expr_mat <- as.matrix(expr_mat);
-	cor_mat = Hmisc::rcorr(t(expr_mat), type="spearman")
-	p_mat <- cor_mat$P
-	cor_mat <- cor_mat$r
+	if (!is.null(fdr)) {
+		cor_mat = Hmisc::rcorr(t(expr_mat), type="spearman")
+		p_mat <- cor_mat$P
+		cor_mat <- cor_mat$r
+	} else {
+		cor_mat <- cor(t(expr_mat), method="spearman")
+	}
 	diag(cor_mat) <- 0
 	if (dir[1] == "both") {
 		score = apply(cor_mat, 1, function(x) {sum(abs(min(x)), abs(max(x)))})

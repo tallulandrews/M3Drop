@@ -338,6 +338,7 @@ NBumiFeatureSelectionCombinedDrop <- function(fit, ntop=NULL, fdr=2, suppress.pl
 	reorder <- order(pvalue, droprate_exp-droprate_obs) # deal with ties (e.g. lots of zero p-values)
 
 	out <- pvalue[reorder]
+	diff <- diff[reorder]
 	qval <- p.adjust(out, method="fdr")
 	if (is.null(ntop)) {
 		out <- out[qval < fdr]
