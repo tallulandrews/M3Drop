@@ -287,4 +287,3 @@ Tallulah Andrews, Martin Hemberg. Modelling dropouts allows for unbiased identif
 Philip Brennecke, Simon Anders, Jong Kyoung Kim, Aleksandra A Kolodziejczyk, Xiuwei Zhang, Valentina Proserpio, Bianka Baying, Vladimir Benes, Sarah A Teichmann, John C Marioni and Marcus G Heisler. Accounting for technical noise in single-cell RNA-seq experiments. \textit{Nature Methods}, 10:1093-1095, 2013. doi:10.1038/nmeth.2645, PMID: 24056876
 
 \end{document}
-

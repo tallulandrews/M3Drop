@@ -11,6 +11,11 @@ Installation :
 >require("devtools")
 >install_github('tallulandrews/M3Drop')
 
+OR
+
+>source("https://bioconductor.org/biocLite.R")
+>biocLite("M3Drop")
+
 Example Data:
 
 >require("devtools")
@@ -20,6 +25,5 @@ OR
 
 >source("https://bioconductor.org/biocLite.R")
 >biocLite("M3DExampleData")
->biocLite("M3Drop")
 
 Read More: DOI: 10.1101/065094
