@@ -302,7 +302,7 @@ obsolete__nbumiFeatureSelectionDropouts <- function(fit) {
 	return(sort(pvalue))
 }
 
-NBumiFeatureSelectionCombinedDrop <- function(fit, ntop=NULL, fdr=2, suppress.plot=TRUE) {
+NBumiFeatureSelectionCombinedDrop <- function(fit, ntop=NULL, method="fdr", qval.thresh=2, suppress.plot=TRUE) {
 	# Global mean-variance, gene-specific mean
 	vals <- fit$vals;
 
@@ -339,11 +339,11 @@ NBumiFeatureSelectionCombinedDrop <- function(fit, ntop=NULL, fdr=2, suppress.pl
 
 	out <- pvalue[reorder]
 	diff <- diff[reorder]
-	qval <- p.adjust(out, method="fdr")
+	qval <- p.adjust(out, method=method)
 	if (is.null(ntop)) {
-		out <- out[qval < fdr]
-		diff <- diff[qval < fdr]
-		qval <- qval[qval < fdr]
+		out <- out[qval < qval.thresh]
+		diff <- diff[qval < qval.thresh]
+		qval <- qval[qval < qval.thresh]
 	} else {
 		out <- out[1:ntop]
 		diff <- diff[1:ntop]
