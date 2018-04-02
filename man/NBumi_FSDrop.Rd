@@ -11,7 +11,8 @@
 \arguments{
   \item{fit}{output from NBumiFitModel or NBumiFitBasicModel.}
   \item{ntop}{number of top ranked genes to return}
-  \item{fdr}{significant threshold}
+  \item{method}{correction method for multiple comparisons (check ?p.adjust.methods for more details)}
+  \item{qval.thresh}{significant threshold}
   \item{suppress.plot}{logical, whether to plot the fitted curve and highlight selected features}
 }
 \details{
