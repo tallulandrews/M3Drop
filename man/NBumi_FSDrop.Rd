@@ -5,7 +5,7 @@
 	Ranks genes by significance of increase in dropouts compared to expectation.
 }
 \usage{
-	NBumiFeatureSelectionCombinedDrop(fit, ntop=NULL, fdr=2, suppress.plot=TRUE)
+	NBumiFeatureSelectionCombinedDrop(fit, ntop=NULL, method="fdr", qval.thresh=2, suppress.plot=TRUE)
 	
 }
 \arguments{
@@ -27,13 +27,13 @@
 		Gene 
 		effect_size (difference between observed and expected dropout rate)
 		p.value
-		q.value (fdr corrected)
+		q.value (corrected by adjustment method specifed by the method argument)
 }
 \examples{
 	library(M3DExampleData)
 	counts <- NBumiConvertData(Mmus_example_list$data)
 	fit <- NBumiFitModel(counts);
-	Drop_features <- names(NBumiFeatureSelectionCombinedDrop(fit, fdr=0.05));
+	Drop_features <- names(NBumiFeatureSelectionCombinedDrop(fit, qval.thresh=0.05));
 }
 \keyword{single cell}
 \keyword{feature selection}
