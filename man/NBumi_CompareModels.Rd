@@ -18,10 +18,14 @@
 	model is calculated. And a plot of fitted and observed mean-expression vs dropouts is created.
 }
 \value{
-	Vector of errors for each model.
+	A named list containing: 
+		errors : Vector of errors for each model.
+		basic_fit : object for the basic negative binomial.
+		adjusted_fit : object for the depth-adjusted negative binomial.
 }
 \examples{
 	library(M3DExampleData)
 	counts <- NBumiConvertData(Mmus_example_list$data)
-	coeffs <- NBumiCompareModels(counts);
+	out <- NBumiCompareModels(counts);
+	out$errors
 }

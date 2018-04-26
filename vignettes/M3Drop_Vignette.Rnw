@@ -170,6 +170,9 @@ print(c(stats$gene_error,stats$cell_error))
 \textbf{Figure 3}: Fits of the depth-adjusted negative binomial.
 \end{center}
 
+Since this is a full-transcript dataset that we have converted from normalized values the model 
+doesn't fit well as can be seen above. We will continue with this data for demonstration purposes only.
+
 We use a binomial test to evaluable the significance of features under the DANB
 model:
 

@@ -150,7 +150,7 @@ NBumiCompareModels <- function(counts, size_factor=(colSums(counts)/median(colSu
 	err_bas <- sum(abs(check_basic$rowPs/nc-fit_adjust$vals$djs/nc))
 	legend("bottomleft", paste(c("Depth-Adjusted\nError:", "Basic\nError:"), round(c(err_adj, err_bas)), c("\n","\n")), col=c("goldenrod1","purple"), pch=16, bty="n", cex=0.75)
 	out <- c(err_adj, err_bas); names(out) <- c("Depth-Adjusted", "Basic");
-	return(out)
+	return(list(errors=out, basic_fit=fit_basic, adjusted_fit=fit_adjust))
 }
 
 obsolete__fit_size_to_drop <- function(obs, mu_vec, max_size, min_size=10^-10, convergence=0.001) {
