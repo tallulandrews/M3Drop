@@ -132,6 +132,9 @@ NBumiCheckFitFS <- function(counts, fit, suppress.plot=FALSE) {
 
 
 NBumiCompareModels <- function(counts, size_factor=(colSums(counts)/median(colSums(counts)))) {
+	if (max(counts) < max(size_factor)) {
+		stop("Error: size factors are too large");
+	}
 	norm <- NBumiConvertToInteger(t(t(counts)/size_factor));
 	counts <- counts[rownames(counts) %in% rownames(norm),]; # necessary for plotting
 	fit_adjust <- NBumiFitModel(counts);
