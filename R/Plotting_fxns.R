@@ -217,7 +217,11 @@ M3DropGetHeatmapClusters <- function (heatout, k, type="cell") {
                 curr_k <- curr_k-1+length(children)
         }
         # Make group vector
-        names_orig_order <- labels(dendro)[order(heatout$colInd)]
+	if (grepl("gene",type) | grepl("row",type)) {
+	        names_orig_order <- labels(dendro)[order(heatout$rowInd)]
+	} else if (grepl("cell",type) | grepl("col",type)) {
+		names_orig_order <- labels(dendro)[order(heatout$colInd)]
+	}
         groups <- rep(0, times=length(names_orig_order))
         for (i in 1:length(dendro_list)) {
                 groups[names_orig_order %in% labels(dendro_list[[i]])] <- i
