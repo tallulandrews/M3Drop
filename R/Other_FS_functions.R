@@ -183,7 +183,7 @@ corFS <- function(expr_mat, dir=c("both", "pos", "neg"), fdr=NULL) {
 	return(sort(-score))
 }
 
-Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=nrow(counts)), pcs=c(2,3)) {
+Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=nrow(counts)), pcs=c(2,3), include_cors=TRUE) {
 	# Check input
 	#if (!is.matrix(counts)) {
 	#	counts <- as.matrix(counts);
@@ -231,12 +231,17 @@ Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=nrow(counts)
 	# pca
 	pca_fs <- irlbaPcaFS(norm, pcs=pcs) 
 	# cor
-	cor_fs <- corFS(norm)
+	if (include_cors) {
+		cor_fs <- corFS(norm)
+	} else {
+		cor_fs <- rep(-1, times=nrow(norm));
+		names(cor_fs) <- rownames(norm);
+	}
 
 	# sort by mean_rank of each gene.
 	ranks <- 1:nrow(norm);
 	ref_order <- rownames(counts); 
-	table <- data.frame(
+	out_table <- data.frame(
 		DANB_drop = ranks[match(ref_order, DANB$Gene)],
 		DANB_var = ranks[match(ref_order, names(DANB_var))],
 		M3Drop = ranks[match(ref_order, m3drop$Gene)],
@@ -245,10 +250,13 @@ Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=nrow(counts)
 		Cor = ranks[match(ref_order, names(cor_fs))],
 		Gini = ranks[match(ref_order, names(gini))]
 		)
-	rownames(table) <- ref_order;
-	consensus_score = rowMeans(table, na.rm=TRUE);
-	table <- table[order(consensus_score),]
-	table$Cons <- 1:nrow(table) # currently adding this in plotting scripts
+	if (!include_cors) {
+		out_table$Cor <- rep(-1, times=nrow(out_table));
+	}
+	rownames(out_table) <- ref_order;
+	consensus_score <- rowMeans(out_table, na.rm=TRUE);
+	out_table <- out_table[order(consensus_score),]
+	out_table$Cons <- 1:nrow(out_table) 
 
-	return(table)
+	return(out_table)
 }

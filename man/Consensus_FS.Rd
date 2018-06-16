@@ -5,13 +5,14 @@
 	Performs seven different feature selection methods then calculates the consensus ranking of features from that.
 }
 \usage{
-	Consensus_FS(counts, norm=NA, is.spike=rep(FALSE, times=nrow(counts)), pcs=c(2,3))
+	Consensus_FS(counts, norm=NA, is.spike=rep(FALSE, times=nrow(counts)), pcs=c(2,3), include_cors=TRUE)
 }
 \arguments{
   \item{counts}{raw count matrix, rows=genes, cols=cells}
   \item{norm}{normalized but not log-transformed gene expression matrix, rows=genes, cols=cells}
   \item{is.spike}{logical, vector of whether each gene is/isn't a spike-in}
   \item{pcs}{which principle components to use to score genes}
+  \item{include_cors}{logical, whether to perform gene-gene correlation feature selection which is much slower than all other methods.}
 }
 \details{
 
