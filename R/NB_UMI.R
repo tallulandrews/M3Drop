@@ -3,6 +3,7 @@ hidden_calc_vals <- function(counts) {
         if (sum(counts < 0) >0) {stop("Expression matrix contains negative values! Please provide raw UMI counts!")}
 	if ( sum(counts >= 1) != sum(counts > 0) ) {stop("Error: Expression matrix is not integers! Please provide raw UMI counts.")}
 #        if (sum(!is.integer(counts)) >0) {stop("Expression matrix is not integers! Please provide a matrix (not data.frame) raw UMI counts!")}
+	if (is.null(rownames(counts))) { rownames(counts) <- as.character(1:nrow(counts)) }
 
         tjs <- rowSums(counts, na.rm=T) # Total molecules/gene
 	no_detect <- sum(tjs <= 0)
