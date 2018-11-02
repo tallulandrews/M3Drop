@@ -565,10 +565,10 @@ NBumiConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=1
 		# New scater
 		c <- which(names(input@assays) == "counts")
 		ln <- which(names(input@assays) == "logcounts")
-		if (length(ln) > 0) {
-			lognorm <- input@assays[[ln]]
-		} else if (length(c) > 0) {
+		if (length(c) > 0) {
 			counts <- input@assays[[c]]
+		} else if (length(ln) > 0) {
+			lognorm <- input@assays[[ln]]
 		} else {
 			stop("Error: Recognized SingleCellExperiment object but cannot find either counts or lognorm expression.")
 		}
@@ -621,11 +621,12 @@ NBumiConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=1
 		norm <- 2^lognorm-pseudocount
 	}
 	if (!is.null(dim(norm))) {
-		sf <- colSums(norm)
-		detected <- colSums(norm > 0);
-		detected <- detected/median(detected);
-		libsize <- detected*median(sf)
-		counts <- t( t(norm/sf*libsize) )
+		sf <- apply(norm, 2, function(x){min(x[x>0])}) #colSums(norm)
+		sf <- 1/sf
+		#detected <- colSums(norm > 0);
+		#detected <- detected/median(detected);
+		#libsize <- detected*median(sf)
+		counts <- t( t(norm)/sf) #*libsize) )
 		counts <- ceiling(counts)
 		counts <- remove_undetected_genes(counts);
 		return(counts)
