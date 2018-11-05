@@ -178,7 +178,7 @@ model:
 
 \begin{center}
 <<fig=TRUE>>=
-NBDropFS <- NBumiFeatureSelectionCombinedDrop(DANB_fit, fdr=0.01, suppress.plot=FALSE)
+NBDropFS <- NBumiFeatureSelectionCombinedDrop(DANB_fit, method="fdr", qval.thres=0.01, suppress.plot=FALSE)
 @
 \textbf{Figure 4}: Dropout-based feature selection using DANB
 \end{center}

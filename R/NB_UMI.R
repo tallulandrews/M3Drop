@@ -55,7 +55,9 @@ NBumiFitModel <- function(counts) {
 NBumiFitBasicModel <- function(counts) {
 	vals <- hidden_calc_vals(counts);
 	mus <- vals$tjs/vals$nc
-	v <- Matrix::rowVars(counts)
+	gm <- Matrix::rowMeans(counts)
+	v <- Matrix::rowSums((counts-gm)^2)/(ncol(counts)-1)
+	#v <- matrixStats::rowVars(counts)
 	errs <- v < mus;
 	v[errs] <- mus[errs]+10^-10;
 	size <- mus^2/(v-mus)
@@ -243,7 +245,7 @@ hidden_shift_size <- function(mu_all, size_all, mu_group, coeffs) {
 	return(size_group)
 }
 
-obsolete__nbumiFeatureSelectionHighVarDist2Med <- function(fit, window_size=1000) {
+obsolete__nbFeatureSelectionHighVarDist2Med <- function(fit, window_size=1000) {
 	vals <- fit$vals;
 	mean_order <- order(vals$tjs);
 	obs_mean <- vals$tjs[mean_order]/vals$nc
@@ -275,7 +277,7 @@ NBumiFeatureSelectionHighVar <- function(fit) {
 	return(sort(res))
 }
 
-obsolete__nbumiFeatureSelectionDropouts <- function(fit) {
+obsolete__nbFeatureSelectionDropouts <- function(fit) {
 	# Gene-specific variance, mean
 	vals <- fit$vals;
 	size_mat <- matrix(rep(fit$sizes, times=vals$nc), ncol=vals$nc, byrow=F)
@@ -428,7 +430,7 @@ PoissonUMIFeatureSelectionDropouts <- function(fit) {
 
 # HERE HERE HERE - editing for Matrix sparse-matrix compatibility #
 
-bg__nbumiGroupDE <- function(counts, fit, groups) {
+unfinished__nbGroupDE <- function(counts, fit, groups) {
 	# Global mean-variance, gene-specific variance & mean
 	vals <- fit$vals;
 	size_g <- fit$sizes
@@ -472,7 +474,7 @@ bg__nbumiGroupDE <- function(counts, fit, groups) {
 }
 
 
-broken__nbumiCGroupDE <- function(counts, fit, groups) {
+broken__nbCGroupDE <- function(counts, fit, groups) {
 	# Seg faults!
 	if (!is.factor(groups)) {
 		groups <- factor(groups);
@@ -503,7 +505,7 @@ broken__nbumiCGroupDE <- function(counts, fit, groups) {
 	return(output);
 }
 
-hidden_nbumiImputeZeros <- function(counts, fit) {
+hidden_nbImputeZeros <- function(counts, fit) {
 	vals <- fit$vals
 	for (i in 1:nrow(counts)) {
 		mu_is <- vals$tjs[i]*vals$tis/vals$total

@@ -5,7 +5,7 @@
 	Compares the fit of the depth-adjusted negative binomial model and basic negative binomial model.
 }
 \usage{
-	NBumiCompareModels(counts, size_factor=(colSums(counts)/median(colSums(counts))))
+	NBumiCompareModels(counts, size_factor=(Matrix::colSums(counts)/median(Matrix::colSums(counts))))
 }
 \arguments{
   \item{counts}{a numeric matrix of raw UMI counts, columns = samples, rows = genes.}

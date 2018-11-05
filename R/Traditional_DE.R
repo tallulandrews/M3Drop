@@ -21,7 +21,7 @@ hidden_get_K <- function(expr_mat) {
 }
 
 bg__get_mean2disp <- function(expr_mat) {
-	cv2 <- Matrix::rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
+	cv2 <- matrixStats::rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
 	xes <- log(rowMeans(expr_mat, na.rm=T))/log(10)
 	reg <- lm(log(cv2[xes > 0])~xes[xes>0])
 	mean2disp_fun <- function(mu){
@@ -35,7 +35,7 @@ bg__get_mean2disp <- function(expr_mat) {
 }
 
 bg__fitdispersion <- function(expr_mat) {
-	V <- Matrix::rowVars(expr_mat)
+	V <- matrixStats::rowVars(expr_mat)
 	mu <- rowMeans(expr_mat)
 	xes <- log(mu)/log(10)
 	V[V <= mu] <- mu[V <= mu]+10^-10;
@@ -46,7 +46,7 @@ bg__fitdispersion <- function(expr_mat) {
 }
 
 hidden__cv2coeffs <- function(expr_mat) {
-	cv2 <- Matrix::rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
+	cv2 <- matrixStats::rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
 	xes <- log(rowMeans(expr_mat, na.rm=T))/log(10)
 	reg <- lm(log(cv2[xes > 0])~xes[xes>0])
 	return(c(reg$coeff[1], reg$coeff[2]))
@@ -64,7 +64,7 @@ hidden_calc_p <- function(obs, mu, K, disp) {
 	}
 	return(p);
 }
-bg__m3dropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
+unfinished__m3dTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
 	# Batch-specific mean-variance
 	# Check Input
 	if (!is.factor(batches)) {
@@ -122,7 +122,7 @@ bg__m3dropTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=lengt
 }
 
 
-broken__m3dropCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
+broken__m3dCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
 	# Seg faults!
 	# Check Input
 	if ( length(groups) != length(expr_mat[1,])) {
@@ -163,7 +163,7 @@ broken__m3dropCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
 	return(AllOut);
 }
 
-bg__m3dropTraditionalDEShiftDisp <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
+unfinished__m3dTraditionalDEShiftDisp <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
 	# Batch specific mean-variance, gene-specific variance.
 	# Check Input
 	if (!is.factor(batches)) {
@@ -186,7 +186,7 @@ bg__m3dropTraditionalDEShiftDisp <- function(expr_mat, groups, batches=rep(1, ti
 
 	Ms <- rowMeans(expr_mat, na.rm=T)
 	Mis <- by(t(expr_mat), groups, colMeans)
-	V <- Matrix::rowVars(expr_mat)
+	V <- matrixStats::rowVars(expr_mat)
 	V[V<=Ms] <- Ms[V<=Ms] + 10^-10;
 	nb_size <- Ms^2/(V-Ms); # gene-specific dataset-wide dispersion
 

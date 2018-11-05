@@ -8,26 +8,21 @@
 	Performs traditional (i.e. compare defined groups) differential expression using a negative binomial model with MM zero-inflation. Functions tagged with "bg__" are not meant for direct usage and are not available in the Bioconductor release.
 }
 \usage{
-	bg__m3dropTraditionalDE(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05)
-	bg__m3dropTraditionalDEShiftDisp(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05)
 	bg__get_mean2disp(expr_mat)
 	bg__fitdispersion(expr_mat)
 }
 \arguments{
   \item{expr_mat}{a numeric matrix of library-size normalized expression values, columns = samples, rows = genes.}
-  \item{groups}{a vector of biological group IDs for each cell(columns).}
-  \item{batches}{a vector of technical batch IDs for each cell(columns)}
-  \item{fdr}{false discovery rate threshold for returning results.}
 }
 \details{
-THIS FUNCTION SHOULD BE CONSIDERED UNSTABLE.
+THESE FUNCTIONS SHOULD NOT BE USED.
 
-\code{bg__m3dropTraditionalDE} : Uses a log-likelihood ratio test to perform model selection between a model of constant mean expression vs a model of different mean expression across the biological groups. 
+\code{unfinished__m3dropTraditionalDE} : Uses a log-likelihood ratio test to perform model selection between a model of constant mean expression vs a model of different mean expression across the biological groups. 
 Probabilities of observing the data given the model are calculated using a zero-inflated negative binomial distribution. Global relationships between mean and dispersion (power-law) as well as mean and 
 dropouts (Michaelis-Menten) for genes are fit independently for each batch. Dispersions are fixed for each batch and calculated using the fitted power-law using the global mean expression of each gene.
 Significance is evaluated using the chi-square distribution.
 
-\code{bg__m3dropTraditionalDEShiftDisp}: Uses a log-likelihood ratio test to perform model selection between a model of constant mean expression vs a model of different mean expression across the biological groups. 
+\code{unfinished__m3dropTraditionalDEShiftDisp}: Uses a log-likelihood ratio test to perform model selection between a model of constant mean expression vs a model of different mean expression across the biological groups. 
 Probabilities of observing the data given the model are calculated using a zero-inflated negative binomial distribution. Global relationships between mean and dispersion (power-law) as well as mean and 
 dropouts (Michaelis-Menten) for genes are fit independently for each batch. Dispersions are shifted from the global variance according to the mean expression for each biological group, using batch-specific power-laws.
 Significance is evaluated using the chi-square distribution.

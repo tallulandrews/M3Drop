@@ -6,8 +6,6 @@
 	Ineffective alternative feature selection methods based on the depth-adjusted negative binomial model. Functions tagged with "bg__" are not meant for direct usage and are not available in the Bioconductor release.
 }
 \usage{
-	obsolete__nbumiFeatureSelectionDropouts(fit)
-	obsolete__nbumiFeatureSelectionHighVarDist2Med(fit, window_size=1000)
 	
 }
 \arguments{
