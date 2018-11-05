@@ -16,7 +16,7 @@
 
 M3DropConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=1) {
 	remove_undetected_genes <- function(mat) {
-		no_detect <- rowSums(mat > 0, na.rm=T) == 0;
+		no_detect <- Matrix::rowSums(mat > 0, na.rm=T) == 0;
 		print(paste("Removing ",sum(no_detect), "undetected genes."))
 		return(mat[!no_detect,])
 	}
@@ -80,11 +80,7 @@ M3DropConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=
 
 	# CPM transform raw counts
 	if (!is.null(dim(counts))) {
-		if (class(counts)[1] == "dgCMatrix"){
-			sf <- Matrix::colSums(counts)
-		} else {
-			sf <- colSums(counts)
-		}
+		sf <- Matrix::colSums(counts)
 		norm <- t( t(counts)/sf * median(sf) )
 		norm <- remove_undetected_genes(norm)
 		return( norm )
@@ -123,11 +119,11 @@ bg__calc_variables <- function(expr_mat) {
         warning("Warning: Expression matrix contains few zero values (dropouts) this may lead to poor performance.")
     }
     
-    p <- 1 - rowSums(expr_mat > 0)/ncol(expr_mat)
+    p <- 1 - Matrix::rowSums(expr_mat > 0)/ncol(expr_mat)
     if (sum(p == 1) > 0) {
 	warning(paste("Warning: Removing", sum(p==1),"undetected genes."))
 	expr_mat <- expr_mat[p < 1,]
-        p <- 1-rowSums(expr_mat > 0)/ncol(expr_mat)
+        p <- 1-Matrix::rowSums(expr_mat > 0)/ncol(expr_mat)
     }
 
     p_stderr <- sqrt(p*(1-p)/ncol(expr_mat))

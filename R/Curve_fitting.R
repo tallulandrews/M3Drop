@@ -50,7 +50,7 @@ hidden__fit_MM_lognormal<-function(p,s){
 			IQR <- Qs[2]-Qs[1];
 
 			thing <- densCols(p_c, log(s_c)/log(10), colramp = colorRampPalette(c("black","white")));
-			dens <- colSums(col2rgb(thing))
+			dens <- Matrix::colSums(col2rgb(thing))
 			thresh <- quantile(dens, prob=0.05);
 
 			R <- R[dens > thresh]

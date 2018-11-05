@@ -150,8 +150,8 @@ obsolete__calc_DE_stats <- function(expr_mat, TP, Observed_Means, mt_threshold=0
 	M3Drop_col="black"
 	HVG_col="forestgreen"
 
-        expr_mat = expr_mat[rowSums(expr_mat) > 0,]
-        expr_mat = expr_mat[rowSums(expr_mat == 0) > 0,]
+        expr_mat = expr_mat[Matrix::rowSums(expr_mat) > 0,]
+        expr_mat = expr_mat[Matrix::rowSums(expr_mat == 0) > 0,]
         TP = TP[TP %in% rownames(expr_mat)]
 
         DE = M3DropFeatureSelection(expr_mat, mt_method = mt_method, mt_threshold=2, suppress.plot=TRUE)
@@ -255,8 +255,8 @@ hidden__calc_DE_stats_simplified <- function(expr_mat, TP, Observed_Means, mt_th
         # Test DE
         mt_method="fdr"
 
-        expr_mat = expr_mat[rowSums(expr_mat) > 0,]
-        expr_mat = expr_mat[rowSums(expr_mat == 0) > 0,]
+        expr_mat = expr_mat[Matrix::rowSums(expr_mat) > 0,]
+        expr_mat = expr_mat[Matrix::rowSums(expr_mat == 0) > 0,]
         TP = TP[TP %in% rownames(expr_mat)]
 
         DE = M3DropFeatureSelection(expr_mat, mt_method = mt_method, mt_threshold=2, suppress.plot=TRUE)
@@ -369,8 +369,8 @@ hidden__calc_DE_stats_fpr<- function(expr_mat, TP, Observed_Means, mt_threshold=
         # Test DE
         mt_method="fdr"
 
-        expr_mat = expr_mat[rowSums(expr_mat) > 0,]
-        expr_mat = expr_mat[rowSums(expr_mat == 0) > 0,]
+        expr_mat = expr_mat[Matrix::rowSums(expr_mat) > 0,]
+        expr_mat = expr_mat[Matrix::rowSums(expr_mat == 0) > 0,]
         TP = TP[TP %in% rownames(expr_mat)]
 
         DE = M3DropFeatureSelection(expr_mat, mt_method = mt_method, mt_threshold=2, suppress.plot=TRUE)
@@ -447,7 +447,7 @@ M3DropSimulationTrifecta <- function(original_data, n_genes=25000, n_cells=250, 
 	n_cells1 = round(n_cells*2*sub_pop_prop)
 	n_cells2 = round(n_cells*2*(1-sub_pop_prop))
 #	require("M3Drop")
-	tis = colSums(original_data)
+	tis = Matrix::colSums(original_data)
 	norm = t(t(original_data)/tis*median(tis))
 	Mjs = rowMeans(norm);
 	vals <- bg__calc_variables(norm)

@@ -5,15 +5,15 @@ hidden_calc_vals <- function(counts) {
 #        if (sum(!is.integer(counts)) >0) {stop("Expression matrix is not integers! Please provide a matrix (not data.frame) raw UMI counts!")}
 	if (is.null(rownames(counts))) { rownames(counts) <- as.character(1:nrow(counts)) }
 
-        tjs <- rowSums(counts, na.rm=T) # Total molecules/gene
+        tjs <- Matrix::rowSums(counts, na.rm=T) # Total molecules/gene
 	no_detect <- sum(tjs <= 0)
 	if (no_detect > 0) {
 		stop(paste("Error: contains",no_detect, "undetected genes."))
 	}
-        tis <- colSums(counts, na.rm=T) # Total molecules/cell
+        tis <- Matrix::colSums(counts, na.rm=T) # Total molecules/cell
 	if (sum(tis <= 0) > 0) {stop("Error: all cells must have at least one detected molecule.")}
-        djs <- ncol(counts)-rowSums(counts > 0, na.rm=T) # Observed Dropouts per gene
-        dis <- nrow(counts)-colSums(counts > 0, na.rm=T) # Observed Dropouts per cell
+        djs <- ncol(counts)-Matrix::rowSums(counts > 0, na.rm=T) # Observed Dropouts per gene
+        dis <- nrow(counts)-Matrix::colSums(counts > 0, na.rm=T) # Observed Dropouts per cell
         nc <- length(counts[1,]) # Number of cells
         ng <- length(counts[,1]) # Number of genes
         total <- sum(tis, na.rm=T) # Total molecules sampled
@@ -23,7 +23,7 @@ hidden_calc_vals <- function(counts) {
 NBumiConvertToInteger <- function(mat) {
         mat <- ceiling(as.matrix(mat))
         storage.mode(mat) <- "integer"
-        mat <- mat[rowSums(mat) > 0,]
+        mat <- mat[Matrix::rowSums(mat) > 0,]
         return(mat)
 }
 
@@ -55,7 +55,7 @@ NBumiFitModel <- function(counts) {
 NBumiFitBasicModel <- function(counts) {
 	vals <- hidden_calc_vals(counts);
 	mus <- vals$tjs/vals$nc
-	v <- rowVars(counts)
+	v <- Matrix::rowVars(counts)
 	errs <- v < mus;
 	v[errs] <- mus[errs]+10^-10;
 	size <- mus^2/(v-mus)
@@ -132,7 +132,7 @@ NBumiCheckFitFS <- function(counts, fit, suppress.plot=FALSE) {
 }
 
 
-NBumiCompareModels <- function(counts, size_factor=(colSums(counts)/median(colSums(counts)))) {
+NBumiCompareModels <- function(counts, size_factor=(Matrix::colSums(counts)/median(Matrix::colSums(counts)))) {
 	if (max(counts) < max(size_factor)) {
 		stop("Error: size factors are too large");
 	}
@@ -150,7 +150,7 @@ NBumiCompareModels <- function(counts, size_factor=(colSums(counts)/median(colSu
 	points( fit_adjust$vals$tjs/nc, check_basic$rowPs/nc, col="purple", pch=16, cex=0.5 )
 
 	err_adj <- sum(abs(check_adjust$rowPs/nc-fit_adjust$vals$djs/nc))
-#	err_bas <- sum(abs(rowSums(check_basic$exp_ps)/nc-fit_basic$vals$djs/nc))
+#	err_bas <- sum(abs(Matrix::rowSums(check_basic$exp_ps)/nc-fit_basic$vals$djs/nc))
 	err_bas <- sum(abs(check_basic$rowPs/nc-fit_adjust$vals$djs/nc))
 	legend("bottomleft", paste(c("Depth-Adjusted\nError:", "Basic\nError:"), round(c(err_adj, err_bas)), c("\n","\n")), col=c("goldenrod1","purple"), pch=16, bty="n", cex=0.75)
 	out <- c(err_adj, err_bas); names(out) <- c("Depth-Adjusted", "Basic");
@@ -292,9 +292,9 @@ obsolete__nbumiFeatureSelectionDropouts <- function(fit) {
 #	Exp_p <- (1+fit$mus/size_mat)^(-size_mat)
 #	Exp_p_var <- Exp_p*(1-Exp_p)
 
-#	droprate_exp <- rowSums(Exp_p)/vals$nc
+#	droprate_exp <- Matrix::rowSums(Exp_p)/vals$nc
 	droprate_exp[droprate_exp < 1/vals$nc] <- 1/vals$nc # Is this necessary?
-#	droprate_exp_err <- sqrt(rowSums(Exp_p_var)/(vals$nc^2))
+#	droprate_exp_err <- sqrt(Matrix::rowSums(Exp_p_var)/(vals$nc^2))
 	droprate_obs <- vals$djs/vals$nc
 	droprate_obs_err <- sqrt(droprate_obs*(1-droprate_obs)/vals$nc)
 
@@ -327,9 +327,9 @@ NBumiFeatureSelectionCombinedDrop <- function(fit, ntop=NULL, method="fdr", qval
 		droprate_exp_err[i] <- sqrt(sum(p_var_is)/(vals$nc^2));
 	}
 
-	#droprate_exp <- rowSums(Exp_p)/vals$nc
+	#droprate_exp <- Matrix::rowSums(Exp_p)/vals$nc
 	droprate_exp[droprate_exp < 1/vals$nc] <- 1/vals$nc # Is this necessary?
-	#droprate_exp_err <- sqrt(rowSums(Exp_p_var)/(vals$nc^2))
+	#droprate_exp_err <- sqrt(Matrix::rowSums(Exp_p_var)/(vals$nc^2))
 	droprate_obs <- vals$djs/vals$nc
 	droprate_obs_err <- sqrt(droprate_obs*(1-droprate_obs)/vals$nc)
 
@@ -384,9 +384,9 @@ PoissonUMIFeatureSelectionDropouts <- function(fit) {
 		droprate_exp_err[i] <- sqrt(sum(p_var_is)/(vals$nc^2));
 	}
 
-	#droprate_exp <- rowSums(Exp_p)/vals$nc
+	#droprate_exp <- Matrix::rowSums(Exp_p)/vals$nc
 	droprate_exp[droprate_exp < 1/vals$nc] <- 1/vals$nc # Is this necessary?
-	#droprate_exp_err <- sqrt(rowSums(Exp_p_var)/(vals$nc^2))
+	#droprate_exp_err <- sqrt(Matrix::rowSums(Exp_p_var)/(vals$nc^2))
 	droprate_obs <- vals$djs/vals$nc
 	droprate_obs_err <- sqrt(droprate_obs*(1-droprate_obs)/vals$nc)
 
@@ -437,7 +437,7 @@ bg__nbumiGroupDE <- function(counts, fit, groups) {
 	group_specific_factor <- group_specific_factor[,-1]
 	group_specific_factor <- t(group_specific_factor)
 	group_specific_tjs <- group_specific_factor; 
-	group_total <- colSums(group_specific_tjs)
+	group_total <- Matrix::colSums(group_specific_tjs)
 	group_specific_factor <- t(t(group_specific_tjs)/group_total) / (vals$tjs/vals$total) # Relative expression level in group vs across whole dataset.
 	group_specific_factor[vals$tjs == 0,] <- rep(1, length(group_specific_factor[1,]))
 
@@ -486,7 +486,7 @@ broken__nbumiCGroupDE <- function(counts, fit, groups) {
 	group_specific_factor <- group_specific_factor[,-1]
 	group_specific_factor <- t(group_specific_factor)
 	group_specific_tjs <- group_specific_factor; 
-	group_total <- colSums(group_specific_tjs)
+	group_total <- Matrix::colSums(group_specific_tjs)
 	group_specific_factor <- t(t(group_specific_tjs)/group_total) / (vals$tjs/vals$total) # Relative expression level in group vs across whole dataset.
 	group_specific_factor[vals$tjs == 0,] <- rep(1, length(group_specific_factor[1,]))
 
@@ -606,7 +606,7 @@ NBumiConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=1
 
 	# Prefer raw counts to lognorm
 	remove_undetected_genes <- function(mat) {
-		no_detect <- rowSums(mat > 0, na.rm=T) == 0;
+		no_detect <- Matrix::rowSums(mat > 0, na.rm=T) == 0;
 		print(paste("Removing ",sum(no_detect), "undetected genes."))
 		return(mat[!no_detect,])
 	}

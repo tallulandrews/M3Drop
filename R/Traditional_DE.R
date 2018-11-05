@@ -21,7 +21,7 @@ hidden_get_K <- function(expr_mat) {
 }
 
 bg__get_mean2disp <- function(expr_mat) {
-	cv2 <- rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
+	cv2 <- Matrix::rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
 	xes <- log(rowMeans(expr_mat, na.rm=T))/log(10)
 	reg <- lm(log(cv2[xes > 0])~xes[xes>0])
 	mean2disp_fun <- function(mu){
@@ -35,7 +35,7 @@ bg__get_mean2disp <- function(expr_mat) {
 }
 
 bg__fitdispersion <- function(expr_mat) {
-	V <- rowVars(expr_mat)
+	V <- Matrix::rowVars(expr_mat)
 	mu <- rowMeans(expr_mat)
 	xes <- log(mu)/log(10)
 	V[V <= mu] <- mu[V <= mu]+10^-10;
@@ -46,7 +46,7 @@ bg__fitdispersion <- function(expr_mat) {
 }
 
 hidden__cv2coeffs <- function(expr_mat) {
-	cv2 <- rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
+	cv2 <- Matrix::rowVars(expr_mat)/((rowMeans(expr_mat, na.rm=T))^2)
 	xes <- log(rowMeans(expr_mat, na.rm=T))/log(10)
 	reg <- lm(log(cv2[xes > 0])~xes[xes>0])
 	return(c(reg$coeff[1], reg$coeff[2]))
@@ -186,7 +186,7 @@ bg__m3dropTraditionalDEShiftDisp <- function(expr_mat, groups, batches=rep(1, ti
 
 	Ms <- rowMeans(expr_mat, na.rm=T)
 	Mis <- by(t(expr_mat), groups, colMeans)
-	V <- rowVars(expr_mat)
+	V <- Matrix::rowVars(expr_mat)
 	V[V<=Ms] <- Ms[V<=Ms] + 10^-10;
 	nb_size <- Ms^2/(V-Ms); # gene-specific dataset-wide dispersion
 

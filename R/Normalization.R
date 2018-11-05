@@ -18,11 +18,11 @@
 hidden__UQ <- function(x){quantile(x[x>0],0.75)};
 
 bg__filter_cells <- function(expr_mat,labels=NA, suppress.plot=FALSE, min_detected_genes=NA) {
-	num_detected <-  colSums(expr_mat > 0, na.rm=TRUE);
+	num_detected <-  Matrix::colSums(expr_mat > 0, na.rm=TRUE);
 	if (!is.na(min_detected_genes)) {
 		low_quality <- num_detected < min_detected_genes;
 	} else {
-		num_zero <- colSums(expr_mat == 0, na.rm=TRUE);
+		num_zero <- Matrix::colSums(expr_mat == 0, na.rm=TRUE);
 		cell_zero <- num_zero;
 		mu <- mean(cell_zero);
 		sigma <- sd(cell_zero);
@@ -50,7 +50,7 @@ bg__filter_cells <- function(expr_mat,labels=NA, suppress.plot=FALSE, min_detect
 hidden__normalize <- function(data) {
 	# Combine UQ and detection rate adjusted normalization 
 	# Stephanie Hick, Mingziang Teng, Rafael A Irizarry "On the widespread and critical impact of systematic single-cell RNA-Seq data" http://dx.doi.org/10.1101/025528 
-	cell_zero <- colSums(data == 0)/length(data[,1]);
+	cell_zero <- Matrix::colSums(data == 0)/length(data[,1]);
 	uq <- unlist(apply(data,2,hidden__UQ));
 	normfactor <- (uq/median(uq)) * (median(cell_zero)/cell_zero); 
 	data <- t(t(data)/normfactor);
@@ -66,18 +66,18 @@ M3DropCleanData <- function(expr_mat, labels = NA, is.counts=TRUE, suppress.plot
 
 	data_list <- bg__filter_cells(expr_mat, labels, suppress.plot = suppress.plot, min_detected_genes=min_detected_genes);
 	
-        detected <- rowSums(data_list$data > 0) > 3;
+        detected <- Matrix::rowSums(data_list$data > 0) > 3;
         expr_mat <- data_list$data[detected,];
-        detected <- rowSums(data_list$data> 0) > 3;
+        detected <- Matrix::rowSums(data_list$data> 0) > 3;
         expr_mat <- data_list$data[detected,];
 	labels   <- data_list$labels
 
 	spikes <- grep("ercc",rownames(expr_mat), ignore.case=TRUE)
 	if (is.counts) {
 		if (length(spikes) > 1) {
-	                totreads <- colSums(expr_mat[-c(spikes),])
+	                totreads <- Matrix::colSums(expr_mat[-c(spikes),])
 		} else {
-			totreads <- colSums(expr_mat);
+			totreads <- Matrix::colSums(expr_mat);
 		}
                 cpm <- t(t(expr_mat)/totreads)*1000000;
                 lowExpr <- rowMeans(cpm) < 10^-5;

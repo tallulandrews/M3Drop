@@ -1,7 +1,7 @@
 hidden__pca_fs <- function(expr_mat, pcs = c(1,2)) {
 	pca <- prcomp(log(expr_mat+1)/log(2));
 	if (length(pcs) > 1) {
-		score <- rowSums(abs(pca$x[,pcs]))
+		score <- Matrix::rowSums(abs(pca$x[,pcs]))
 	} else {
 		score <- abs(pca$x[,pcs])
 	}
@@ -13,7 +13,7 @@ irlbaPcaFS <- function(expr_mat, pcs=c(2,3)) {
 	#require("irlba")
 	#require("Matrix")
 	norm <- expr_mat
-	nz_genes <- which(rowSums(norm) != 0)
+	nz_genes <- which(Matrix::rowSums(norm) != 0)
 	norm[nz_genes,] <- log(norm[nz_genes,] + 1)/log(2)
 	# Create sparse Matrix
 
@@ -39,7 +39,7 @@ irlbaPcaFS <- function(expr_mat, pcs=c(2,3)) {
 	irlba_pca_res <- irlba::irlba(Matrix::t(norm), nu=0, center=expression_means, scale=sqrt(expression_vars), right_only=TRUE)$v
 	row.names(irlba_pca_res) <- row.names(norm)
 	if (length(pcs) > 1) {
-		score <- rowSums(abs(irlba_pca_res[, pcs]))
+		score <- Matrix::rowSums(abs(irlba_pca_res[, pcs]))
 	} else {
 		score <- abs(irlba_pca_res[, pcs])
 	}
@@ -118,7 +118,7 @@ hidden__ginifs_simple <- function(expr_mat) {
 
 giniFS <- function(expr_mat, suppress.plot=TRUE) {
 	# GiniClust
-	expr_mat <- expr_mat[rowSums(expr_mat) > 0,]
+	expr_mat <- expr_mat[Matrix::rowSums(expr_mat) > 0,]
 	#require("reldist")
 	ginis <- apply(expr_mat, 1, reldist::gini)
 	max_expr <- apply(expr_mat, 1, max)
@@ -194,7 +194,7 @@ Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=nrow(counts)
 		if (is.null(dim(norm))) {
 			if (length(norm) < ncol(counts)) {
 				# apply CPM
-				sf <- colSums(counts[!is.spike,])
+				sf <- Matrix::colSums(counts[!is.spike,])
 			} else {
 				sf <- norm
 			}
@@ -206,7 +206,7 @@ Consensus_FS <- function(counts, norm=NA, is.spike=rep(FALSE, times=nrow(counts)
 	if (ncol(counts) < 1000) {
 		row_vars <- (rowMeans(counts^2)-rowMeans(counts)^2);
 	} else {
-		row_vars <- rowSums(counts);
+		row_vars <- Matrix::rowSums(counts);
 	}
 	invariant <- row_vars == 0;
 	counts <- counts[!invariant,]
