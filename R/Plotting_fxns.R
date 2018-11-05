@@ -72,6 +72,7 @@ bg__highlight_genes <- function (base_plot, expr_mat, genes, col="darkorange", p
 }
 
 bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels=NA, key_genes=genes, key_cells=NA) { 
+	par_orig <- par()
 	#require("RColorBrewer")
 	#require("gplots")
 	if(!is.numeric(genes)) {
@@ -155,6 +156,7 @@ bg__expression_heatmap <- function (genes, expr_mat, cell_labels=NA, gene_labels
 	if (!is.na(cell_labels[1])) {
 		legend("left", mylegend$names, pt.bg = mylegend$fill,bg="white",col="black", pch=22, pt.cex=2.5, cex=1.25, bty="n",y.intersp = 2);
 	}
+	suppressWarnings(par(par_orig))
 	invisible(heatmap_output);
 }
 
