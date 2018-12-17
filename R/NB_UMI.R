@@ -473,38 +473,6 @@ unfinished__nbGroupDE <- function(counts, fit, groups) {
 	return(output);
 }
 
-
-broken__nbCGroupDE <- function(counts, fit, groups) {
-	# Seg faults!
-	if (!is.factor(groups)) {
-		groups <- factor(groups);
-	}
-	vals <- fit$vals;
-	size_g <- fit$sizes
-	nc = length(counts[1,]);
-	ng = length(counts[,1]);
-	group_specific_factor <- aggregate(t(counts), by=list(groups), sum)
-	rownames(group_specific_factor) <- group_specific_factor[,1]
-	group_specific_factor <- group_specific_factor[,-1]
-	group_specific_factor <- t(group_specific_factor)
-	group_specific_tjs <- group_specific_factor; 
-	group_total <- Matrix::colSums(group_specific_tjs)
-	group_specific_factor <- t(t(group_specific_tjs)/group_total) / (vals$tjs/vals$total) # Relative expression level in group vs across whole dataset.
-	group_specific_factor[vals$tjs == 0,] <- rep(1, length(group_specific_factor[1,]))
-
-	coeffs <- NBumiFitDispVsMean(fit, suppress.plot=TRUE);
-	pvals <- rep(-0.1, times=vals$ng);
-
-	out <- .C("loglikehood_nbumi", as.integer(as.matrix(round(counts))), as.double(fit$mus), as.integer(groups), as.double(group_specific_factor), as.double(size_g), as.integer(nc), as.integer(ng), as.double(coeffs[2]), as.double(pvals));
-
-	pvals = out[[5]];
-	# Format output.
-	output <- cbind(group_specific_factor, pvals, p.adjust(pvals, method="fdr"));
-	rownames(output) <- rownames(counts);
-	colnames(output) <- c(colnames(group_specific_factor), "p.value","q.value")
-	return(output);
-}
-
 hidden_nbImputeZeros <- function(counts, fit) {
 	vals <- fit$vals
 	for (i in 1:nrow(counts)) {
