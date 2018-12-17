@@ -122,47 +122,6 @@ unfinished__m3dTraditionalDE <- function(expr_mat, groups, batches=rep(1, times=
 }
 
 
-broken__m3dCTraditionalDE <- function(expr_mat, groups, fdr=0.05) {
-	# Seg faults!
-	# Check Input
-	if ( length(groups) != length(expr_mat[1,])) {
-		stop("Error: length of groups must match number of cells (columns of expr_mat)");
-	}
-	if (!is.matrix(expr_mat)) {
-		expr_mat <- as.matrix(expr_mat);
-	}
-	if (!is.factor(groups)) {
-		groups <- factor(groups);
-	}
-	ngroup = length(levels(groups));
-	ng = length(expr_mat[,1]);
-	nc = length(expr_mat[,2]);
-
-	# Fit K & Disp
-	Ks <- hidden_get_K(expr_mat)
-	DispFits <- hidden__cv2coeffs(expr_mat)
-
-	Ms <- rowMeans(expr_mat, na.rm=T)
-	Mis <- by(t(expr_mat), groups, colMeans)
-	Mis <- matrix(unlist(Mis), ncol=ngroup)
-	colnames(Mis) <- levels(groups);
-
-	# Do tests in C
-	prob <- rep(-0.1, times=ng);
-
-	out <- .C("loglikehood_m3d", as.integer(round(expr_mat)), as.double(Ms), as.integer(groups), as.double(Mis), as.integer(nc), as.integer(ng), as.double(DispFits), as.double(Ks));
-#	out <- .C("loglikehood_m3d", as.integer(as.matrix(round(expr_mat))), as.double(Ms), as.integer(ng));
-	
-	pvalues <- out[[2]];
-	#### --------- ####
-
-	AllOut <- cbind(Mis, pvalues, p.adjust(pvalues, method="fdr"));
-	rownames(AllOut) <- rownames(expr_mat)
-	colnames(AllOut) <- c(levels(factor(groups)), "p.value", "q.value")
-	AllOut <- AllOut[AllOut[,length(AllOut[1,])] < fdr,]
-	return(AllOut);
-}
-
 unfinished__m3dTraditionalDEShiftDisp <- function(expr_mat, groups, batches=rep(1, times=length(expr_mat[1,])), fdr=0.05) {
 	# Batch specific mean-variance, gene-specific variance.
 	# Check Input
