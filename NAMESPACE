@@ -1,4 +1,3 @@
-useDynLib(M3Drop)
 exportPattern("M3Drop*")
 exportPattern("NBumi*")
 exportPattern("bg__*")
