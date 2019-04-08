@@ -27,3 +27,6 @@ OR
 >biocLite("M3DExampleData")
 
 Read More: DOI: 10.1101/065094
+
+Citation:
+Amdrews, TS and Hemberg, M. (2018) M3Drop:dropout-based feature selection for scRNASeq. Bioinformatics, bty1044. https://doi.org/10.1093/bioinformatics/bty1044
