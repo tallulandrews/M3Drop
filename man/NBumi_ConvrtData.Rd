@@ -19,20 +19,34 @@
 	You must have loaded the respective packages (in parentheses) into your namespace before running this function on the respective objects. Note that to maintain scalability sparse matrices will remain as such.
 
 	Supported classes/objects:
-		SCESet (scater <= 1.4.0) : uses "counts" or if unavailable then "exprs" 
-		SingleCellExperiment (scater >= 1.6.0) : uses "counts", if unavailable then "logcounts", which is assumed to be log-normalized.
-		CellDataSet (monocle) : uses "exprs", specify log/counts using arguments
-		ExpressionSet (Biobase) : uses "exprs", specify log/counts using arguments
-		seurat (Seurat) : uses "raw.data" as counts.
+		\describe{
 
+		\item{SCESet (scater <= 1.4.0)}{uses "counts" or if unavailable then "exprs"}
+
+		\item{SingleCellExperiment (scater >= 1.6.0)} {uses "counts", if unavailable then "logcounts", which is assumed to be log-normalized.}
+
+		\item{CellDataSet (monocle)} {uses "exprs", specify log/counts using arguments}
+
+		\item{ExpressionSet (Biobase)} {uses "exprs", specify log/counts using arguments}
+
+		\item{seurat (Seurat)}{uses "raw.data" as counts.}
+		}
 		Matrix/Dataframe classes :
-		dgCMatrix (Matrix) : specify log/counts using arguments
-		data.table (data.table) : specify log/counts using arguments
-		DataTable (S4Vectors) : specify log/counts using arguments
-		DataFrame (S4Vectors): specify log/counts using arguments
-		AnnotatedDataFrame (Biobase) : specify log/counts using arguments
-		matrix (base-r) : specify log/counts using arguments
-		data.frame (base-r) : specify log/counts using arguments
+		\describe{
+		\item{dgCMatrix (Matrix)} {specify log/counts using arguments}
+
+		\item{data.table (data.table)} {specify log/counts using arguments}
+
+		\item{DataTable (S4Vectors)} {specify log/counts using arguments}
+
+		\item{DataFrame (S4Vectors)}{specify log/counts using arguments}
+
+		\item{AnnotatedDataFrame (Biobase)} {specify log/counts using arguments}
+
+		\item{matrix (base-r)} {specify log/counts using arguments}
+
+		\item{data.frame (base-r)} {specify log/counts using arguments}
+		}
 
 	Counts are rounded up to integers if necessary, if counts are 
 	unavailable then this will attempt to convert log2 normalized expression
