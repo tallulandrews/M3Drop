@@ -32,7 +32,10 @@ M3DropConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=
 		# New scater
 		c <- which(names(input@assays) == "counts")
 		ln <- which(names(input@assays) == "logcounts")
-		if (length(ln) > 0) {
+		norm <- which(names(input@assays) == "normcounts")
+		if (length(norm) > 0) {
+			return(remove_undetected_genes(input));
+		} else if (length(ln) > 0) {
 			lognorm <- input@assays[[ln]]
 		} else if (length(c) > 0) {
 			counts <- input@assays[[c]]
