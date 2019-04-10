@@ -8,7 +8,7 @@ NBumiHVG <- function(counts, fit, fdr_thresh=0.05, suppress.plot=FALSE, method=c
 	if (method[1] == "DANB") {
 		#fit <- NBumiFitModel(counts);
 		mu_obs <- fit$vals$tjs/n
-		v_obs <- mus_obs + mus_obs^2/fit$size
+		v_obs <- mu_obs + mu_obs^2/fit$size
 	} else {
 		mu_obs <- Matrix::rowMeans(counts)
 		v_obs <- Matrix::rowSums((counts-mu_obs)^2)/(n-1)
