@@ -24,8 +24,8 @@ NBumiCoexpression <- function(counts, fit, gene_list=NULL, method=c("both", "on"
 	lib.size <- fit$vals$tis;
 
 	Z_mat <- matrix(-1, ncol=length(pd_gene), nrow=length(pd_gene));
-	for(i in 1:length(pd_gene)) {
-		for (j in (i):length(pd_gene)) {
+	for(i in 1:nrow(pd_gene)) {
+		for (j in (i):nrow(pd_gene)) {
 			p_g1 <- pd_gene[i,];
 			p_g2 <- pd_gene[j,];	
 			expr_g1 <- counts[rownames(counts)==rownames(pd_gene)[i],]
