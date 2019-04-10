@@ -2,14 +2,13 @@ NBumiHVG <- function(counts, fit, fdr_thresh=0.05, suppress.plot=FALSE, method=c
 	# v of v : https://math.stackexchange.com/questions/72975/variance-of-sample-variance
 	# Moments of NB: http://mathworld.wolfram.com/NegativeBinomialDistribution.html
 
-	require("Matrix")
 	n <- ncol(counts);
 	
 	# DANB model
 	if (method[1] == "DANB") {
 		#fit <- NBumiFitModel(counts);
 		mu_obs <- fit$vals$tjs/n
-		v_obs <- mus + mus^2/fit$size
+		v_obs <- mus_obs + mus_obs^2/fit$size
 	} else {
 		mu_obs <- Matrix::rowMeans(counts)
 		v_obs <- Matrix::rowSums((counts-mu_obs)^2)/(n-1)
