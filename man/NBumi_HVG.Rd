@@ -1,8 +1,8 @@
 \name{NBumiHVG}
 \alias{NBumiHVG}
-\title{Variance-based Feature Selection}
+\title{Variance-based Feature Selection Accounting for Library Size and Sample Variance}
 \description{
-	Ranks genes by residual dispersion from mean-dispersion power-law relationship.
+	Tests for significantly high variability in droplet-based datasets.
 }
 \usage{
 	NBumiHVG(counts, fit, fdr_thresh=0.05, suppress.plot=FALSE, method=c("DANB", "basic"))
@@ -38,3 +38,7 @@
 \keyword{single cell}
 \keyword{feature selection}
 \keyword{depth-adjusted negative binomial}
+\references{
+	[1] Svensson, V. (2019) Droplet scRNA-seq is not zero-inflated. bioRxiv. doi: https://doi.org/10.1101/582064
+	[2] Rose, C. and Smith, M. D. Mathematical Statistics with Mathematica. New York: Springer-Verlag, 2002. p264
+}

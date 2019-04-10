@@ -28,7 +28,10 @@ NBumiHVG <- function(counts, fit, fdr_thresh=0.05, suppress.plot=FALSE, method=c
 	mu4 <- r*(1-p)*(6-6*p+p^2+3*r-3*p*r)/(p^4)
 	sigma2 <- r*(1-p)/(p^2)
 
-	v_of_v <- mu4/n - (sigma2^2*(n-3)/(n*n-1))
+	#v_of_v <- mu4/n - (sigma2^2*(n-3)/(n*(n-1)) #https://math.stackexchange.com/questions/72975/variance-of-sample-variance
+
+	v_of_v <- mu4*(n-1)^2/n^3 - (sigma2^2*(n-3)*(n-1))/(n^3) #http://mathworld.wolfram.com/SampleVarianceDistribution.html
+
 	z <- (v_obs - sigma2)/sqrt(v_of_v)
 	p <- pnorm(z, lower.tail=FALSE)
 	q <- p.adjust(p, method="fdr")
