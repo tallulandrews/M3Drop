@@ -533,12 +533,12 @@ NBumiConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=1
 
 	} else if (type == "SingleCellExperiment") {
 		# New scater
-		c <- which(names(input@assays) == "counts")
-		ln <- which(names(input@assays) == "logcounts")
+		c <- which(names(assays(input)) == "counts")
+		ln <- which(names(assays(input)) == "logcounts")
 		if (length(c) > 0) {
-			counts <- input@assays[[c]]
+			counts <- assays(input)[[c]]
 		} else if (length(ln) > 0) {
-			lognorm <- input@assays[[ln]]
+			lognorm <- assays(input)[[ln]]
 		} else {
 			stop("Error: Recognized SingleCellExperiment object but cannot find either counts or lognorm expression.")
 		}

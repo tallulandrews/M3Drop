@@ -30,15 +30,15 @@ M3DropConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=
 
 	} else if (type == "SingleCellExperiment") {
 		# New scater
-		c <- which(names(input@assays) == "counts")
-		ln <- which(names(input@assays) == "logcounts")
-		norm <- which(names(input@assays) == "normcounts")
+		c <- which(names(assays(input)) == "counts")
+		ln <- which(names(assays(input)) == "logcounts")
+		norm <- which(names(assays(input)) == "normcounts")
 		if (length(norm) > 0) {
 			return(remove_undetected_genes(input));
 		} else if (length(ln) > 0) {
-			lognorm <- input@assays[[ln]]
+			lognorm <- assays(input)[[ln]]
 		} else if (length(c) > 0) {
-			counts <- input@assays[[c]]
+			counts <- assays(input)[[c]]
 		} else {
 			stop("Error: Recognized SingleCellExperiment object but cannot find either counts or lognorm expression.")
 		}
