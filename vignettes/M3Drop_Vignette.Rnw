@@ -46,6 +46,8 @@ $S_{i}$ is the mean expression of gene $i$ and $K$ is the Michaelis constant.
 This model fits observed single-cell RNASeq data which have been sequenced to 
 near saturation (i.e. >100,000 reads per cell). 
 
+Note: This model works well for Smartseq2 and other single-cell datasets that do not use unique molecular identifiers (UMIs). For 10X Chromium data or other UMI tagged data see the NBumi model below.
+
 We'll be using a portion of the Deng et al. (2014) dataset in this example. You can download the R-package containing this data (M3DExampleData) from Bioconductor using biocLite().
 <<results=hide>>=
 library(M3Drop)
@@ -182,6 +184,33 @@ NBDropFS <- NBumiFeatureSelectionCombinedDrop(DANB_fit, method="fdr", qval.thres
 @
 \textbf{Figure 4}: Dropout-based feature selection using DANB
 \end{center}
+
+\subsection*{Pearson Residuals}
+Pearson residuals have recently been proposed as an alternative normalization approach for UMI tagged single-cell RNAseq data. (https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02451-7)
+
+We have added two option for calculating Pearson residuals using the DANB model presented here:
+
+<<>>=
+pearson1 <- NBumiPearsonResiduals(count_mat, DANB_fit)
+pearson2 <- NBumiPearsonResidualsApprox(count_mat, DANB_fit)
+@
+
+If you have not fit the DANB model to the data, you can run each of these functions directly on the count matrix alone, and the required model fitting will be performed as part of the function. In this case the NBumiPearsonResidualsApprox function will be much quicker since it does not fit the dispersion parameter of the DANB model, only the mean, and approximates the Pearson residuals as if the data was Poisson distributed:
+
+$$p_{approx} = \frac{x_{ij}-mu_{ij}}{\sqrt{mu_{ij}}}$$
+
+Where $x_{ij}$ is the observed umi counts.
+
+Whereas the NBumiPearsonResiduals function calculates the Pearson residuals using the full DANB model as:
+
+$$p_{exact} = \frac{x_{ij}-mu_{ij}}{\sqrt{mu_{ij} + \frac{mu_{ij}^2}{r_i}}}$$
+
+We do not perform any trimming or clipping of the residuals. To perform $\sqrt{n}$ clipping as per Hafemeister and Satija, simple run the following additional steps:
+
+<<>>=
+pearson1[pearson1 > sqrt(ncol(count_mat))] <- sqrt(ncol(count_mat))
+pearson1[pearson1 < -sqrt(ncol(count_mat))] <- -1*sqrt(ncol(count_mat))
+@
 
 
 \section*{Other Feature Selection Methods}

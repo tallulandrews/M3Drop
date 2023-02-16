@@ -89,3 +89,27 @@ M3DropCleanData <- function(expr_mat, labels = NA, is.counts=TRUE, suppress.plot
         data<-expr_mat[!lowExpr,];
         return(list(data=expr_mat, labels=labels));
 }
+
+#### Pearson Residuals ####
+# February 16, 2023
+
+NBumiPearsonResiduals <- function(counts, fits=NULL) {
+	if (is.null(fits)) {
+		fits <- NBumiFitModel(counts)
+	}
+	mus <- t(t(fits$vals$tjs/fits$vals$total)) %*% fits$vals$tis
+	pearson <- (counts-mus)/sqrt(mus + mus^2/fits$sizes)
+	return(pearson)
+}
+
+NBumiPearsonResidualsApprox <- function(counts, fits=NULL) {
+	if (is.null(fits)) {
+		vals <- hidden_calc_vals(counts);
+	} else {
+		vals <- fits$vals
+	}
+	mus <- t(t(vals$tjs/vals$total)) %*% vals$tis
+	pearson <- (counts-mus)/sqrt(mus)
+	return(pearson)
+}
+#############################

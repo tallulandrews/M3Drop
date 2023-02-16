@@ -1,12 +1,12 @@
 Package: M3Drop
-Version: 3.10.5
-Date: 2019-04-10
+Version: 3.10.6
+Date: 2023-02-16
 Title: Michaelis-Menten Modelling of Dropouts in single-cell RNASeq
 Author: Tallulah Andrews <tallulandrews@gmail.com>
 Maintainer: Tallulah Andrews <tallulandrews@gmail.com>
 Depends: R (>= 3.4), numDeriv
 Imports: RColorBrewer, gplots, bbmle, statmod, grDevices, graphics, stats, matrixStats, Matrix, irlba, reldist, Hmisc, methods
-Suggests: ROCR, knitr, M3DExampleData, scater, SingleCellExperiment, monocle, Seurat, Biobase
+Suggests: ROCR, knitr, M3DExampleData, scater, SingleCellExperiment, Seurat, Biobase
 VignetteBuilder: knitr
 biocViews: RNASeq, Sequencing, Transcriptomics, GeneExpression, Software, DifferentialExpression, DimensionReduction, FeatureExtraction
 Collate: basics.R Plotting_fxns.R Curve_fitting.R Extremes.R Normalization.R Brennecke_implementation.R Threeway_ProportionalArea_VennDiagrams.R Simulations_Functions.R Traditional_DE.R NB_UMI.R M3D_Imputation.R Other_FS_functions.R DANB_HVG.R DANB_Coexpression.R

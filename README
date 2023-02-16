@@ -1,12 +1,15 @@
-M3Drop - Michaelis-Menten Modelling of Dropouts for scRNASeq
+# M3Drop - Michaelis-Menten Modelling of Dropouts for scRNASeq
 
 This is an R package providing functions for fitting a modified Michaelis-Menten (MM) equation to the pattern of dropouts observed in a single-cell sequencing experiment. As well as the Depth-Adjusted Negative Binomial (DANB) model which is tailored for datasets quantified using unique molecular identifiers (UMIs).
 
 Functions are provided for fitting each model as well as performing dropout-based feature selection. These can be used to reduce technical noise in downstream analyses such as clustering or pseudotime analysis.
 
+Update 2023-02-16 :
+New functions: NBumiPearsonResiduals and NBumiPearsonResidualsApprox enable the calculation of pearson residuals using the depth-adjusted negative binomial model. Pearson residuals have recently been suggested as an alternative normalization strategy for single-cell RNAseq data see: https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02451-7#S
+
 For comparison, the algorithm presented in Brennecke et al (2015) for detection of significantly highly variable genes is included.
 
-Installation :
+## Installation :
 
 >require("devtools")
 >install_github('tallulandrews/M3Drop')
@@ -28,5 +31,5 @@ OR
 
 Read More: DOI: 10.1101/065094
 
-Citation:
+## Citation:
 Amdrews, TS and Hemberg, M. (2018) M3Drop:dropout-based feature selection for scRNASeq. Bioinformatics, bty1044. https://doi.org/10.1093/bioinformatics/bty1044

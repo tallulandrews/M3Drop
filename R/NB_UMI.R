@@ -1,3 +1,21 @@
+## Cell-type DANB ##
+# fit variances with contribution from global mean~var relationship for small clusters. 
+#Copyright (c) 2015, 2016 Genome Research Ltd .
+#Author : Tallulah Andrews <tallulandrews@gmail.com>
+#This file is part of M3Drop.
+
+#M3Drop is free software : you can redistribute it and/or modify it under
+#the terms of the GNU General Public License as published by the Free Software
+#Foundation; either version 2 of the License, or (at your option) any later
+#version.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT
+#ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License along with
+#this program . If not , see <http://www.gnu.org/licenses/>.
+
 #### Fitting #####
 hidden_calc_vals <- function(counts) {
         if (sum(counts < 0) >0) {stop("Expression matrix contains negative values! Please provide raw UMI counts!")}
@@ -221,6 +239,8 @@ bg__fit_size_to_var <- function(obs, mu_vec, max_size, min_size=10^-10, converge
        warning("Fitting size did not converge.");
        return(size_fit);
 }
+
+
 
 #### Dispersion vs Mean & Feature Selection ####
 NBumiFitDispVsMean <- function(fit, suppress.plot=TRUE) {
@@ -504,23 +524,6 @@ NBumiImputeNorm <- function(counts, fit, total_counts_per_cell=median(fit$vals$t
 	return(norm);
 }
 
-## Cell-type DANB ##
-# fit variances with contribution from global mean~var relationship for small clusters. 
-#Copyright (c) 2015, 2016 Genome Research Ltd .
-#Author : Tallulah Andrews <tallulandrews@gmail.com>
-#This file is part of M3Drop.
-
-#M3Drop is free software : you can redistribute it and/or modify it under
-#the terms of the GNU General Public License as published by the Free Software
-#Foundation; either version 2 of the License, or (at your option) any later
-#version.
-
-#This program is distributed in the hope that it will be useful, but WITHOUT
-#ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-#You should have received a copy of the GNU General Public License along with
-#this program . If not , see <http://www.gnu.org/licenses/>.
 
 NBumiConvertData <- function(input, is.log=FALSE, is.counts=FALSE, pseudocount=1) {
 	type <- class(input)[1]
