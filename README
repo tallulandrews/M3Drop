@@ -10,25 +10,28 @@ New functions: NBumiPearsonResiduals and NBumiPearsonResidualsApprox enable the 
 For comparison, the algorithm presented in Brennecke et al (2015) for detection of significantly highly variable genes is included.
 
 ## Installation :
-
->require("devtools")
->install_github('tallulandrews/M3Drop')
-
+```r
+require("remotes")
+install_github('tallulandrews/M3Drop')
+```
 OR
-
->source("https://bioconductor.org/biocLite.R")
->biocLite("M3Drop")
-
+```r
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("M3Drop")
+```
 Example Data:
-
->require("devtools")
->install_github('tallulandrews/M3DExampleData')
-
+```r
+require("remotes")
+install_github('tallulandrews/M3DExampleData')
+```
 OR
 
->source("https://bioconductor.org/biocLite.R")
->biocLite("M3DExampleData")
-
+```r
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("M3DExapleData")
+```
 Read More: DOI: 10.1101/065094
 
 ## Citation:
